@@ -669,6 +669,7 @@ export function EventView() {
                       }
                     >
                       <tbody>
+
                         <For each={eventDetails()!}>
                           {(e) => (
                             <>
@@ -777,6 +778,7 @@ export function EventView() {
                       {/* Object Cards */}
                       <Row>
                         <For each={[objectColumns.col1, objectColumns.col2]}>
+                          
                           {(col) => (
                             <>
                               <Col class={"col-sm-12 col-md-6"}>
@@ -784,7 +786,9 @@ export function EventView() {
                                   {(o) => (
                                     <>
                                       <Card class={"m-2 event-detail-card"}>
+                                
                                         <Card.Header>{o.title}</Card.Header>
+                                   
                                         <Card.Body class={"p-0"}>
                                           <table
                                             class={
@@ -1497,18 +1501,45 @@ function History(props: {
                 </For>
               </ul>
             </div>
-            <Show when={!props.showCommentForm}>
+            {/* <Show when={!props.showCommentForm}>
               <div class="card-footer">
                 <div class="text-end">
                   <button
                     class="btn btn-primary"
                     onClick={() => props.setShowCommentForm(true)}
                   >
-                    Add Comment
+                    Check File
                   </button>
                 </div>
               </div>
-            </Show>
+            </Show> */}
+              {/* <Show when={!props.showCommentForm}>
+              <div class="card-footer">
+                <div class="d-flex justify-content-center" style="gap: 30rem;">
+                  <button
+                    class="btn btn-primary"
+                    onClick={() => {
+                      //alert(objectColumns.col1);
+                      //props.setShowCommentForm(true)
+                    }}
+                  >
+                    Check DB
+                  </button>
+                  <button
+                  class="btn btn-primary"
+                   onClick={() => {
+                    alert("Check Virus!");
+                    //props.setShowCommentForm(true)
+
+                  }}
+                  >
+                    Check VirusToTal
+                  </button>
+
+                </div>
+              </div>
+            </Show> */}
+            
           </div>
         </div>
       </div>
