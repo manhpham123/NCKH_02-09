@@ -235,15 +235,10 @@ def recognize_from_packet(models, packet_hex, flow_id):
                 attack_label[flow_id][label] = 0
             
     #print(attack_label[flow_id])
+    return labels, socres
     
     #print("Script finished successfully.")
     
-            
-      
-
-    
-
-
 MODEL_DIR = "/home/frblam/NCKH_moi/NCKH_moi/bert-packet-flow/model"
 TOKENIZER_DIR = "/home/frblam/NCKH_moi/NCKH_moi/bert-packet-flow/tokenizer"
 
@@ -282,27 +277,33 @@ def print_result(labels, socres):
             attack_lable[label] = 0
             
     return attack_lable
+def bert_pred(flow_id, collection_name):
+    attack_label = {}
+    model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
+    models = {
+        "tokenizer": tokenizer,
+        "model": model,
+    }
+    flow_payload = read_raw_payload(collection_name, flow_id=flow_id)
+    packets = flow_payload["raw_payload"]
+    top_k = 3
+    for packet in packets:
+        labels, scores = recognize_from_packet(models, packet, flow_payload["flow_id"])
+        for label, score in list(zip(labels, scores))[:top_k]:
+        #print(f"{label} : {score*100:.3f}")
+            if label in attack_label:
+                if score*100 > 50:
+                    attack_label[label] += 1
+                    #print("hello: ", attack_label[flow_id][label])          
+            else:
+                if score*100 > 50:
+                    #print(score*100)
+                    attack_label[label]= 1
+                else :
+                    attack_label[label]= 0
+    return attack_label
+
 def main():
-    # # model files check and download
-    # check_and_download_models(WEIGHT_PATH, MODEL_PATH, REMOTE_PATH)
-
-    # env_id = args.env_id
-
-    # # initialize
-    # if not args.onnx:
-    #     net = ailia.Net(MODEL_PATH, WEIGHT_PATH, env_id=env_id)
-    #     pass
-    # else:
-    #     import onnxruntime
-
-    #     net = onnxruntime.InferenceSession(WEIGHT_PATH)
-
-    # if args.disable_ailia_tokenizer:
-    #     from transformers import AutoTokenizer
-    #     tokenizer = AutoTokenizer.from_pretrained("tokenizer")
-    # else:
-    #     from ailia_tokenizer import BertTokenizer
-    #     tokenizer = BertTokenizer.from_pretrained("./tokenizer/")
     model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
 
     models = {
@@ -320,17 +321,17 @@ def main():
     
     
     
-    for flow in flows:
-        fl_id = flow["flow_id"]
-        stt = int(fl_id[2:])
-        if stt > 1000:
-            packets = flow["raw_payload"]
-            for packet in packets:
-                recognize_from_packet(models, packet, fl_id)
+    # for flow in flows:
+    #     fl_id = flow["flow_id"]
+    #     stt = int(fl_id[2:])
+    #     if stt > 1000:
+    #         packets = flow["raw_payload"]
+    #         for packet in packets:
+    #             lables, scores = recognize_from_packet(models, packet, fl_id)
             
-            print(f"flow_id : {fl_id}" ,attack_label[fl_id])
+    #         print(f"flow_id : {fl_id}" ,attack_label[fl_id])
         
-        
+    print(bert_pred("fl01003", collection_packets))
     
     # for packet_hex in packets:
     #     count += 1
@@ -341,4 +342,4 @@ def main():
         
  
     
-main()
+#main()
