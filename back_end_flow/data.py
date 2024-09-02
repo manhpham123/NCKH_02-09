@@ -392,7 +392,9 @@ def predict_label(collection):
     #df_st['label'] = pred
     df_f['label'] = df_f['label'].map(reverse_label_mapping)
     #df_st['label'] = df_st['label'].map(reverse_label_mapping)
-    df_f['RF'] = pred_proba_percent  # Lưu xác suất dưới dạng danh sách
+   
+    df_f['RF'] = pred_proba_percent
+    print(pred_proba_percent)
     
     
     #AE-mse
@@ -441,10 +443,22 @@ def predict_label(collection):
         flow_id = row['_id'] if '_id' in row else index  # Giả sử '_id' là ID duy nhất trong MongoDB hoặc sử dụng 'index' nếu không có
     # Chỉ thêm dữ liệu nếu flow_id của dòng hiện tại lớn hơn last_flow_id
         if last_flow_id is None or flow_id > last_flow_id:  # Nếu last_flow_id là None (không có bản ghi nào trước đó) hoặc flow_id lớn hơn last_flow_id
-            flowpre_collection.insert_one({
+            # flowpre_collection.insert_one({
+            #     'flow_id': flow_id,
+            #     "PortScan": row["RF"]["PortScan"],
+            #     "DoS slowloris": row["RF"]["DoS slowloris"],  # Chứa xác suất dự đoán của Random Forest (dưới dạng phần trăm)
+            #     "Bruce Force" : row["RF"]["Bruce Force"],
+            #     'MSE_Autoencoder': row['MSE_Autoencoder']  # Chứa MSE của Autoencoder
+            # })
+            
+             flowpre_collection.insert_one({
                 'flow_id': flow_id,
-                'RF': row['RF'],  # Chứa xác suất dự đoán của Random Forest (dưới dạng phần trăm)
-                'MSE_Autoencoder': row['MSE_Autoencoder']  # Chứa MSE của Autoencoder
+                "normal": row["RF"][0],
+                "portscan": row["RF"][1],
+                "dos_slowloris": row["RF"][2],  # Chứa xác suất dự đoán của Random Forest (dưới dạng phần trăm)
+                "bruce_force" : row["RF"][3],
+                'MSE_Autoencoder': row['MSE_Autoencoder'],
+                "time": row["Timestamp"]# Chứa MSE của Autoencoder
             })
 
     #print(df_f)
