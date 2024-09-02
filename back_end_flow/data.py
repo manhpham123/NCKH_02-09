@@ -17,6 +17,7 @@ from sklearn.preprocessing import normalize
 from tensorflow.keras.models import load_model
 from datetime import datetime
 from schema.file import FileNameInput, FileResponse
+from test_bert import bert_pred
 
 
 protocol_numbers = {
@@ -110,6 +111,7 @@ reverse_label_mapping = {value: key for key, value in label_mapping.items()}
 collection = db[f"flow_data_{ip}_{intf_str}"]
 flowpre_collection = db["flow_prediction"]
 collection_alert = db_log["alert"]
+collection_packets = db[f"packet_{ip}_{intf_str}"]
 #load model
 model = joblib.load("random_forest_model_2_9_cic_4label.joblib")
 
@@ -166,11 +168,22 @@ def update_file(filename, collection_name):
     
     result = collection_name.update_one({"filename":filename}, {"$set": {"creation_date": formatted_date}})
     doc = collection_name.find_one({"filename":filename})
-    
-    
     return doc
     
 
+def get_flow_by_id(flow_id):
+    print(flow_id)
+    flow = collection.find_one({"_id": str(flow_id)})
+    predict = flowpre_collection.find_one({"flow_id": str(flow_id)})
+    predict.pop("_id", None)
+    bert_pred_fl = bert_pred(flow_id, collection_packets)
+    
+    combine_flow_pre = {"info": flow,
+                        "pre_rf_ae":predict,
+                        "bert": bert_pred_fl}
+    return combine_flow_pre
+    
+    
 
 def read_all_data(collection_name):
     cursor = collection_name.find()
@@ -419,13 +432,21 @@ def predict_label(collection):
     df_st = df_f[['Source IP', 'Source Port', 'Destination IP', 'Destination Port', 'Protocol', 'Timestamp', 'Flow Duration', 'label']]
 
     
+    # Tìm flow_id cuối cùng đã tồn tại trong collection
+    last_document = flowpre_collection.find_one(sort=[("flow_id", -1)])  # Tìm document cuối cùng theo flow_id
+    last_flow_id = last_document['flow_id'] if last_document else None  # Lấy flow_id cuối cùng, nếu không có thì là None
+
+    # Chạy vòng lặp qua từng hàng trong dataframe df_f
     for index, row in df_f.iterrows():
         flow_id = row['_id'] if '_id' in row else index  # Giả sử '_id' là ID duy nhất trong MongoDB hoặc sử dụng 'index' nếu không có
-        flowpre_collection.insert_one({
-            'flow_id': flow_id,
-            'RF': row['RF'],  # Chứa xác suất dự đoán của Random Forest (dưới dạng phần trăm)
-            'MSE_Autoencoder': row['MSE_Autoencoder']
-        })
+    # Chỉ thêm dữ liệu nếu flow_id của dòng hiện tại lớn hơn last_flow_id
+        if last_flow_id is None or flow_id > last_flow_id:  # Nếu last_flow_id là None (không có bản ghi nào trước đó) hoặc flow_id lớn hơn last_flow_id
+            flowpre_collection.insert_one({
+                'flow_id': flow_id,
+                'RF': row['RF'],  # Chứa xác suất dự đoán của Random Forest (dưới dạng phần trăm)
+                'MSE_Autoencoder': row['MSE_Autoencoder']  # Chứa MSE của Autoencoder
+            })
+
     #print(df_f)
     df_f.drop(columns='MSE_Autoencoder', axis=1)
     
@@ -498,8 +519,8 @@ def get_alert (df_st):
     #print(sum_sql_dos/sum_sql)   
     return l_df_a
    
-
-
+# flow = get_flow_by_id("fl00001")
+# print(flow)
 #print(read_all_data(collection_name=collection_alert))     
 # kq =  get_alert(df_st)
 # print(kq)

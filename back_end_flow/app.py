@@ -32,7 +32,8 @@ num_rows = 0
 collection = db[f"flow_data_{ip}_{intf_str}"]
 collection_alert = db_log["alert"]
 collection_file = db_rule["rule_files"]
-
+flowpre_collection = db["flow_prediction"]
+collection_packets = db[f"packet_{ip}_{intf_str}"]
 
 
 #file para
@@ -102,8 +103,23 @@ async def get_rule_alerts ():
     alearts = read_all_data(collection_name=collection_alert)
     return alearts
 
-    
+@app.get("/line-chart-data", response_model=List[dict])
+async def get_rule_alerts ():
+    pred_data = read_all_data(collection_name=flowpre_collection)
+    return pred_data  
   
+
+@app.get("/get_flow/", response_model=Dict)
+async def get_flow(flow_id: str = Query(...)):
+    try:
+        flow_id = str(flow_id)
+        result = get_flow_by_id(flow_id)
+        return result
+    except Exception as e:
+    # Nếu có lỗi, trả về thông báo lỗi với status code 500
+        raise HTTPException(status_code=500, detail=str(e))
+    
+   
     
 #API: http://127.0.0.1:8000/items/?page=1&limit=10&filter_field=Source%20IP&filter_value=117.18.232.200   
 @app.get("/items/", response_model=Dict)
@@ -344,7 +360,7 @@ async def delete_file(filename: str = Query(...)):
     delete_file_on_client(client_ip, username, password, remote_file_path)
     if response.deleted_count > 0:
         return {"status": 200, "message": "Delete success!"}
-    raise HTTPException(status_code=404, detail=f"There is no file with filename {filename}")\
+    raise HTTPException(status_code=404, detail=f"There is no file with filename {filename}")
         
 @app.get("/rule-client/get_rules/", response_model=str)
 async def get_rule_file(filename: str = Query(...)):
