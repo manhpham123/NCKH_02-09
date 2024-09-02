@@ -1,6 +1,5 @@
 import {NCKHAxiosClient} from './base'
-import { CommonGetAllParams, FileNameParams, CommonSearchAllParams, UpdateRuleParams } from "../constants/types/common.type";
-import { Key } from '../constants/types/key.type';
+import { FileNameParams } from "../constants/types/common.type";
 
 export const RuleApi = {
   addRuleFile: (data: { name: string, content_rule: string }) => {
