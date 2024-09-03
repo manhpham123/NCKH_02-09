@@ -17,8 +17,7 @@ from sklearn.preprocessing import normalize
 from tensorflow.keras.models import load_model
 from datetime import datetime
 from schema.file import FileNameInput, FileResponse
-from test_bert import bert_pred
-
+from test_bert import bert_pred, bert_pred_pt
 
 protocol_numbers = {
     1: "ICMP",          # Internet Control Message Protocol
@@ -176,11 +175,11 @@ def get_flow_by_id(flow_id):
     flow = collection.find_one({"_id": str(flow_id)})
     predict = flowpre_collection.find_one({"flow_id": str(flow_id)})
     predict.pop("_id", None)
-    bert_pred_fl = bert_pred(flow_id, collection_packets)
-    
+    bert_pred_fl = bert_pred_pt(flow_id, collection_packets)
+    top_3 = dict(sorted(bert_pred_fl.items(), key=lambda x: x[1], reverse=True)[:3])
     combine_flow_pre = {"info": flow,
                         "pre_rf_ae":predict,
-                        "bert": bert_pred_fl}
+                        "bert": top_3}
     return combine_flow_pre
     
     
