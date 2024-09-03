@@ -239,8 +239,8 @@ def recognize_from_packet(models, packet_hex, flow_id):
     
     #print("Script finished successfully.")
     
-MODEL_DIR = "/home/frblam/NCKH_moi/NCKH_moi/bert-packet-flow/model"
-TOKENIZER_DIR = "/home/frblam/NCKH_moi/NCKH_moi/bert-packet-flow/tokenizer"
+MODEL_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/bert-packet-flow/model"
+TOKENIZER_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/bert-packet-flow/tokenizer"
 
 def load_model_and_tokenizer(model_dir, tokenizer_dir):
     # Kiểm tra xem model và tokenizer đã tồn tại chưa
@@ -342,4 +342,4 @@ def main():
         
  
     
-#main()
+main()

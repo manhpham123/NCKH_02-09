@@ -103,10 +103,18 @@ async def get_rule_alerts ():
     alearts = read_all_data(collection_name=collection_alert)
     return alearts
 
-@app.get("/line-chart-data", response_model=List[dict])
+@app.get("/line-chart-data", response_model=Dict[str, List[Dict]])
 async def get_rule_alerts ():
-    pred_data = read_all_data(collection_name=flowpre_collection)
-    return pred_data  
+    try: 
+        pred_data = read_all_data(collection_name=flowpre_collection)
+        data = {
+            "data": pred_data
+        }
+        return data  
+    except Exception as e:
+    # Nếu có lỗi, trả về thông báo lỗi với status code 500
+        raise HTTPException(status_code=500, detail=str(e))
+    
   
 
 @app.get("/get_flow/", response_model=Dict)
