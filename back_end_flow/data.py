@@ -196,6 +196,17 @@ def read_all_data(collection_name):
     
     return all_data
 
+def read_all_data_time(collection_name):
+    cursor = collection_name.find().sort("time", 1)
+
+    # Chuyển đổi dữ liệu từ cursor thành danh sách các từ điển (dict)
+    all_data = []
+    for document in cursor:
+        document["_id"] = str(document["_id"])  # Chuyển đổi ObjectId thành chuỗi
+        all_data.append(document)
+    
+    return all_data
+
 
 
 

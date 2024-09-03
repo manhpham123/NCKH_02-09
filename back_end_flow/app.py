@@ -106,7 +106,7 @@ async def get_rule_alerts ():
 @app.get("/line-chart-data", response_model=Dict[str, List[Dict]])
 async def get_rule_alerts ():
     try: 
-        pred_data = read_all_data(collection_name=flowpre_collection)
+        pred_data = read_all_data_time(collection_name=flowpre_collection)
         data = {
             "data": pred_data
         }
