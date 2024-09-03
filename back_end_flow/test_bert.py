@@ -291,25 +291,59 @@ def bert_pred(flow_id, collection_name):
         labels, scores = recognize_from_packet(models, packet, flow_payload["flow_id"])
         for label, score in list(zip(labels, scores))[:top_k]:
         #print(f"{label} : {score*100:.3f}")
-            if label in attack_label:
-                if score*100 > 50:
-                    attack_label[label] += 1
-                    #print("hello: ", attack_label[flow_id][label])          
-            else:
-                if score*100 > 50:
-                    #print(score*100)
-                    attack_label[label]= 1
-                else :
-                    attack_label[label]= 0
+            if label != "Normal":
+                if label in attack_label :
+                    if score*100 > 50:
+                        attack_label[label] += 1
+                        #print("hello: ", attack_label[flow_id][label])          
+                else:
+                    if score*100 > 50:
+                        #print(score*100)
+                        attack_label[label]= 1
+                    else :
+                        attack_label[label]= 0
     return attack_label
 
-def main():
+def bert_pred_pt(flow_id, collection_name):
+    attack_label = {}  # Tạo dictionary để lưu tổng số điểm và số lần xuất hiện của mỗi nhãn
     model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
-
     models = {
         "tokenizer": tokenizer,
         "model": model,
     }
+    flow_payload = read_raw_payload(collection_name, flow_id=flow_id)
+    packets = flow_payload["raw_payload"]
+    top_k = 3
+
+    # Duyệt qua từng packet để dự đoán nhãn
+    for packet in packets:
+        labels, scores = recognize_from_packet(models, packet, flow_payload["flow_id"])
+        for label, score in list(zip(labels, scores))[:top_k]:
+            # Nếu nhãn đã có trong attack_label, cập nhật tổng điểm và số lần xuất hiện
+            if label != "Normal":
+                if label in attack_label:
+                    attack_label[label]["total_score"] += score * 100  # Cộng tổng điểm
+                    attack_label[label]["count"] += 1
+                    
+                else:
+                    # Nếu nhãn chưa có trong attack_label, khởi tạo
+                    attack_label[label] = {"total_score": score * 100, "count": 1}
+
+    # Tính toán trung bình % dự đoán của mỗi nhãn
+    average_attack_label = {}
+    for label, data in attack_label.items():
+        average_attack_label[label] = data["total_score"] / data["count"]  # Tính trung bình
+
+    return average_attack_label  # Trả về kết quả là dictionary chứa trung bình % dự đoán của mỗi nhãn
+
+
+def main():
+    # model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
+
+    # models = {
+    #     "tokenizer": tokenizer,
+    #     "model": model,
+    # }
     print("hello")
     count = 0
     
@@ -324,14 +358,14 @@ def main():
     # for flow in flows:
     #     fl_id = flow["flow_id"]
     #     stt = int(fl_id[2:])
-    #     if stt > 1000:
+    #     if stt > 1127:
     #         packets = flow["raw_payload"]
     #         for packet in packets:
     #             lables, scores = recognize_from_packet(models, packet, fl_id)
             
     #         print(f"flow_id : {fl_id}" ,attack_label[fl_id])
         
-    print(bert_pred("fl01003", collection_packets))
+    print(bert_pred_pt("fl01162", collection_packets))
     
     # for packet_hex in packets:
     #     count += 1
