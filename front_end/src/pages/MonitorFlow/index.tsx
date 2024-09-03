@@ -78,7 +78,7 @@ const MonitorFlow: FC = () => {
       }
     },
     title: {
-      text: 'Thuật Toán 1'
+      text: 'RandomForest'
     },
     xAxis: {
       type: 'linear',
@@ -131,7 +131,7 @@ const MonitorFlow: FC = () => {
           events: {
             click: function () {
               const point = this as any;
-              alert(`Flow ID: ${point.flow_id}`);
+              //alert(`Flow ID: ${point.flow_id}`);
               setSelectedPoint(point);
               navigate(`/flow-details/${point.flow_id}`);
             }
@@ -161,7 +161,7 @@ const MonitorFlow: FC = () => {
       }
     },
     title: {
-      text: 'Thuật Toán 2'
+      text: 'Auto Encoder'
     },
     xAxis: {
       type: 'linear',
@@ -214,7 +214,7 @@ const MonitorFlow: FC = () => {
           events: {
             click: function () {
               const point = this as any;
-              alert(`Flow ID: ${point.flow_id}`);
+              //alert(`Flow ID: ${point.flow_id}`);
               setSelectedPoint(point);
               navigate(`/flow-details/${point.flow_id}`);
             }
