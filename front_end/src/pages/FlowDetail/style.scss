@@ -1,15 +1,64 @@
-.categories-administratives-table-container {
-  .inline-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.container-wrapper {
+  background-color: #f0f2f5; /* Màu nền tổng thể */
 }
 
-.page-container {
-  .ant-card-body .total-Page-SystemParam {
-    position: absolute;
-    bottom: 12px;
-    left: 100px;
-  }
+.card-container {
+  padding: 20px;
+  height: 100vh;
+  background-color: #fff; /* Nền trắng cho card-container */
+}
+
+.table-container {
+  background-color: #fff; /* Nền trắng cho bảng */
+  padding: 10px; /* Thêm padding nếu cần */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Thêm bóng cho phần bảng */
+  max-height: calc(100vh - 20px); /* Chiều cao tối đa trừ padding */
+  overflow-y: auto; /* Hiển thị thanh cuộn dọc nếu cần */
+}
+
+.spacing-between-columns {
+  background-color: #f0f0f0; /* Màu nền xám cho khoảng cách giữa các cột */
+  height: 100%; /* Đảm bảo phần xám phủ toàn bộ chiều cao */
+}
+
+.right-side-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Canh giữa các biểu đồ */
+}
+
+.print-button {
+  margin-bottom: 20px; /* Khoảng cách dưới nút in */
+}
+
+.pie-charts-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 1000px;
+}
+
+.pie-chart {
+  width: 100%; /* Chiều rộng của biểu đồ tròn */
+  height: 400px; /* Chiều cao của biểu đồ tròn */
+  margin-bottom: 20px; /* Khoảng cách giữa các biểu đồ tròn */
+  background-color: #fff; /* Nền trắng cho biểu đồ tròn */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Thêm bóng cho biểu đồ tròn */
+}
+
+.pie-charts-container {
+  display: flex;
+  justify-content: space-between; /* Điều chỉnh căn giữa các biểu đồ tròn */
+}
+
+.pie-chart {
+  flex: 1;
+  margin: 0 10px; /* Tạo khoảng cách giữa các biểu đồ */
+  position: relative;
+  padding: 20px;
+}
+
+.pie-chart canvas {
+  width: 60% !important;
+  height: auto !important;
 }
