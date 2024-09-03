@@ -12,6 +12,7 @@ import ruleDetailsRoute from '../pages/RuleDetail/route'
 import addruleRoute from '../pages/AddFileRule/route'
 import monitorflowRoute from '../pages/MonitorFlow/route'
 import flowdetailsRoute from '../pages/FlowDetail/route'
+import check_fileRoute from '../pages/CheckFile/route'
 // tên route ở đây đặt là gì cũng được
 export default [
   settingRoute,
@@ -27,5 +28,6 @@ export default [
   ruleDetailsRoute,
   addruleRoute ,
   monitorflowRoute,
-  flowdetailsRoute 
+  flowdetailsRoute ,
+  check_fileRoute 
 ];
