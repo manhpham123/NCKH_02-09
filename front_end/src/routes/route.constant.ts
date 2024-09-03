@@ -20,4 +20,5 @@ export const RULE_DETAILS = "/rule-details/:filename";
 export const ADD_FILE = "/add-file";
 export const MONITOR_FLOW = "/monitor-flow";
 export const FLOW_DETAILS = "/flow-details/:id";
+export const CHECK_FILE = "/check-hash";
 
