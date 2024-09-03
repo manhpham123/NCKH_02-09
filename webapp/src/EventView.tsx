@@ -476,6 +476,7 @@ export function EventView() {
     col1: [],
     col2: [],
   });
+ 
 
   createEffect(() => {
     let objects: DisplayObject[] = [];
@@ -1513,7 +1514,9 @@ function History(props: {
                 </div>
               </div>
             </Show> */}
-              {/* <Show when={!props.showCommentForm}>
+
+
+              <Show when={!props.showCommentForm}>
               <div class="card-footer">
                 <div class="d-flex justify-content-center" style="gap: 30rem;">
                   <button
@@ -1538,7 +1541,7 @@ function History(props: {
 
                 </div>
               </div>
-            </Show> */}
+            </Show>
             
           </div>
         </div>

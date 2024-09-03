@@ -64,7 +64,7 @@ export const useListFileRule  = (
 }
 
 export const useMonitorFlow = () => {
-    const {data, error, isLoading, mutate}= useSWR('/monitor-flow', {refreshInterval: 0});
+    const {data, error, isLoading, mutate}= useSWR('/line-chart-data', {refreshInterval: 0});
     return {data,error,isLoading,mutate}
 }
 
