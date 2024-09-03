@@ -12,10 +12,10 @@ const FlowDetails: FC = () => {
 
   const fetchDataFlow = async () => {
 
-    const dataToSend = { 
-      flow_id: id
-  };
-    const res = await FlowApi.GetFlowDetails(dataToSend);
+    const res = await FlowApi.GetFlowDetails({flow_id: id });
+    //console.log(res.data.info)
+    //console.log(res.data.pre_rf_ae)
+    console.log(res.data.bert)
     setDataFlow(res.data);
   }
   useEffect(() => {

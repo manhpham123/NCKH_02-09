@@ -45,6 +45,9 @@ export type UpdateCustomerStatus = {
 export type FileNameParams = {
   filename?: string;
 };
+export type FlowIdParams = {
+  flow_id?: string;
+};
 export type Account = {
   accountId: number,
   ownerName: string,
