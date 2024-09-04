@@ -113,7 +113,7 @@ const MonitorFlow: FC = () => {
         }
       },
       min: 0,
-      max: 100
+      max: 105
     },
     tooltip: {
       shared: true,
