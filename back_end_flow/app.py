@@ -32,7 +32,7 @@ num_rows = 0
 collection = db[f"flow_data_{ip}_{intf_str}"]
 collection_alert = db_log["alert"]
 collection_file = db_rule["rule_files"]
-flowpre_collection = db["flow_prediction"]
+flowpre_collection = db[f"flow_prediction_{ip}_{intf_str}"]
 collection_packets = db[f"packet_{ip}_{intf_str}"]
 
 
@@ -103,13 +103,20 @@ async def get_rule_alerts ():
     alearts = read_all_data(collection_name=collection_alert)
     return alearts
 
-@app.get("/line-chart-data", response_model=Dict[str, List[Dict]])
-async def get_rule_alerts ():
+@app.get("/line-chart-data", response_model=Dict)
+async def get_chart_data():
     try: 
-        pred_data = read_all_data_time(collection_name=flowpre_collection)
+        threshold = 0.0027183422921063186
+        pred_data = read_all_data(collection_name=flowpre_collection)
+        max_mse_entry = max(pred_data, key=lambda x: x["MSE_Autoencoder"])
         data = {
-            "data": pred_data
+            "data": pred_data,
+            "max_mse": max_mse_entry["MSE_Autoencoder"],
+            "threshold": threshold
         }
+        # data = {
+        #     "data": pred_data
+        # }
         return data  
     except Exception as e:
     # Nếu có lỗi, trả về thông báo lỗi với status code 500

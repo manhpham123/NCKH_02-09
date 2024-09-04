@@ -25,7 +25,8 @@ collection_packets = db[f"packet_{ip}_{intf_str}"]
 
 def read_raw_payload(collection_name, flow_id):
     cursor = collection_name.find_one({"flow_id": flow_id})
-
+    if cursor is None:
+        return {}
     # Chuyển đổi dữ liệu từ cursor thành danh sách các từ điển (dict)
     # raw_payload_flow = []
     # for doc in cursor:
@@ -317,17 +318,22 @@ def bert_pred_pt(flow_id, collection_name):
 
     # Duyệt qua từng packet để dự đoán nhãn
     for packet in packets:
-        labels, scores = recognize_from_packet(models, packet, flow_payload["flow_id"])
+        try:
+            labels, scores = recognize_from_packet(models, packet, flow_payload["flow_id"])
+        except ValueError as e:
+            # Bỏ qua packet không phải là TCP/IP
+            print(f"Packet không phải là TCP/IP cho flow_id {flow_id}: {str(e)}")
+            continue
         for label, score in list(zip(labels, scores))[:top_k]:
             # Nếu nhãn đã có trong attack_label, cập nhật tổng điểm và số lần xuất hiện
-            if label != "Normal":
-                if label in attack_label:
-                    attack_label[label]["total_score"] += score * 100  # Cộng tổng điểm
-                    attack_label[label]["count"] += 1
-                    
-                else:
-                    # Nếu nhãn chưa có trong attack_label, khởi tạo
-                    attack_label[label] = {"total_score": score * 100, "count": 1}
+            #if label != "Normal":
+            if label in attack_label:
+                attack_label[label]["total_score"] += score * 100  # Cộng tổng điểm
+                attack_label[label]["count"] += 1
+                
+            else:
+                # Nếu nhãn chưa có trong attack_label, khởi tạo
+                attack_label[label] = {"total_score": score * 100, "count": 1}
 
     # Tính toán trung bình % dự đoán của mỗi nhãn
     average_attack_label = {}
@@ -365,7 +371,7 @@ def main():
             
     #         print(f"flow_id : {fl_id}" ,attack_label[fl_id])
         
-    print(bert_pred_pt("fl01162", collection_packets))
+    #print(bert_pred_pt("fl01247", collection_packets))
     
     # for packet_hex in packets:
     #     count += 1

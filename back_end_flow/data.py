@@ -71,7 +71,8 @@ port_to_protocol = {
 }
 
 #threshold = 0.0006894694064366165
-threshold = 0.0027183422921063186
+#threshold = 0.0027183422921063186
+threshold = 0.0036183422921063186
 
 def get_protocol_name(protocol_number):
     return protocol_numbers.get(protocol_number, "Unknown")
@@ -108,7 +109,7 @@ label_mapping = {"BENIGN": 0, "PortScan":1, "DoS slowloris": 2, "Bruce Force": 3
 reverse_label_mapping = {value: key for key, value in label_mapping.items()}
 
 collection = db[f"flow_data_{ip}_{intf_str}"]
-flowpre_collection = db["flow_prediction"]
+flowpre_collection = db[f"flow_prediction_{ip}_{intf_str}"]
 collection_alert = db_log["alert"]
 collection_packets = db[f"packet_{ip}_{intf_str}"]
 #load model
@@ -185,7 +186,7 @@ def get_flow_by_id(flow_id):
     
 
 def read_all_data(collection_name):
-    cursor = collection_name.find()
+    cursor = collection_name.find().sort("flow_id", 1)
 
     # Chuyển đổi dữ liệu từ cursor thành danh sách các từ điển (dict)
     all_data = []
@@ -438,21 +439,25 @@ def predict_label(collection):
         
         df_f.loc[index, 'label'] = pred_au
         
-        df_f.loc[(df_f["Source Port"] == 27017) | (df_f["Destination Port"] == 27017), 'label'] = "BENIGN"
+        df_f.loc[(df_f["Source Port"] == 27017) | 
+          (df_f["Destination Port"] == 27017) | 
+          ((df_f["Destination IP"] != "192.168.10.5") & 
+         (df_f["Destination IP"] != "192.168.10.10")), 'label'] = "BENIGN"
     
     
     df_st = df_f[['Source IP', 'Source Port', 'Destination IP', 'Destination Port', 'Protocol', 'Timestamp', 'Flow Duration', 'label']]
 
-    
+    df_f['MSE_Autoencoder'] = df_f['MSE_Autoencoder'].apply(lambda x: 0.001 if pd.isna(x) else x)
     # Tìm flow_id cuối cùng đã tồn tại trong collection
     last_document = flowpre_collection.find_one(sort=[("flow_id", -1)])  # Tìm document cuối cùng theo flow_id
     last_flow_id = last_document['flow_id'] if last_document else None  # Lấy flow_id cuối cùng, nếu không có thì là None
-
     # Chạy vòng lặp qua từng hàng trong dataframe df_f
     for index, row in df_f.iterrows():
         flow_id = row['_id'] if '_id' in row else index  # Giả sử '_id' là ID duy nhất trong MongoDB hoặc sử dụng 'index' nếu không có
     # Chỉ thêm dữ liệu nếu flow_id của dòng hiện tại lớn hơn last_flow_id
-        if last_flow_id is None or flow_id > last_flow_id:  # Nếu last_flow_id là None (không có bản ghi nào trước đó) hoặc flow_id lớn hơn last_flow_id
+        if last_flow_id is None or flow_id > last_flow_id:
+     
+            # Nếu last_flow_id là None (không có bản ghi nào trước đó) hoặc flow_id lớn hơn last_flow_id
             # flowpre_collection.insert_one({
             #     'flow_id': flow_id,
             #     "PortScan": row["RF"]["PortScan"],
@@ -460,7 +465,7 @@ def predict_label(collection):
             #     "Bruce Force" : row["RF"]["Bruce Force"],
             #     'MSE_Autoencoder': row['MSE_Autoencoder']  # Chứa MSE của Autoencoder
             # })
-            
+          
              flowpre_collection.insert_one({
                 'flow_id': flow_id,
                 "normal": row["RF"][0],
