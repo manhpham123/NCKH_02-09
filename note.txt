@@ -49,6 +49,9 @@ rule-files:
 + rule tự viết: sudo gedit /var/lib/suricata/rules/local.rules
 + rule sẵn: sudo gedit /var/lib/suricata/rules/suricata.rules
 + tao rule co san: sudo suricata-update
++ Thư mục lưu trữ Rule : cd /var/lib/suricata/rules
++ Đổi tên file rule mặc định : mv suricata.rules custom.rules
++ Lên mogodb tạo 1 file có tên : custom.rules
 - kiêm tra file câu hình:  sudo suricata -T -c /etc/suricata/suricata.yaml -v
 - chạy suricata:  sudo suricata -c /etc/suricata/suricata.yaml -i ens33 
 - file log eve.json : sudo gedit /var/log/suricata/eve.json   

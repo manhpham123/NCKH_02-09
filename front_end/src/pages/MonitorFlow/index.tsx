@@ -196,7 +196,20 @@ const MonitorFlow: FC = () => {
         }
       },
       min: 0,
-      max: 0.05
+      max: 0.05,
+      plotLines: [{
+        color: 'red', // Màu của đường ngang
+        value: 0.0035, // Giá trị trên trục y mà đường sẽ vẽ
+        width: 2, // Độ dày của đường
+        label: {
+          text: 'Ngưỡng 0.0035', // Văn bản hiển thị trên đường
+          align: 'right', // Vị trí của văn bản (left, center, right)
+          style: {
+            color: 'red',
+            fontWeight: 'bold'
+          }
+        }
+      }]
     },
     tooltip: {
       shared: true,
