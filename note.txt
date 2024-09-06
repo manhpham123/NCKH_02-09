@@ -64,6 +64,9 @@ sudo systemctl restart suricata.service
 - test tải file: 192.168.189.128/downloads/yourfile.txt  , bao gồm test mã hash và alert
 - trong thư mục Documents của máy client có file:  suricata.rules
 
+=========
+- ở máy server tạo bảng "hash_md5" trong csdl "hash_malware"
+
 ============================ 1 số rule test
 alert icmp any any -> $HOME_NET any (msg:"co nguoi dang ping"; sid:10000001;)   : rule ping
 alert http any any -> any any (msg:"dang tai file"; sid:10000001;)               : rule tải file

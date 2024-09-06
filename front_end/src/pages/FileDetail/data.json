@@ -1,0 +1,137 @@
+ const data = {
+    
+    "hash": {
+      "md5": "486868aae425e458c56a5a4c6a9fbcf2",
+      "sha1": "ee4b2a2a5992127b71678e82b72d574e54ded8b4",
+      "sha256": "c8440d0baf8343ef5e692d5b09ef495aa4532c9c88cdf1cffd37064e7e1704ed"
+    },
+    "score": "32/59",
+    "malicious_count": 32,
+    "total_engines": 59,
+    "detections": [
+      {
+        "engine_name": "Cynet",
+        "result": "Malicious (score: 85)"
+      },
+      {
+        "engine_name": "FireEye",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "CAT-QuickHeal",
+        "result": "Coinhive.Miner.30698"
+      },
+      {
+        "engine_name": "McAfee",
+        "result": "JS/Miner.ck"
+      },
+      {
+        "engine_name": "Zillya",
+        "result": "Trojan.CoinMiner.JS.3"
+      },
+      {
+        "engine_name": "Sangfor",
+        "result": "Malware"
+      },
+      {
+        "engine_name": "Invincea",
+        "result": "Coinhive JavaScript cryptocoin miner (PUA)"
+      },
+      {
+        "engine_name": "TrendMicro-HouseCall",
+        "result": "Coinminer_COINHIVE.SMF1-JS"
+      },
+      {
+        "engine_name": "Avast",
+        "result": "JS:Miner-AF [PUP]"
+      },
+      {
+        "engine_name": "ClamAV",
+        "result": "Js.Coinminer.Generic-6836639-1"
+      },
+      {
+        "engine_name": "BitDefender",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "NANO-Antivirus",
+        "result": "Riskware.Script.Miner.fmbqgs"
+      },
+      {
+        "engine_name": "MicroWorld-eScan",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "Rising",
+        "result": "Trojan.CoinHive!1.B2E9 (CLASSIC)"
+      },
+      {
+        "engine_name": "Ad-Aware",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "Emsisoft",
+        "result": "Application.BitCoinMiner.AJF (B)"
+      },
+      {
+        "engine_name": "Comodo",
+        "result": "Application.JS.CoinMiner.RA@7u1yex"
+      },
+      {
+        "engine_name": "F-Secure",
+        "result": "PotentialRisk.PUA/CryptoMiner.Gen"
+      },
+      {
+        "engine_name": "DrWeb",
+        "result": "JS.Miner.11"
+      },
+      {
+        "engine_name": "TrendMicro",
+        "result": "Coinminer_COINHIVE.SMF1-JS"
+      },
+      {
+        "engine_name": "Sophos",
+        "result": "Coinhive JavaScript cryptocoin miner (PUA)"
+      },
+      {
+        "engine_name": "Ikarus",
+        "result": "PUA.CoinMiner"
+      },
+      {
+        "engine_name": "Jiangmin",
+        "result": "Trojan.Script.Generic1"
+      },
+      {
+        "engine_name": "Avira",
+        "result": "PUA/CryptoMiner.Gen"
+      },
+      {
+        "engine_name": "Antiy-AVL",
+        "result": "Trojan[Infect]/JS.Miner"
+      },
+      {
+        "engine_name": "Microsoft",
+        "result": "Trojan:Script/Wacatac.C!ml"
+      },
+      {
+        "engine_name": "Arcabit",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "GData",
+        "result": "Script.Application.CoinHive.A"
+      },
+      {
+        "engine_name": "Tencent",
+        "result": "Html.Win32.Script.504241"
+      },
+      {
+        "engine_name": "MAX",
+        "result": "malware (ai score=82)"
+      },
+      {
+        "engine_name": "Fortinet",
+        "result": "JS/Miner.CK!tr"
+      }
+    ]
+  }

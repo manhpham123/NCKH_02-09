@@ -48,6 +48,9 @@ export type FileNameParams = {
 export type FlowIdParams = {
   flow_id?: string;
 };
+export type Md5Params = {
+  md5?: string;
+};
 export type Account = {
   accountId: number,
   ownerName: string,

@@ -1,4 +1,4 @@
-import { Button, Card, Tooltip, Typography } from "antd";
+import { Button, Card, Tooltip, Typography, Modal } from "antd";
 import { FC, useState } from "react";
 import { ColumnsType } from "antd/es/table";
 
@@ -94,16 +94,31 @@ const CheckFileTable: FC = () => {
     "total": 100
   }
   
-  
-  const [isEditSystemParamsModalShow, SetIsEditSystemParamsModalShow] =
-    useState(false);
-  const [selectedRule, setSelectedRule] = useState<any>({});
-  const closeEditSystemParamsModal = () => {
-    SetIsEditSystemParamsModalShow(false);
+  // const [isEditSystemParamsModalShow, SetIsEditSystemParamsModalShow] =
+  //   useState(false);
+  // const [selectedRule, setSelectedRule] = useState<any>({});
+  // const closeEditSystemParamsModal = () => {
+  //   SetIsEditSystemParamsModalShow(false);
+  // };
+  // const openEditSystemParamsModal = (record: any) => {
+  //   SetIsEditSystemParamsModalShow(true);
+  //   setSelectedRule(record);
+  // };
+ 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
+
+  const showModal = (content: JSX.Element) => {
+    setModalContent(content);
+    setIsModalVisible(true);
   };
-  const openEditSystemParamsModal = (record: any) => {
-    SetIsEditSystemParamsModalShow(true);
-    setSelectedRule(record);
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
  
   const columns: ColumnsType<any> = [
@@ -149,17 +164,17 @@ const CheckFileTable: FC = () => {
         </Tooltip>
       ),
     },
-    // {
-    //   key: 5,
-    //   title: "SHA256",
-    //   dataIndex: "sha256",
-    //   align: "center",
-    //   render: (group) => (
-    //     <Tooltip title={group}>
-    //       <div className="inline-text">{group}</div>
-    //     </Tooltip>
-    //   ),
-    // },
+    {
+      key: 5,
+      title: "SHA256",
+      dataIndex: "sha256",
+      align: "center",
+      render: (group) => (
+        <Tooltip title={group}>
+          <div className="inline-text">{group}</div>
+        </Tooltip>
+      ),
+    },
     {
       key: 6,
       title: "Kích Thước (KB)",
@@ -178,31 +193,74 @@ const CheckFileTable: FC = () => {
       width: "20%",
       render: (_, record) => (
         <div>
-          <Button
+          {/* <Button
             type="primary"
             style={{ marginRight: 8 }}
             onClick={() => handleCheckDb(record.md5)}
           >
             Check DB
-          </Button>
+          </Button> */}
           <Button
             type="primary"
-            onClick={() => handleCheckVirusTotal(record.md5)}
+            onClick={() => handleCheckFile(record.md5)}
           >
-            Check VirusTotal
+            Check File
           </Button>
         </div>
       ),
     }
   ];
-  const handleCheckDb = (md5: string) => {
-    console.log("Check DB với mã MD5:", md5);
-    // Thêm logic xử lý khi nhấn "Check DB"
+ 
+const handleCheckFile = (md5: string) => {
+  navigate(`/file-details/${md5}`);
   };
+
+const handleCheckDb = (md5: string) => {
+    alert(md5)
+  
+    //Dữ liệu mẫu trả về thành công
+    // const response = {
+    //   status: "success",
+    //   name: "Trojan.Win32.Emotet.471040.A"
+    // };
+
+    const response = {
+      status: "fail",
+      name: "Không tìm thấy thông tin"
+    };
+    // Kiểm tra xem dữ liệu trả về có thành công không
+    if (response.status === "success") {
+      showModal(
+        <div>
+         <div>
+          <Typography.Title level={3}>Kiểm Tra File Thành Công</Typography.Title>
+         
+            <strong style={{ fontWeight: "normal",fontSize: "18px" }} >Kết quả phát hiện:</strong>{" "}
+            <span style={{ color: "red",fontSize: "18px" }}>{response.name}</span>
+          
+        </div>
+        </div>
+      );
+    } else {
+      showModal(
+        <div>
+        <Typography.Title level={3}>Kiểm Tra File Thất Bại</Typography.Title>
+        <p style={{ fontWeight: "normal",fontSize: "18px" }}>Không tìm thấy thông tin file trong cơ sở dữ liệu.</p>
+      </div>
+      );
+    }
+  };
+  
 
   const handleCheckVirusTotal = (md5: string) => {
     console.log("Check VirusTotal với mã MD5:", md5);
-    // Thêm logic xử lý khi nhấn "Check VirusTotal"
+    showModal(
+      <div>
+      <Typography.Title level={4}>Check VirusTotal</Typography.Title>
+      <p style={{ fontWeight: "normal" }}>MD5: {md5}</p>
+      <p style={{ fontWeight: "normal" }}>Thêm nội dung modal ở đây...</p>
+    </div>
+    );
   };
 
   return (
@@ -213,7 +271,6 @@ const CheckFileTable: FC = () => {
           dataSource={data?.data}
           columns={columns}
           bordered={true}
-          //isLoading={!data && isLoading}
           isLoading={isLoading}
           limit={params.limit || 15 }
           total={data?.total}
@@ -226,6 +283,17 @@ const CheckFileTable: FC = () => {
           page={params.page || 1}
         />
       </Card>
+      <Modal
+      title={<Typography.Title level={3}>Thông Tin Kiểm Tra File</Typography.Title>} // Tăng kích thước tiêu đề
+      visible={isModalVisible}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      width={800} // Tăng kích thước modal
+      style={{ borderRadius: "10px", overflow: "hidden" }} // Thêm phong cách cho modal
+      bodyStyle={{ height: "200px", overflowY: "auto" }} // Tăng chiều cao của nội dung modal và cho phép cuộn
+    >
+      {modalContent}
+      </Modal>
     </div>
   );
 };

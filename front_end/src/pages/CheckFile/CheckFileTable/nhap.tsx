@@ -1,8 +1,8 @@
-import { Button, Card, Tooltip, Typography } from "antd";
+import { Button, Card, Tooltip, Typography, Modal } from "antd";
 import { FC, useState } from "react";
 import { ColumnsType } from "antd/es/table";
 
-import "./style.scss";
+import "./style.scss"; // Bổ sung thêm CSS của bạn vào đây
 import TableCustom from "../../../components/TableCustom";
 import { CommonGetAllParams } from "../../../constants/types/common.type";
 import CardTitleCustom from "../../../components/CardTitleCustom";
@@ -17,112 +17,70 @@ const CheckFileTable: FC = () => {
 
   const isLoading = false;
   const data = {
-    "data": [
-      // Dữ liệu mock của bạn
+    data: [
+      //... dữ liệu file mẫu
     ],
-    "limit": 10,
-    "page": 1,
-    "total": 100
-  }
+    limit: 10,
+    page: 1,
+    total: 100,
+  };
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
+
+  const showModal = (content: JSX.Element) => {
+    setModalContent(content);
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   const columns: ColumnsType<any> = [
-    {
-      key: 1,
-      title: "Số Thứ Tự",
-      align: "center",
-      width: "10%",
-      render: (_, record, index) => {
-        return index + 1;
-      },
-    },
-    {
-      key: 2,
-      title: "Tên File",
-      dataIndex: "filename",
-      align: "center",
-      render: (group) => (
-        <Tooltip title={group}>
-          <div className="inline-text">{group}</div>
-        </Tooltip>
-      ),
-    },
-    {
-      key: 3,
-      title: "MD5",
-      dataIndex: "md5",
-      align: "center",
-      render: (group) => (
-        <Tooltip title={group}>
-          <div className="inline-text">{group}</div>
-        </Tooltip>
-      ),
-    },
-    {
-      key: 4,
-      title: "SHA1",
-      dataIndex: "sha1",
-      align: "center",
-      render: (group) => (
-        <Tooltip title={group}>
-          <div className="inline-text">{group}</div>
-        </Tooltip>
-      ),
-    },
-    {
-      key: 5,
-      title: "SHA256",
-      dataIndex: "sha256",
-      align: "center",
-      render: (group) => (
-        <Tooltip title={group}>
-          <div className="inline-text">{group}</div>
-        </Tooltip>
-      ),
-    },
-    {
-      key: 6,
-      title: "Kích Thước",
-      dataIndex: "size",
-      align: "center",
-      render: (group) => (
-        <Tooltip title={group}>
-          <div className="inline-text">{group}</div>
-        </Tooltip>
-      ),
-    },
-    {
-      key: 7,
-      title: "Hành Động",
-      align: "center",
-      width: "20%",
-      render: (_, record) => (
-        <div>
-          <Button
-            type="primary"
-            style={{ marginRight: 8 }}
-            onClick={() => handleCheckDb(record.md5)}
-          >
-            Check DB
-          </Button>
-          <Button
-            type="default"
-            onClick={() => handleCheckVirusTotal(record.md5)}
-          >
-            Check VirusTotal
-          </Button>
-        </div>
-      ),
-    },
+    //... Các cột của bảng như trong mã gốc
   ];
 
   const handleCheckDb = (md5: string) => {
-    console.log("Check DB với mã MD5:", md5);
-    // Thêm logic xử lý khi nhấn "Check DB"
+    // Dữ liệu mẫu trả về thành công
+    const response = {
+      status: "success",
+      name: "Trojan.Win32.Emotet.471040.A",
+    };
+
+    if (response.status === "success") {
+      showModal(
+        <div>
+          <Typography.Title level={4}>Kiểm Tra File Thành Công</Typography.Title>
+          <p style={{ fontWeight: "normal" }}>
+            <strong>Kết quả phát hiện:</strong>{" "}
+            <span style={{ color: "red" }}>{response.name}</span>
+          </p>
+          <p style={{ fontWeight: "normal" }}>Thông tin về file được tìm thấy trong cơ sở dữ liệu.</p>
+        </div>
+      );
+    } else {
+      showModal(
+        <div>
+          <Typography.Title level={4}>Kiểm Tra File Thất Bại</Typography.Title>
+          <p style={{ fontWeight: "normal" }}>Không tìm thấy thông tin file trong cơ sở dữ liệu.</p>
+        </div>
+      );
+    }
   };
 
   const handleCheckVirusTotal = (md5: string) => {
-    console.log("Check VirusTotal với mã MD5:", md5);
-    // Thêm logic xử lý khi nhấn "Check VirusTotal"
+    showModal(
+      <div>
+        <Typography.Title level={4}>Check VirusTotal</Typography.Title>
+        <p style={{ fontWeight: "normal" }}>MD5: {md5}</p>
+        <p style={{ fontWeight: "normal" }}>Thêm nội dung modal ở đây...</p>
+      </div>
+    );
   };
 
   return (
@@ -145,6 +103,16 @@ const CheckFileTable: FC = () => {
           page={params.page || 1}
         />
       </Card>
+      <Modal
+        title="Thông Tin Kiểm Tra"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width={600} // Tăng kích thước modal
+        style={{ borderRadius: "10px", overflow: "hidden" }} // Thêm phong cách cho modal
+      >
+        {modalContent}
+      </Modal>
     </div>
   );
 };
