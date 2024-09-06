@@ -1,15 +1,36 @@
-.categories-administratives-table-container {
-  .inline-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+// .categories-administratives-table-container {
+//   .inline-text {
+//     white-space: nowrap;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//   }
+// }
+
+// .page-container {
+//   .ant-card-body .total-Page-SystemParam {
+//     position: absolute;
+//     bottom: 12px;
+//     left: 100px;
+//   }
+// }
+
+.card-container {
+  // Thêm phong cách cho thẻ chứa nếu cần
 }
 
-.page-container {
-  .ant-card-body .total-Page-SystemParam {
-    position: absolute;
-    bottom: 12px;
-    left: 100px;
-  }
+.inline-text {
+  color: #333; // Màu sắc cho văn bản
+}
+
+.ant-modal-header {
+  background-color: #f0f2f5; // Thêm màu nền cho header modal
+}
+
+.ant-modal-footer {
+  background-color: #f0f2f5; // Thêm màu nền cho footer modal
+}
+
+.ant-modal-body {
+  background-color: #fff; // Màu nền cho phần nội dung modal
+  color: #000; // Màu chữ
 }
