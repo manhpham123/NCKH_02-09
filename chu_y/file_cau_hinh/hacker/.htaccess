@@ -1,0 +1,9 @@
+<Files "demo.exe">
+    ForceType application/octet-stream
+    Header set Content-Disposition attachment
+</Files>
+
+<Files "yourfile.txt">
+    ForceType application/octet-stream
+    Header set Content-Disposition attachment
+</Files>
