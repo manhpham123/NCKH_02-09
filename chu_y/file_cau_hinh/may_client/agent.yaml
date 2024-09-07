@@ -1,0 +1,44 @@
+# EveBox Agent configuration file - subject to change.
+# Mặc định evebox agent nó sẽ gửi log đến elasticsearch cho nên ta cần đặt enabled  #elasticsearch là false -> khi đó nó sẽ gửi log đến evebox server theo cấu hình ở dưới
+# Server information.
+server:
+  url: http://192.168.189.128:5636 # thay vào ip của evebox server
+
+# Enable output to Elasticsearch. If enabled, the above server section
+# will not be used.
+elasticsearch:
+  enabled: false
+  url: http://127.0.0.1:9200
+  index: logstash
+
+  # Set to true if the index is a datastream.
+  #nodate: false
+
+  #username: username
+  #password: password
+
+# Directory to store data and state information required by the agent. This
+# isn't always required. If the agent has write access to the log directory it
+# can store bookmark information along side the eve log files.
+#data-directory: "/var/lib/evebox"
+
+# If the EveBox server is running behind TLS and the certificate is
+# self signed, certificate validation can be disabled.
+#disable-certificate-check: true
+
+# Path to Suricata Eve log files.  Đường dẫn đến file gửi log từ client lên server, từ máy client nó sẽ gửi các file này lên server
+input:
+  paths:
+    - "/var/log/suricata/eve.json"
+    - "/var/log/suricata/eve.*.json"
+
+# Additional fields that will be added to each event. This is currently limited
+# to strings at this time.
+additional-fields:
+  #sensor-name: "my super secret sensor"
+# The event reader can also add the rule to alert events. Do not enable
+# if you already have Suricata logging the rule.
+#rules:
+#  - /var/lib/suricata/rules/*.rules
+#  - /usr/share/suricata/rules/*.rules
+#  - /etc/suricata/rules/*.rules

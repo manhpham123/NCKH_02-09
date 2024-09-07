@@ -1,0 +1,4 @@
+- tạo 2 file trong thư mục /var/www/html/downloads: cd /var/www/html/downloads
+-  file demo.exe và yourfile.txt
+- sudo gedit /var/www/html/downloads/.htaccess
+- sudo gedit /etc/apache2/apache2.conf

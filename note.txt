@@ -61,22 +61,54 @@ sudo systemctl start suricata.service
 sudo systemctl status suricata.service
 sudo systemctl stop suricata.service
 sudo systemctl restart suricata.service
-
-- test tải file: 192.168.189.128/downloads/yourfile.txt  , bao gồm test mã hash và alert
-- trong thư mục Documents của máy client có file:  suricata.rules
+- thư mục lưu trữ việc hash file và thông tin file :  cd /var/log/suricata/filestore/
 
 =========
 - ở máy server tạo bảng "hash_md5" trong csdl "hash_malware"
 
-============================ 1 số rule test
+============================ 1 số rule test========================
 alert icmp any any -> $HOME_NET any (msg:"co nguoi dang ping"; sid:10000001;)   : rule ping
 alert http any any -> any any (msg:"dang tai file"; sid:10000001;)               : rule tải file
 
 ===========
 ** ở máy attacker:
-- vào thư mục : /home/kali/Documents/Download , thư mục này có 2 file mã độc
+- Tắt bảo vệ của chrome: chrome://settings/security -> no protection  (mục đích là để tải file độc hại về được)
+- cách 1 : vào thư mục : /home/kali/Documents/Download , thư mục này có 2 file mã độc
     + Tại thư mục này chạy lệnh : sudo python3 -m http.server 80
     + vào trình duyệt máy client gõ : http://192.168.10.5/demo.exe  và  http://192.168.10.5/example.dll  để tải file mã độc về
-- Tắt bảo vệ của chrome: chrome://settings/security -> no protection
-- sudo cp /home/kali/Documents/malware/demo.exe /var/www/html/downloads
-- sudo cp /home/kali/Documents/malware/example.dll /var/www/html/downloads  
+- cách 2 :  + ta dùng apache, cách cấu hình xem lại, nếu truy cập vào đường dẫn nó ko có quyền thì cần cấp quyền cho thư mục : sudo chmod 777 "thư mục"
+            + nếu apache chết thì start lại nó : sudo systemctl start apache2
+            + ở đây nếu ở máy client ta vào trình duyệt và truy cập : http://192.168.10.5/downloads/demo.exe  và http://192.168.10.5/downloads/yourfile.txt 
+            thì sẽ ko hash file được vì chrome chặn các file mã độc này
+            + máy client truy cập vào terminal (vì vào chrome thì trình duyệt nó bảo vệ file nên ko thể tải file mã độc về được), ở đây ta tải về đâu thì ta Mở
+            terminal ở thư mục đó : 
+            wget http://192.168.10.5/downloads/demo.exe     wget http://192.168.10.5/downloads/yourfile.txt  
+*** Thông tin hash 2 file demo.exe và yourfile.txt đúng
+ - yourfile.txt:
+      + MD5: 0faeda9053e7c336690e0e8e20e304d0 
+      + SHA-1: 38f59497344fdb85ad013118a602836db25a4176 
+      + SHA-256: 806d32cf94567fb6a34540a5248657786f2e573107c63760eaa063a0da59118e
+  -demo.exe : tên gốc là lab03-04.exe
+    +  MD5 : b94af4a4d4af6eac81fc135abda1c40c 
+    +  SHA-1 :d6356b2c6f8d29f8626062b5aefb13b7fc744d54 
+    +  SHA-256 : 6ac06dfa543dca43327d55a61d0aaed25f3c90cce791e0555e3e306d47107859
+- tại máy client: ta ko cần ap các rule vào thì khi tải file http xuống ta vẫn có thể hash file của nó. Khi tải file về
+chú ý 2 sự kiện là "fileinfo" và "http". còn để phát hiện các cuộc tấn công thì app rule alert vào và xem sự kiện "alert"
+-tại máy client có thể log xem các sự kiện fileinfo:  cat /var/log/suricata/eve.json | grep 'fileinfo'
+- máy client copy file log eve.json ra ngoài để xem : cp -p /var/log/suricata/eve.json /home/william/Documents/evejson
+===============
+*** cấu hình các máy ảo
+- server :  + ens37 : 192.168.189.128  
+            + ens33: 192.168.10.3     
+
+- client :  + ens33 : 192.168.189.133
+            + ens36: 192.168.10.10
+
+- hacker :  + eth1 : 192.168.189.135
+            + eth2: 192.168.10.5
+- các địa chỉ ip :
++  192.168.10.3 , 192.168.10.5, 192.168.10.10 : chỉ cần cấu hình ip tĩnh 
++ 192.168.189.128  , 192.168.189.133: cấu hình ip tĩnh, gateway: 92.168.189.2, dns : 92.168.189.2 (tắt dns auto đi), router để auto
++ riêng ở máy hacker ip  192.168.189.135 , ta để nó tự động nhận vì ip này để kết nối internet chứ ko phải ip để tấn công client
+
+
