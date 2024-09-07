@@ -54,6 +54,7 @@ rule-files:
 + Lên mogodb tạo 1 file có tên : custom.rules
 - kiêm tra file câu hình:  sudo suricata -T -c /etc/suricata/suricata.yaml -v
 - chạy suricata:  sudo suricata -c /etc/suricata/suricata.yaml -i ens33 
+- xem log trực tiếp: sudo tail -f /var/log/suricata/fast.log
 - file log eve.json : sudo gedit /var/log/suricata/eve.json   
 - xóa file eve.json : sudo truncate -s 0 /var/log/suricata/eve.json
 sudo systemctl start suricata.service
@@ -70,3 +71,12 @@ sudo systemctl restart suricata.service
 ============================ 1 số rule test
 alert icmp any any -> $HOME_NET any (msg:"co nguoi dang ping"; sid:10000001;)   : rule ping
 alert http any any -> any any (msg:"dang tai file"; sid:10000001;)               : rule tải file
+
+===========
+** ở máy attacker:
+- vào thư mục : /home/kali/Documents/Download , thư mục này có 2 file mã độc
+    + Tại thư mục này chạy lệnh : sudo python3 -m http.server 80
+    + vào trình duyệt máy client gõ : http://192.168.10.5/demo.exe  và  http://192.168.10.5/example.dll  để tải file mã độc về
+- Tắt bảo vệ của chrome: chrome://settings/security -> no protection
+- sudo cp /home/kali/Documents/malware/demo.exe /var/www/html/downloads
+- sudo cp /home/kali/Documents/malware/example.dll /var/www/html/downloads  

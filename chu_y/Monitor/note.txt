@@ -1,0 +1,1 @@
+file này chạy ở client, dùng đê thu thập log, sau đó gửi về server
