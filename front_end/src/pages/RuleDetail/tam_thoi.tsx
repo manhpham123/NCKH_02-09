@@ -112,15 +112,15 @@ const RuleDetails: FC = () => {
 
               {/* Button Import */}
               <ButtonCustom
-                type="primary"
+                type="default"
                 size="small"
                 onClick={() => document.getElementById('file-input')?.click()}
-                label="Import File"
+                label="Import"
                 style={{ margin: "10px 0" }}
               />
               <input
                 type="file"
-                accept=".txt,.json,.xml,.csv, .rules"  // Chấp nhận nhiều loại tệp
+                accept=".txt,.json,.xml,.csv"  // Chấp nhận nhiều loại tệp
                 style={{ display: "none" }}
                 id="file-input"
                 onChange={handleFileImport}
