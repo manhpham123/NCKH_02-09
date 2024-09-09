@@ -1,0 +1,4 @@
+/home/frblam/NCKH_2024/NCKH_02-09/chu_y/rule_ids/bruce-force.rules
+/home/frblam/NCKH_2024/NCKH_02-09/chu_y/rule_ids/dos.rules
+/home/frblam/NCKH_2024/NCKH_02-09/chu_y/rule_ids/Port_Scan.rules
+/home/frblam/NCKH_2024/NCKH_02-09/chu_y/rule_ids/default.rules

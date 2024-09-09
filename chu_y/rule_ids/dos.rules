@@ -1,0 +1,77 @@
+alert udp any any -> any any (msg:"Possible UDP Flood DoS"; threshold: type both, track by_dst, count 200, seconds 1; classtype:attempted-dos; sid:1; rev:1;)
+alert tcp any any -> $HOME_NET any (msg: "Possible DDoS attack"; flags: S; flow: stateless; threshold: type both, track by_dst, count 200, seconds 5; classtype:denial-of-service; sid:2; rev:1;)
+alert icmp any any -> any any (msg:"Possible ICMP Flood DoS"; itype:8; threshold: type both, track by_dst, count 200, seconds 1; classtype:attempted-dos; sid:3; rev:1;)
+#DOS ATTACK DETECTION
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: S; msg:"Possible SYN DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:5;rev:1;)
+#alert tcp !$HOME_NET any -> $HOME_NET any (flags: A; msg:"Possible ACK DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:6;rev:1;)
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: R; msg:"Possible RST DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:7;rev:1;)
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: F; msg:"Possible FIN DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:8;rev:1;)
+alert udp !$HOME_NET any -> $HOME_NET any (msg:"Possible UDP DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:9;rev:1;)
+alert icmp !$HOME_NET any -> $HOME_NET any (msg:"Possible ICMP DoS"; threshold: type both, track by_dst, count 250, seconds 3; sid:10;rev:1;)
+
+#DDOS ATTACK DETECTION
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: S; msg:"Possible SYN DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:13;rev:1;)
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: A; msg:"Possible ACK DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:14;rev:1;)
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: R; msg:"Possible RST DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:15;rev:1;)
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: F; msg:"Possible FIN DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:16;rev:1;)
+alert udp !$HOME_NET any -> $HOME_NET any (msg:"Possible UDP DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:17;rev:1;)
+alert icmp !$HOME_NET any -> $HOME_NET any (msg:"Possible ICMP DDoS"; threshold: type both, track by_dst, count 100000, seconds 10; sid:18;rev:1;)
+
+#PING OF DEATH DETECTION
+alert icmp any any -> $HOME_NET any (msg:"Possible Ping of Death"; dsize: > 10000; sid:21;rev:1;)
+# (C) Copyright 2001-2004, Martin Roesch, Brian Caswell, et al.
+#    All rights reserved.
+# $Id: ddos.rules,v 1.26 2005/02/10 01:11:03 bmc Exp $
+#-----------
+# DDOS RULES
+#-----------
+
+alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS TFN Probe"; icmp_id:678; itype:8; content:"1234"; reference:arachnids,443; classtype:attempted-recon; sid:29; rev:4;)
+alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS tfn2k icmp possible communication"; icmp_id:0; itype:0; content:"AAAAAAAAAA"; reference:arachnids,425; classtype:attempted-dos; sid:30; rev:2;)
+alert udp $EXTERNAL_NET any -> $HOME_NET 31335 (msg:"DDOS Trin00 Daemon to Master PONG message detected"; content:"PONG"; reference:arachnids,187; classtype:attempted-recon; sid:31; rev:3;)
+alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS TFN client command BE"; icmp_id:456; icmp_seq:0; itype:0; reference:arachnids,184; classtype:attempted-dos; sid:32; rev:3;)
+
+
+alert tcp $HOME_NET 20432 -> $EXTERNAL_NET any (msg:"DDOS shaft client login to handler"; flow:from_server,established; content:"login|3A|"; reference:arachnids,254; reference:url,security.royans.net/info/posts/bugtraq_ddos3.shtml; classtype:attempted-dos; sid:35; rev:5;)
+alert udp $EXTERNAL_NET any -> $HOME_NET 18753 (msg:"DDOS shaft handler to agent"; content:"alive tijgu"; reference:arachnids,255; classtype:attempted-dos; sid:36; rev:2;)
+alert udp $EXTERNAL_NET any -> $HOME_NET 20433 (msg:"DDOS shaft agent to handler"; content:"alive"; reference:arachnids,256; classtype:attempted-dos; sid:37; rev:2;)
+# alert tcp $HOME_NET any <> $EXTERNAL_NET any (msg:"DDOS shaft synflood"; flow:stateless; flags:S,12; seq:674711609; reference:arachnids,253; reference:cve,2000-0138; classtype:attempted-dos; sid:38; rev:10;)
+
+
+
+
+alert udp $EXTERNAL_NET any -> $HOME_NET 31335 (msg:"DDOS Trin00 Daemon to Master message detected"; content:"l44"; reference:arachnids,186; classtype:attempted-dos; sid:43; rev:3;)
+alert udp $EXTERNAL_NET any -> $HOME_NET 31335 (msg:"DDOS Trin00 Daemon to Master *HELLO* message detected"; content:"*HELLO*"; reference:arachnids,185; reference:url,www.sans.org/newlook/resources/IDFAQ/trinoo.htm; classtype:attempted-dos; sid:44; rev:5;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 27665 (msg:"DDOS Trin00 Attacker to Master default startup password"; flow:established,to_server; content:"betaalmostdone"; reference:arachnids,197; classtype:attempted-dos; sid:45; rev:3;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 27665 (msg:"DDOS Trin00 Attacker to Master default password"; flow:established,to_server; content:"gOrave"; classtype:attempted-dos; sid:46; rev:2;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 27665 (msg:"DDOS Trin00 Attacker to Master default mdie password"; flow:established,to_server; content:"killme"; classtype:bad-unknown; sid:47; rev:2;)
+alert udp $EXTERNAL_NET any -> $HOME_NET 27444 (msg:"DDOS Trin00 Master to Daemon default password attempt"; content:"l44adsl"; reference:arachnids,197; classtype:attempted-dos; sid:48; rev:2;)
+alert icmp $HOME_NET any -> $EXTERNAL_NET any (msg:"DDOS TFN server response"; icmp_id:123; icmp_seq:0; itype:0; content:"shell bound to port"; reference:arachnids,182; classtype:attempted-dos; sid:49; rev:6;)
+
+
+
+alert udp $EXTERNAL_NET any -> $HOME_NET 6838 (msg:"DDOS mstream agent to handler"; content:"newserver"; classtype:attempted-dos; sid:53; rev:2;)
+alert udp $EXTERNAL_NET any -> $HOME_NET 10498 (msg:"DDOS mstream handler to agent"; content:"stream/"; reference:cve,2000-0138; classtype:attempted-dos; sid:54; rev:3;)
+alert udp $EXTERNAL_NET any -> $HOME_NET 10498 (msg:"DDOS mstream handler ping to agent"; content:"ping"; reference:cve,2000-0138; classtype:attempted-dos; sid:55; rev:3;)
+alert udp $EXTERNAL_NET any -> $HOME_NET 10498 (msg:"DDOS mstream agent pong to handler"; content:"pong"; classtype:attempted-dos; sid:56; rev:2;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 12754 (msg:"DDOS mstream client to handler"; flow:to_server,established; content:">"; reference:cve,2000-0138; classtype:attempted-dos; sid:57; rev:4;)
+alert tcp $HOME_NET 12754 -> $EXTERNAL_NET any (msg:"DDOS mstream handler to client"; flow:to_client,established; content:">"; reference:cve,2000-0138; classtype:attempted-dos; sid:58; rev:4;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 15104 (msg:"DDOS mstream client to handler"; flow:stateless; flags:S,12; reference:arachnids,111; reference:cve,2000-0138; classtype:attempted-dos; sid:59; rev:8;)
+alert tcp $HOME_NET 15104 -> $EXTERNAL_NET any (msg:"DDOS mstream handler to client"; flow:from_server,established; content:">"; reference:cve,2000-0138; classtype:attempted-dos; sid:60; rev:4;)
+alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS - TFN client command LE"; icmp_id:51201; icmp_seq:0; itype:0; reference:arachnids,183; classtype:attempted-dos; sid:61; rev:3;)
+
+
+alert icmp 3.3.3.3/32 any -> $EXTERNAL_NET any (msg:"DDOS Stacheldraht server spoof"; icmp_id:666; itype:0; reference:arachnids,193; classtype:attempted-dos; sid:64; rev:3;)
+alert icmp $HOME_NET any -> $EXTERNAL_NET any (msg:"DDOS Stacheldraht gag server response"; icmp_id:669; itype:0; content:"sicken"; reference:arachnids,195; classtype:attempted-dos; sid:65; rev:6;)
+alert icmp $HOME_NET any -> $EXTERNAL_NET any (msg:"DDOS Stacheldraht server response"; icmp_id:667; itype:0; content:"ficken"; reference:arachnids,191; classtype:attempted-dos; sid:66; rev:6;)
+alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS Stacheldraht client spoofworks"; icmp_id:1000; itype:0; content:"spoofworks"; reference:arachnids,192; classtype:attempted-dos; sid:67; rev:6;)
+alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS Stacheldraht client check gag"; icmp_id:668; itype:0; content:"gesundheit!"; reference:arachnids,194; classtype:attempted-dos; sid:68; rev:6;)
+alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS Stacheldraht client check skillz"; icmp_id:666; itype:0; content:"skillz"; reference:arachnids,190; classtype:attempted-dos; sid:69; rev:5;)
+alert icmp $EXTERNAL_NET any <> $HOME_NET any (msg:"DDOS Stacheldraht handler->agent niggahbitch"; icmp_id:9015; itype:0; content:"niggahbitch"; reference:url,staff.washington.edu/dittrich/misc/stacheldraht.analysis; classtype:attempted-dos; sid:70; rev:7;)
+alert icmp $EXTERNAL_NET any <> $HOME_NET any (msg:"DDOS Stacheldraht agent->handler skillz"; icmp_id:6666; itype:0; content:"skillz"; reference:url,staff.washington.edu/dittrich/misc/stacheldraht.analysis; classtype:attempted-dos; sid:71; rev:7;)
+alert icmp $EXTERNAL_NET any <> $HOME_NET any (msg:"DDOS Stacheldraht handler->agent ficken"; icmp_id:6667; itype:0; content:"ficken"; reference:url,staff.washington.edu/dittrich/misc/stacheldraht.analysis; classtype:attempted-dos; sid:72; rev:7;)
+
+
+#================== RULR TỰ VIẾT 
+alert http any any -> any any (msg:"ET DOS Possible Slowloris DoS Attack"; flow:to_server,established; content:"GET"; http_method; threshold:type both, track by_src, count 10, seconds 60; classtype:attempted-dos; sid:76; rev:1;)
+alert http any any -> any any (msg:"ET DOS Possible GoldenEye DoS Attack"; flow:to_server,established; content:"User-Agent|3A|"; http_header; threshold:type both, track by_src, count 15, seconds 30; classtype:attempted-dos; sid:77; rev:1;)

