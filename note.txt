@@ -20,7 +20,10 @@ cd /var/lib/evebox/
 + sudo du -sh /var/lib/evebox/events.sqlite: kiểm tra dung lượng cụ thể của file
 + xem cơ sở dữ liệu:  cài đặt SQLite DB Browse
 Mở DB Browser for SQLite với Quyền root sau đơ mở file events.sqlite:
-sudo sqlitebrowser /var/lib/evebox/events.sqlite
++ sudo sqlitebrowser /var/lib/evebox/events.sqlite
++ sudo sqlitebrowser /var/lib/evebox/config.sqlite
++ sudo sqlitebrowser /var/lib/evebox/events.sqlite-shm 
++ sudo sqlitebrowser /var/lib/evebox/events.sqlite-wal
 
 + Xóa file csdl: Để xóa file /var/lib/evebox/events.sqlite lúc ấy evebox server ko còn gì để hiện thị cả
   Dừng dịch vụ EveBox: sudo systemctl stop evebox

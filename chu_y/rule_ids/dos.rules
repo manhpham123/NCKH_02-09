@@ -1,13 +1,13 @@
-alert udp any any -> any any (msg:"Possible UDP Flood DoS"; threshold: type both, track by_dst, count 200, seconds 1; classtype:attempted-dos; sid:1; rev:1;)
-alert tcp any any -> $HOME_NET any (msg: "Possible DDoS attack"; flags: S; flow: stateless; threshold: type both, track by_dst, count 200, seconds 5; classtype:denial-of-service; sid:2; rev:1;)
-alert icmp any any -> any any (msg:"Possible ICMP Flood DoS"; itype:8; threshold: type both, track by_dst, count 200, seconds 1; classtype:attempted-dos; sid:3; rev:1;)
+alert udp any any -> any any (msg:"Possible UDP Flood DoS"; threshold: type both, track by_dst, count 200, seconds 10; classtype:attempted-dos; sid:1; rev:1;)
+alert tcp any any -> $HOME_NET any (msg: "Possible DDoS attack"; flags: S; flow: stateless; threshold: type both, track by_dst, count 200, seconds 10; classtype:denial-of-service; sid:2; rev:1;)
+alert icmp any any -> any any (msg:"Possible ICMP Flood DoS"; itype:8; threshold: type both, track by_dst, count 200, seconds 10; classtype:attempted-dos; sid:3; rev:1;)
 #DOS ATTACK DETECTION
-alert tcp !$HOME_NET any -> $HOME_NET any (flags: S; msg:"Possible SYN DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:5;rev:1;)
-#alert tcp !$HOME_NET any -> $HOME_NET any (flags: A; msg:"Possible ACK DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:6;rev:1;)
-alert tcp !$HOME_NET any -> $HOME_NET any (flags: R; msg:"Possible RST DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:7;rev:1;)
-alert tcp !$HOME_NET any -> $HOME_NET any (flags: F; msg:"Possible FIN DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:8;rev:1;)
-alert udp !$HOME_NET any -> $HOME_NET any (msg:"Possible UDP DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 3; sid:9;rev:1;)
-alert icmp !$HOME_NET any -> $HOME_NET any (msg:"Possible ICMP DoS"; threshold: type both, track by_dst, count 250, seconds 3; sid:10;rev:1;)
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: S; msg:"Possible SYN DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 10; sid:5;rev:1;)
+#alert tcp !$HOME_NET any -> $HOME_NET any (flags: A; msg:"Possible ACK DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 10; sid:6;rev:1;)
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: R; msg:"Possible RST DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 10; sid:7;rev:1;)
+alert tcp !$HOME_NET any -> $HOME_NET any (flags: F; msg:"Possible FIN DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 10; sid:8;rev:1;)
+alert udp !$HOME_NET any -> $HOME_NET any (msg:"Possible UDP DoS"; flow: stateless; threshold: type both, track by_dst, count 1000, seconds 10; sid:9;rev:1;)
+alert icmp !$HOME_NET any -> $HOME_NET any (msg:"Possible ICMP DoS"; threshold: type both, track by_dst, count 250, seconds 10; sid:10;rev:1;)
 
 #DDOS ATTACK DETECTION
 alert tcp !$HOME_NET any -> $HOME_NET any (flags: S; msg:"Possible SYN DDoS"; flow: stateless; threshold: type both, track by_dst, count 100000, seconds 10; sid:13;rev:1;)
@@ -73,5 +73,5 @@ alert icmp $EXTERNAL_NET any <> $HOME_NET any (msg:"DDOS Stacheldraht handler->a
 
 
 #================== RULR TỰ VIẾT 
-alert http any any -> any any (msg:"ET DOS Possible Slowloris DoS Attack"; flow:to_server,established; content:"GET"; http_method; threshold:type both, track by_src, count 10, seconds 60; classtype:attempted-dos; sid:76; rev:1;)
-alert http any any -> any any (msg:"ET DOS Possible GoldenEye DoS Attack"; flow:to_server,established; content:"User-Agent|3A|"; http_header; threshold:type both, track by_src, count 15, seconds 30; classtype:attempted-dos; sid:77; rev:1;)
+alert http any any -> any any (msg:"ET DOS Possible Slowloris DoS Attack"; flow:to_server,established; content:"GET"; http_method; threshold:type both, track by_src, count 10, seconds 10; classtype:attempted-dos; sid:76; rev:1;)
+alert http any any -> any any (msg:"ET DOS Possible GoldenEye DoS Attack"; flow:to_server,established; content:"User-Agent|3A|"; http_header; threshold:type both, track by_src, count 15, seconds 10; classtype:attempted-dos; sid:77; rev:1;)
