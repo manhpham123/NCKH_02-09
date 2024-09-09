@@ -1,0 +1,10 @@
+alert tcp any any -> any any (msg:"ET SCAN Suspicious TCP Portscan"; flags:S; threshold: type both, track by_src, count 20, seconds 30; classtype:attempted-recon; sid:81; rev:1;)
+alert udp any any -> any any (msg:"ET SCAN Suspicious UDP Portscan"; threshold: type both, track by_src, count 20, seconds 30; classtype:attempted-recon; sid:82; rev:1;)
+alert tcp any any -> any any (msg:"ET SCAN Suspicious XMAS Scan"; flags:FPU; threshold: type both, track by_src, count 5, seconds 30; classtype:attempted-recon; sid:83; rev:1;)
+alert tcp any any -> any any (msg:"ET SCAN Suspicious SYN-FIN Scan"; flags:SF; threshold: type both, track by_src, count 5, seconds 30; classtype:attempted-recon; sid:84; rev:1;)
+# Rule to detect suspicious TCP traffic to high-numbered ports:
+alert tcp any any -> any [1024:65535] (msg:"Suspicious TCP Traffic to High-Numbered Port"; threshold:type both,track by_src,count 5,seconds 60; sid:86; rev:1;)
+# This rule triggers an alert when suspicious TCP traffic to high-numbered ports is detected. The rule uses a threshold to limit the number of alerts generated.
+# Rule to detect incoming traffic to high-numbered ports:
+alert tcp any any -> any [1024:65535] (msg:"Incoming Traffic to High-Numbered Port"; threshold:type both,track by_src,count 5,seconds 60; sid:89; rev:1;)
+# This rule triggers an alert when incoming traffic to high-numbered ports is detected. The rule sets a threshold to limit the number of alerts generated.
