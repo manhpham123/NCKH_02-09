@@ -6,6 +6,7 @@ import HighchartsReact from 'highcharts-react-official';
 import { useNavigate } from "react-router-dom";
 import { Card } from "antd";
 import { useMonitorFlow } from "../../utils/request/index";
+import FlowManagement from "../FlowManagement"; // Nhập thành phần FlowManagement
 
 const MonitorFlow: FC = () => {
   const navigate = useNavigate();
@@ -241,6 +242,8 @@ const MonitorFlow: FC = () => {
 
   return (
     <div className ="container" style={{ width: '100%' }} >
+            {/* Hiển thị thành phần FlowManagement ở đây
+            <FlowManagement /> */}
   
     <Card className="card-container" size="small">
 
@@ -260,7 +263,8 @@ const MonitorFlow: FC = () => {
 />
 </div>
 </Card>
-
+         {/* Hiển thị thành phần FlowManagement ở đây */}
+         <FlowManagement />
   </div>
   );
 };
