@@ -141,22 +141,22 @@ export function Events() {
     window.parent.postMessage({ url: window.location.href }, '*'); 
   };
 
-  // const handleNavigationHai = (href: string | URL | null | undefined) => {
-  //   // Đảm bảo URL có dấu # như mong muốn
-  //   const newHref = href ? `/#${href}` : '#/';
+  const handleNavigationHai = (href: string | URL | null | undefined) => {
+    // Đảm bảo URL có dấu # như mong muốn
+    const newHref = href ? `/#${href}` : '#/';
   
-  //   // Hiển thị thông báo khi thay đổi URL đầu vào
-  //   window.alert(`Đang thay đổi URL thành: ${newHref}`);
+    // Hiển thị thông báo khi thay đổi URL đầu vào
+    window.alert(`Đang thay đổi URL thành: ${newHref}`);
   
-  //   // Thay đổi URL của dịch vụ con
-  //   window.history.pushState({}, '', newHref);  // Sử dụng pushState để thay đổi URL mà không tải lại trang
+    // Thay đổi URL của dịch vụ con
+    window.history.pushState({}, '', newHref);  // Sử dụng pushState để thay đổi URL mà không tải lại trang
   
-  //   // Hiển thị thông báo URL sau khi thay đổi
-  //   window.alert(`URL hiện tại sau khi thay đổi: ${window.location.href}`);
+    // Hiển thị thông báo URL sau khi thay đổi
+    window.alert(`URL hiện tại sau khi thay đổi: ${window.location.href}`);
   
-  //   // Gửi thông điệp cho dịch vụ cha để cập nhật URL
-  //   window.parent.postMessage({ url: window.location.href }, '*');
-  // };
+    // Gửi thông điệp cho dịch vụ cha để cập nhật URL
+    window.parent.postMessage({ url: window.location.href }, '*');
+  };
   
 
   function openEventById(id: string) {

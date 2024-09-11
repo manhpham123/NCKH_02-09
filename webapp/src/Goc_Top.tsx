@@ -31,17 +31,6 @@ const TIME_RANGE_OPTIONS = [
   ["7d", "Last Week"],
   ["", "All"],
 ];
-// type NavItemProps = {
-//   href: string;  // Định nghĩa kiểu dữ liệu cho 'href'
-//   className?: string;
-
-// };
-const handleNavigation = (href: string | URL | null | undefined) => {
-  // Thay đổi URL của dịch vụ con
-  window.history.pushState({}, '', href);  // Sử dụng pushState để thay đổi URL mà không tải lại trang
-  // Gửi thông điệp cho dịch vụ cha để cập nhật URL
-  window.parent.postMessage({ url: window.location.href }, '*');
-};
 
 function isValidTimeRange(range: string): boolean {
   for (const tr of TIME_RANGE_OPTIONS) {
@@ -194,64 +183,12 @@ export function Top(props: { brand?: string; disableRange?: boolean }) {
                   Escalated
                 </A>
               </Nav.Item> */}
-
-              {/*=============== ALERT===================
-      <Nav.Item>
-        <A
-          href={"/alerts"}
-          class={"nav-link"}
-          onClick={(e) => {
-            e.preventDefault(); // Ngăn chặn hành vi mặc định
-            handleNavigation('/alerts'); // Điều hướng và gửi thông điệp
-          }}
-        >
-          Alerts
-        </A>
-      </Nav.Item>
-      ==========================================================
-              */}
-         
-
-        <Nav.Item>
-        <A
-          href={"/alerts"}
-          class={"nav-link"}
-          onClick={(e) => {
-            handleNavigation('/alerts'); // Điều hướng và gửi thông điệp
-          }}
-        >
-          Alerts
-        </A>
-        </Nav.Item>
- 
-
-    {/*  ====================EVENTS  ==============
-      <Nav.Item>
-        <A
-          href={"/events"}
-          class={"nav-link"}
-          onClick={(e) => {
-            e.preventDefault(); // Ngăn chặn hành vi mặc định
-            handleNavigation('/events'); // Điều hướng và gửi thông điệp
-          }}
-        >
-          Events
-        </A>
-      </Nav.Item>
-
-            ===========================================
-               */}
-      <Nav.Item>
-        <A
-          href={"/events"}
-          class={"nav-link"}
-          onClick={(e) => {
-            handleNavigation('/events'); // Điều hướng và gửi thông điệp
-          }}
-        >
-          Events
-        </A>
-      </Nav.Item>
+    
+              <Nav.Item>
+                <A href={"/alerts"} class={"nav-link"}>
+                  Alerts
+                </A>
+              </Nav.Item>
 
               {/*==============STATS========== 
               <Nav.Item>
@@ -259,37 +196,24 @@ export function Top(props: { brand?: string; disableRange?: boolean }) {
                   Stats
                 </A>
               </Nav.Item> */}
-
+              <Nav.Item>
+                <A href={"/events"} class={"nav-link"}>
+                  Events
+                </A>
+              </Nav.Item>
               <NavDropdown
                 title="Reports"
                 active={location.pathname.startsWith("/reports")}
               >
-                <A href={"/reports/overview"} class={"dropdown-item"}
-                onClick={(e) => {
-                  handleNavigation('/reports/overview'); // Điều hướng và gửi thông điệp
-                }}  
-                >
+                <A href={"/reports/overview"} class={"dropdown-item"}>
                   Overview
                 </A>
-
-
-                <A href={"/reports/alerts"} class={"dropdown-item"}
-                onClick={(e) => {
-                  handleNavigation('/reports/alerts'); // Điều hướng và gửi thông điệp
-                }}  
-                >
+                <A href={"/reports/alerts"} class={"dropdown-item"}>
                   Alerts
                 </A>
-
-
-                <A href={"/reports/dhcp"} class={"dropdown-item"}
-                onClick={(e) => {
-                  handleNavigation('/reports/dhcp'); // Điều hướng và gửi thông điệp
-                }}  
-                >
+                <A href={"/reports/dhcp"} class={"dropdown-item"}>
                   DHCP
                 </A>
-
               </NavDropdown>
             </Nav>
             <Nav>
