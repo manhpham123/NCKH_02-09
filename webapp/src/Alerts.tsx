@@ -584,6 +584,12 @@ export function Alerts() {
       });
     });
   }
+  const handleNavigation = (href: string | URL | null | undefined) => {
+    // Thay đổi URL của dịch vụ con
+    window.history.pushState({}, '', href);  // Sử dụng pushState để thay đổi URL mà không tải lại trang
+    // Gửi thông điệp cho dịch vụ cha để cập nhật URL
+    window.parent.postMessage({ url: window.location.href }, '*');
+  };
 
   function openEventAtCursor() {
     let event = visibleEvents()[cursor()];
@@ -881,6 +887,7 @@ export function Alerts() {
                             onclick={() => {
                               setCursor(i);
                               navigateToEvent(event);
+                              
                             }}
                           >
                             <td>

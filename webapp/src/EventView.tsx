@@ -1501,48 +1501,7 @@ function History(props: {
                   )}
                 </For>
               </ul>
-            </div>
-            {/* <Show when={!props.showCommentForm}>
-              <div class="card-footer">
-                <div class="text-end">
-                  <button
-                    class="btn btn-primary"
-                    onClick={() => props.setShowCommentForm(true)}
-                  >
-                    Check File
-                  </button>
-                </div>
-              </div>
-            </Show> */}
-
-
-              <Show when={!props.showCommentForm}>
-              <div class="card-footer">
-                <div class="d-flex justify-content-center" style="gap: 30rem;">
-                  <button
-                    class="btn btn-primary"
-                    onClick={() => {
-                      //alert(objectColumns.col1);
-                      //props.setShowCommentForm(true)
-                    }}
-                  >
-                    Check DB
-                  </button>
-                  <button
-                  class="btn btn-primary"
-                   onClick={() => {
-                    alert("Check Virus!");
-                    //props.setShowCommentForm(true)
-
-                  }}
-                  >
-                    Check VirusToTal
-                  </button>
-
-                </div>
-              </div>
-            </Show>
-            
+            </div>          
           </div>
         </div>
       </div>
