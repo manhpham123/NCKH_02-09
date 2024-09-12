@@ -41,7 +41,7 @@ Mở DB Browser for SQLite với Quyền root sau đơ mở file events.sqlite:
 - lưu trữ csdl của hash file, vào thư mục trên : ~/Documents/check_hash$
 
 ====
-Thao tác với suricata ở máy client
+***Thao tác với suricata ở máy client
 - file cấu hình : sudo gedit /etc/suricata/suricata.yaml
 + Sửa biến HOME_NET
 + Tùy chính file rule: 
@@ -59,12 +59,22 @@ rule-files:
 - chạy suricata:  sudo suricata -c /etc/suricata/suricata.yaml -i ens33 
 - xem log trực tiếp: sudo tail -f /var/log/suricata/fast.log
 - file log eve.json : sudo gedit /var/log/suricata/eve.json   
-- xóa file eve.json : sudo truncate -s 0 /var/log/suricata/eve.json
+- xóa file eve.json và các file log khác : sudo truncate -s 0 fast.log eve.json stats.log suricata.log suricata-start.log
 sudo systemctl start suricata.service
 sudo systemctl status suricata.service
 sudo systemctl stop suricata.service
 sudo systemctl restart suricata.service
-- thư mục lưu trữ việc hash file và thông tin file :  cd /var/log/suricata/filestore/
+
+***Thao tác với bwapp.
+- Các lệnh kích hoạt dịch vụ docker
++ sudo systemctl enable docker
++ sudo systemctl start docker
++ sudo systemctl status docker
++ sudo systemctl stop docker
++ sudo systemctl disable docker
++Xem tất cả container: docker ps -a  
++Start container: docker start container_ID  docker start 20542484b569
++đăng nhập : http://192.168.10.10/login.php ->mât khẩu (bee/bug)
 
 =========
 - ở máy server tạo bảng "hash_md5" trong csdl "hash_malware"
