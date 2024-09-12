@@ -1,0 +1,98 @@
+**Cài đặt và cấu hình bwapp trên 
+- Link yt (sửa file install.php ): https://www.youtube.com/watch?v=AoLrB_p6rF4
+- Link git: https://github.com/SoBatistaCyber-Dev/hacking-writeups/blob/main/bWAPP/setup/install.php
+- Link tải: https://sourceforge.net/projects/bwapp/files/latest/download
+** Cài đặt
+- Tải về sau đó giải nén trong Documents ta được thư mục :  /Documents/bWAPPv2.2 chưa toàn bộ source code. Bây giờ ta sẽ ở vị trí thư muc bWAPPv2.2
+- Cấp quyền cho 1 số file và thư mục trong thư mục bWAPP
++ cd bWAPP/
++ sudo chmod 777 passwords/
++ sudo chmod 777 images/
++ sudo chmod 777 documents/
+- Kiểm tra và cài đặt mysql 
++Kiêm tra cài đặt hay chưa : mysql -V  
++ Cài đặt mysql:      -  sudo apt update
+			-  sudo apt install mysql-server
+			-  sudo systemctl start mysql
+			-  sudo systemctl stop mysql
+			-  sudo systemctl enable mysql
+			-  sudo systemctl status mysql
+- Tạo user
++ sudo mysql
++ CREATE USER 'user'@'localhost' IDENTIFIED BY 'password';
++ Cấp quyền cho user: GRANT ALL PRIVILEGES ON bWAPP.* TO 'user'@'localhost';
++ Thoát: exit
+- Cài đặt php
++ Kiểm tra xem đã cài chưa: php -m
++ kiểm tra version: php -v
++ Chưa cài thì cài đặt : 
+				- sudo apt update
+				- sudo apt install php8.1
++ Cài đặt gói mysqli trong php
+				- Kiểm tra có mysqli hay chưa: php -m | grep mysqli
+				- Cài đặt :sudo apt install php-mysqli
+
+
+
+
+- Chỉnh sửa lại file settings.php
++ cd admin/
++ sudo nano settings.php
++ Thay đổi 2 dòng sau là username vừa mới tạo
+// Database connection settings
+$db_server = "localhost";
+$db_username = "user";
+$db_password = "password";
+$db_name = "bWAPP";
+
+- Chỉnh sửa lại file install.php
++ cd bWAPP/
++ sudo gedit install.php
++ vào link git này và sửa file install.php: https://github.com/SoBatistaCyber-Dev/hacking-writeups/blob/main/bWAPP/setup/install.php
+- Chạy dịch vụ ở thư mục “/Documents/bWAPPv2.2/bWAPP” :  php -S localhost:8080
+- Truy cập url: http://localhost:8080/install.php , sau đó nhấn vào “here” để cài đặt csdl cho bwapp (chỉ cần cài 1 lần thôi, những lần sau ko cần nữa)
+- Kiểm tra xem có csdl chưa
++ mở mysql: sudo mysql
++ xem db : SHOW DATABASES;  -> có db bWAPP
+- Xem các thông tin khác ở file : ~/Documents/bWAPPv2.2/ INSTALL.txt
+ + tài khoản đăng nhập : bee/bug
+- Đăng nhập: http://localhost:8080/login.php  
+- Demo : https://www.youtube.com/watch?v=rac-uv1gmJM
+=====
+***Cài đặt bWAPP với docker
+Link yt: https://www.youtube.com/watch?v=3J6V_JYhRas
+
+- sudo apt update
+- sudo apt install docker.io
+- docker --version
+- Các lệnh kích hoạt dịch vụ docker
++ sudo systemctl enable docker
++ sudo systemctl start docker
++ sudo systemctl status docker
++ sudo systemctl stop docker
++ sudo systemctl disable docker
+- Link docker: https://hub.docker.com/r/hackersploit/bwapp-docker
+- Tải image về: docker pull hackersploit/bwapp-docker
+- Nếu lỗi apache2 đang chạy trên port 80 thì tắt dịch vụ apache2 đi:
++ xem các dịch vụ chạy trên port 80: sudo lsof -i :80
++ sudo systemctl stop apache2.service
++ sudo systemctl disable apache2
++ sudo systemctl is-enabled apache2
+-Tương tự với dịch vụ nginx:
++ xem các dịch vụ chạy trên port 80: sudo lsof -i :80
++ sudo systemctl stop nginx
++ sudo systemctl disable nginx
++ sudo systemctl is-enabled nginx
++ sudo systemctl status nginx
+- Tạo ra 1 container mới để chạy : docker run -d -p 80:80 hackersploit/bwapp-docker
+-  url:
++ cài đặt csdl : http://192.168.10.10/install.php  (chạy lần đầu)
++ đăng nhập : http://192.168.10.10/login.php ->mât khẩu (bee/bug)
+- Xem tất cả container: docker ps -a  
+- Xóa container : docker rm container_ID
+- Start container: docker start container_ID /   docker start 20542484b569
+- Stop container: docker stop container_ID/   docker stop 20542484b569
+- Xem các images tải về : docker images
+- xóa images: docker rmi images_ID
+
+
