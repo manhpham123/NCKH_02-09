@@ -99,13 +99,13 @@ db_log = client["log_json"]
 #client ip
 ip = "192.168.189.133"
 #interface 
-intf_str = "ens36"
+intf_str = "ens33"
 num_rows = 0
 # label_mapping = {"BENIGN": 0, "DoS Hulk": 1,'PortScan':2,'DDoS':3,'DoS GoldenEye':4,
 #                  'FTP-Patator':5,'SSH-Patator':6,'DoS slowloris':7,'DoS Slowhttptest':8,'Bot':9,'Web Attack-Brute Force':10,
 #                  'Web Attack-XSS':11,'Infiltration':12,'Web Attack-Sql Injection':13,'Heartbleed':14}
 
-label_mapping = {"BENIGN": 0, "PortScan":1, "DoS slowloris": 2, "Bruce Force": 3, "Unknown attack": 4}
+label_mapping = {"BENIGN": 0, "PortScan":1, "DoS slowloris": 2, "Bruce Force": 3, 'Unknown attack' : 4}
 reverse_label_mapping = {value: key for key, value in label_mapping.items()}
 
 collection = db[f"flow_data_{ip}_{intf_str}"]
@@ -113,10 +113,10 @@ flowpre_collection = db[f"flow_prediction_{ip}_{intf_str}"]
 collection_alert = db_log["alert"]
 collection_packets = db[f"packet_{ip}_{intf_str}"]
 #load model
-model = joblib.load("random_forest_model_2_9_cic_4label.joblib")
+randomforest = joblib.load("random_forest_model_12_9_cic_4label.joblib")
 
 #model = keras.models.load_model('rfc1.md5')
-autoencoder = load_model('autoencoder_55_25_12_14_.h5')
+autoencoder = load_model('autoencoder62_09_09_53_32_12_8_new.keras')
 print("okk")
 
 #CSDL 
@@ -196,8 +196,8 @@ def read_all_data(collection_name):
     
     return all_data
 
-def read_all_data_time(collection_name):
-    cursor = collection_name.find().sort("time", 1)
+def read_all_data_time(collection_name, time_col):
+    cursor = collection_name.find().sort(time_col, -1)
 
     # Chuyển đổi dữ liệu từ cursor thành danh sách các từ điển (dict)
     all_data = []
@@ -226,50 +226,96 @@ def FilterRead_data(filter_field, filter_value):
     filtered_data = list(collection.find(filter_condition))
 
     return filtered_data
-drop_only_nol_zero = ['Fwd PSH Flags', 'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'SYN Flag Count', 'RST Flag Count', 'PSH Flag Count', 'ACK Flag Count'
-                      , 'URG Flag Count', 'CWE Flag Count', 'ECE Flag Count', 'Fwd Avg Bytes/Bulk'
-                      , 'Fwd Avg Packets/Bulk', 'Fwd Avg Bulk Rate', 'Bwd Avg Bytes/Bulk', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bulk Rate', ]
+# drop_only_nol_zero = ['Fwd PSH Flags', 'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'SYN Flag Count', 'RST Flag Count', 'PSH Flag Count', 'ACK Flag Count'
+#                       , 'URG Flag Count', 'CWE Flag Count', 'ECE Flag Count', 'Fwd Avg Bytes/Bulk'
+#                       , 'Fwd Avg Packets/Bulk', 'Fwd Avg Bulk Rate', 'Bwd Avg Bytes/Bulk', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bulk Rate', ]
 
-drop_only_nol_inden = [ 'Subflow Fwd Packets', 'Subflow Bwd Packets', 'Avg Fwd Segment Size', 'Avg Bwd Segment Size', 'Fwd Header Length.1', 'Average Packet Size']
-
-
+# drop_only_nol_inden = [ 'Subflow Fwd Packets', 'Subflow Bwd Packets', 'Avg Fwd Segment Size', 'Avg Bwd Segment Size', 'Fwd Header Length.1', 'Average Packet Size']
 
 
-def clear_data_only(df):
-    df.columns=df.columns.str.strip()
-    print("Dataset Shape: ",df.shape)
 
-    num=df._get_numeric_data()
-    num[num<0]=0
 
-    df.drop(columns=drop_only_nol_zero, axis=1, inplace=True)
-    print("Zero Variance Columns: ", drop_only_nol_zero, "are dropped.")
-    print("Shape after removing the zero varaince columns: ",df.shape)
+# def clear_data_only(df):
+#     df.columns=df.columns.str.strip()
+#     print("Dataset Shape: ",df.shape)
 
-    df.replace([np.inf,-np.inf],np.nan,inplace=True)
-    print(df.isna().any(axis=1).sum(),"rows dropped")
-    df.dropna(inplace=True)
-    print("Shape after Removing NaN: ",df.shape)
+#     num=df._get_numeric_data()
+#     num[num<0]=0
 
-    df.drop_duplicates(inplace=True)
-    print("Shape after dropping duplicates: ",df.shape)
+#     df.drop(columns=drop_only_nol_zero, axis=1, inplace=True)
+#     print("Zero Variance Columns: ", drop_only_nol_zero, "are dropped.")
+#     print("Shape after removing the zero varaince columns: ",df.shape)
 
-    df.drop(columns=drop_only_nol_inden,axis=1,inplace=True)
-    print("Columns which have identical values: ",drop_only_nol_inden," dropped!")
-    print("Shape after removing identical value columns: ",df.shape)
-    return df
-def preprocess_autoencoder(df):
-    drop = [ 'Source IP','Destination IP', 'Source Port', 'Timestamp'
-        , 'Protocol' ,'label']
-    df.drop(columns=drop, axis=1, inplace=True)
+#     df.replace([np.inf,-np.inf],np.nan,inplace=True)
+#     print(df.isna().any(axis=1).sum(),"rows dropped")
+#     df.dropna(inplace=True)
+#     print("Shape after Removing NaN: ",df.shape)
+
+#     df.drop_duplicates(inplace=True)
+#     print("Shape after dropping duplicates: ",df.shape)
+
+#     df.drop(columns=drop_only_nol_inden,axis=1,inplace=True)
+#     print("Columns which have identical values: ",drop_only_nol_inden," dropped!")
+#     print("Shape after removing identical value columns: ",df.shape)
+#     return df
+# def preprocess_autoencoder(df):
+#     drop = [ 'Source IP','Destination IP', 'Source Port', 'Timestamp'
+#         , 'Protocol' ,'label']
+#     df.drop(columns=drop, axis=1, inplace=True)
     
-    df = clear_data_only(df)
-    index = df.index
-    print(df.info())
-    df.columns=df.columns.str.strip().str.lower().str.replace(' ','_').str.replace('(','').str.replace(')','')
-    scaler = joblib.load('minmax_scaler1.save')
-    X = scaler.transform(df)
-    return X, index
+#     df = clear_data_only(df)
+#     index = df.index
+#     print(df.info())
+#     df.columns=df.columns.str.strip().str.lower().str.replace(' ','_').str.replace('(','').str.replace(')','')
+#     scaler = joblib.load('minmax_scaler1.save')
+#     X = scaler.transform(df)
+#     return X, index
+zero_variance_cols = ['Fwd PSH Flags', 'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'SYN Flag Count', 'RST Flag Count', 'PSH Flag Count', 'ACK Flag Count', 'URG Flag Count', 'CWE Flag Count', 'ECE Flag Count', 'Fwd Avg Bytes/Bulk', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bulk Rate', 'Bwd Avg Bytes/Bulk', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bulk Rate']
+identical_cols = ['Subflow Fwd Packets', 'Subflow Bwd Packets', 'Subflow Fwd Bytes', 'Subflow Bwd Bytes', 'Avg Fwd Segment Size', 'Avg Bwd Segment Size', 'Fwd Header Length.1', 'Average Packet Size']
+scaler_path = 'minmax_scaler_53_32.save'
+def preprocess_autoencoder(df, scaler_path = scaler_path, zero_variance_cols = zero_variance_cols, identical_cols = identical_cols):
+    """
+    Xử lý dữ liệu đầu vào cho dự đoán sau khi đã huấn luyện mô hình.
+
+    Parameters:
+    - df: DataFrame chứa dữ liệu đầu vào.
+    - scaler_path: Đường dẫn đến file MinMaxScaler đã được huấn luyện (định dạng .joblib).
+    - zero_variance_cols: Danh sách các cột đã bị loại bỏ do phương sai bằng 0 trong quá trình huấn luyện.
+    - identical_cols: Danh sách các cột đã bị loại bỏ do giá trị giống hệt nhau trong quá trình huấn luyện.
+
+    Returns:
+    - df_scaled: DataFrame đã được tiền xử lý và chuẩn hóa, sẵn sàng cho dự đoán.
+    """
+    drop = [ 'Source IP','Destination IP', 'Source Port', 'Timestamp'
+        , 'Protocol']
+    
+    # Tạo một bản sao của DataFrame để không thay đổi df ban đầu
+    df_processed = df.copy()
+    df_processed.drop(columns=drop, axis=1, inplace=True)
+    # Loại bỏ khoảng trắng ở tên cột
+    df_processed.columns = df_processed.columns.str.strip()
+
+    # Chuyển các giá trị số âm thành 0 (nếu cần thiết)
+    num = df_processed._get_numeric_data()
+    num[num < 0] = 0
+
+    # Loại bỏ các cột có phương sai bằng 0 (đã biết trước)
+    df_processed.drop(columns=zero_variance_cols, axis=1, inplace=True, errors='ignore')
+
+    # Loại bỏ các cột có giá trị giống hệt nhau (đã biết trước)
+    df_processed.drop(columns=identical_cols, axis=1, inplace=True, errors='ignore')
+
+    # Xử lý giá trị vô cùng và giá trị bị thiếu (NaN)
+    df_processed.replace([np.inf, -np.inf], np.nan, inplace=True)
+    df_processed.fillna(0, inplace=True)  # Thay thế giá trị NaN bằng 0 hoặc bất kỳ chiến lược nào phù hợp
+
+    # Tải MinMaxScaler đã được huấn luyện
+    scaler = joblib.load(scaler_path)
+
+    # Áp dụng MinMaxScaler để chuẩn hóa dữ liệu
+    df_scaled = scaler.transform(df_processed)
+
+    return pd.DataFrame(df_scaled, columns=df_processed.columns)
 
 def predict_anomalies(model , X, threshold):
     # Dự đoán output bằng autoencoder
@@ -371,7 +417,7 @@ def preprocess_flow(df_f):
     
     df_sl = df[selected_columns1]
 
-    ss = joblib.load('scaler_read_cic.save')
+    ss = joblib.load('scaler_real_cic_129.save')
     df = ss.transform(df_sl)  
         
     return df, df_f
@@ -382,106 +428,174 @@ def preprocess_flow(df_f):
 # Gọi hàm preprocess để tiền xử lý dữ liệu
 
 # In DataFrame sau khi thêm cột 'label'
-
+T1 = 0.95
+T2 = 0.0001285
 
 def predict_label(collection):
-    data = read_all_data(collection)
+    data = read_all_data_time(collection, "Timestamp")
     df_f = pd.DataFrame(data)
     df_processed, df_f = preprocess_flow(df_f)
-    columns_to_drop = ['_id', 'RF']
+    #columns_to_drop = ['_id', 'RF']
 
     # # Bỏ các cột đã chọn khỏi dataframe
     # df_f = df_f.drop(columns=columns_to_drop, axis=1)
-    
+    df_pre_autoencoder= preprocess_autoencoder(df_f.drop(columns=['_id'], axis=1))  # Tiền xử lý dữ liệu cho AE
+    reconstructed = autoencoder.predict(df_pre_autoencoder)
+    mse_autoencoder = np.mean(np.power(df_pre_autoencoder - reconstructed, 2), axis=1)
+    df_f['MSE_Autoencoder'] = 0  # Khởi tạo cột MSE
+    df_f['MSE_Autoencoder'] = mse_autoencoder  # Gán MSE cho các phần tử đã tính toán
     # Thực hiện dự đoán
-    pred = model.predict(df_processed)
-    pred_proba = model.predict_proba(df_processed)  # Thêm dòng này để lấy xác suất dự đoán cho mỗi nhãn
+    pred = randomforest.predict(df_processed)
+    pred_proba = randomforest.predict_proba(df_processed)  # Thêm dòng này để lấy xác suất dự đoán cho mỗi nhãn
     pred_proba_percent = (pred_proba * 100).tolist()
    
    
-    df_f['label'] = pred
-    #df_st['label'] = pred
-    df_f['label'] = df_f['label'].map(reverse_label_mapping)
-    #df_st['label'] = df_st['label'].map(reverse_label_mapping)
+    pred_rf = np.array([randomforest.classes_[np.argmax(p)] if np.max(p) > T1 else 5 for p in pred_proba])
+    df_f['label'] = pred_rf.astype(int)   #df_st['label'] = df_st['label'].map(reverse_label_mapping)
    
     df_f['RF'] = pred_proba_percent
     print(pred_proba_percent)
     
     
-    #AE-mse
-    df_pre_autoencoder, index = preprocess_autoencoder(df_f.drop(columns=columns_to_drop, axis=1))
-    pred_autoencoder = autoencoder.predict(df_pre_autoencoder)  # Dự đoán đầu ra của Autoencoder
-
-    # Tính Mean Squared Error (MSE) cho từng dòng
-    mse_autoencoder = np.mean(np.power(df_pre_autoencoder - pred_autoencoder, 2), axis=1)
-    df_f.loc[index ,'MSE_Autoencoder'] = mse_autoencoder
-    
-    
-    df_benign = df_f[df_f['label'] == 'BENIGN']
-    columns_to_drop_be = ['_id', 'RF', 'MSE_Autoencoder']
-    df_benign = df_benign.drop(columns=columns_to_drop_be, axis=1)
-    
-    #df_benign.loc[(df_benign["Source Port"] == 27017) &( df_benign["Destination Port"] == 27017), "label"] = 'BENIGN'
-    if df_benign.shape[0] > 0:
-    
-        df_pre, index = preprocess_autoencoder(df_benign)
-        
-        pred_au = predict_anomalies(autoencoder,df_pre, threshold)
-        
-        print(pred_au)
-        
-        vectorized_map = np.vectorize(reverse_label_mapping.get)
-
-    # Áp dụng ánh xạ cho mảng
-        pred_au = vectorized_map(pred_au)
-        
-        #pred_au = pred_au.map(reverse_label_mapping)
-        
-        df_f.loc[index, 'label'] = pred_au
-        
-        df_f.loc[(df_f["Source Port"] == 27017) | 
-          (df_f["Destination Port"] == 27017) | 
-          ((df_f["Destination IP"] != "192.168.10.5") & 
-         (df_f["Destination IP"] != "192.168.10.10")), 'label'] = "BENIGN"
-    
-    
-    df_st = df_f[['Source IP', 'Source Port', 'Destination IP', 'Destination Port', 'Protocol', 'Timestamp', 'Flow Duration', 'label']]
-
+    uncertain_indices = np.where(pred_rf == 5)[0]
+    if len(uncertain_indices) > 0:
+        # Gán nhãn dựa trên ngưỡng T2 cho các mẫu không chắc chắn
+        pred_ae = np.where(df_f.loc[uncertain_indices, 'MSE_Autoencoder'] > T2, 4, 0)
+        df_f.loc[uncertain_indices, 'label'] = pred_ae
+            
+    df_st = df_f[['_id','Source IP', 'Source Port', 'Destination IP', 'Destination Port', 'Protocol', 'Timestamp', 'Flow Duration', 'label']]
     df_f['MSE_Autoencoder'] = df_f['MSE_Autoencoder'].apply(lambda x: 0.001 if pd.isna(x) else x)
+    df_st['label'] = df_st['label'].map(reverse_label_mapping).astype('str')
+    print(df_f['label'])
+    update_database_with_predictions(df_f)
+    df_f.drop(columns='MSE_Autoencoder', axis=1)
+    
+    return df_f.to_dict(orient='records'), df_st.to_dict(orient='records')
+    #return df_f
+
+def update_database_with_predictions(df_f):
+    """
+    Cập nhật dự đoán vào MongoDB.
+
+    Args:
+        df_f (DataFrame): Dữ liệu với các dự đoán để cập nhật vào MongoDB.
+    """
     # Tìm flow_id cuối cùng đã tồn tại trong collection
     last_document = flowpre_collection.find_one(sort=[("flow_id", -1)])  # Tìm document cuối cùng theo flow_id
     last_flow_id = last_document['flow_id'] if last_document else None  # Lấy flow_id cuối cùng, nếu không có thì là None
+    
     # Chạy vòng lặp qua từng hàng trong dataframe df_f
     for index, row in df_f.iterrows():
         flow_id = row['_id'] if '_id' in row else index  # Giả sử '_id' là ID duy nhất trong MongoDB hoặc sử dụng 'index' nếu không có
-    # Chỉ thêm dữ liệu nếu flow_id của dòng hiện tại lớn hơn last_flow_id
+        # Chỉ thêm dữ liệu nếu flow_id của dòng hiện tại lớn hơn last_flow_id
         if last_flow_id is None or flow_id > last_flow_id:
-     
             # Nếu last_flow_id là None (không có bản ghi nào trước đó) hoặc flow_id lớn hơn last_flow_id
-            # flowpre_collection.insert_one({
-            #     'flow_id': flow_id,
-            #     "PortScan": row["RF"]["PortScan"],
-            #     "DoS slowloris": row["RF"]["DoS slowloris"],  # Chứa xác suất dự đoán của Random Forest (dưới dạng phần trăm)
-            #     "Bruce Force" : row["RF"]["Bruce Force"],
-            #     'MSE_Autoencoder': row['MSE_Autoencoder']  # Chứa MSE của Autoencoder
-            # })
-          
-             flowpre_collection.insert_one({
+            flowpre_collection.insert_one({
                 'flow_id': flow_id,
                 "normal": row["RF"][0],
                 "portscan": row["RF"][1],
                 "dos_slowloris": row["RF"][2],  # Chứa xác suất dự đoán của Random Forest (dưới dạng phần trăm)
                 "bruce_force" : row["RF"][3],
                 'MSE_Autoencoder': row['MSE_Autoencoder'],
-                "time": row["Timestamp"]# Chứa MSE của Autoencoder
-            })
-
-    #print(df_f)
-    df_f.drop(columns='MSE_Autoencoder', axis=1)
+                "time": row["Timestamp"]  # Chứa MSE của Autoencoder
+            })    
     
-    return df_f.to_dict(orient='records'), df_st.to_dict(orient='records')
-    #return df_f
+# def predict_label(collection):
+#     data = read_all_data(collection)
+#     df_f = pd.DataFrame(data)
+#     df_processed, df_f = preprocess_flow(df_f)
+#     columns_to_drop = ['_id', 'RF']
+
+#     # # Bỏ các cột đã chọn khỏi dataframe
+#     # df_f = df_f.drop(columns=columns_to_drop, axis=1)
+    
+#     # Thực hiện dự đoán
+#     pred = randomforest.predict(df_processed)
+#     pred_proba = randomforest.predict_proba(df_processed)  # Thêm dòng này để lấy xác suất dự đoán cho mỗi nhãn
+#     pred_proba_percent = (pred_proba * 100).tolist()
+   
+   
+#     df_f['label'] = pred
+#     #df_st['label'] = pred
+#     df_f['label'] = df_f['label'].map(reverse_label_mapping)
+#     #df_st['label'] = df_st['label'].map(reverse_label_mapping)
+   
+#     df_f['RF'] = pred_proba_percent
+#     print(pred_proba_percent)
+    
+    
+#     #AE-mse
+#     df_pre_autoencoder, index = preprocess_autoencoder(df_f.drop(columns=columns_to_drop, axis=1))
+#     pred_autoencoder = autoencoder.predict(df_pre_autoencoder)  # Dự đoán đầu ra của Autoencoder
+
+#     # Tính Mean Squared Error (MSE) cho từng dòng
+#     mse_autoencoder = np.mean(np.power(df_pre_autoencoder - pred_autoencoder, 2), axis=1)
+#     df_f.loc[index ,'MSE_Autoencoder'] = mse_autoencoder
+    
+    
+#     df_benign = df_f[df_f['label'] == 'BENIGN']
+#     columns_to_drop_be = ['_id', 'RF', 'MSE_Autoencoder']
+#     df_benign = df_benign.drop(columns=columns_to_drop_be, axis=1)
+    
+#     #df_benign.loc[(df_benign["Source Port"] == 27017) &( df_benign["Destination Port"] == 27017), "label"] = 'BENIGN'
+#     if df_benign.shape[0] > 0:
+    
+#         df_pre, index = preprocess_autoencoder(df_benign)
         
+#         pred_au = predict_anomalies(autoencoder,df_pre, threshold)
+        
+#         print(pred_au)
+        
+#         vectorized_map = np.vectorize(reverse_label_mapping.get)
+
+#     # Áp dụng ánh xạ cho mảng
+#         pred_au = vectorized_map(pred_au)
+        
+#         #pred_au = pred_au.map(reverse_label_mapping)
+        
+#         df_f.loc[index, 'label'] = pred_au
+        
+#         # df_f.loc[(df_f["Source Port"] == 27017) | 
+#         #   (df_f["Destination Port"] == 27017) | 
+#         #   ((df_f["Destination IP"] != "192.168.10.5") & 
+#         #  (df_f["Destination IP"] != "192.168.10.10")), 'label'] = "BENIGN"
+    
+    
+#     df_st = df_f[['Source IP', 'Source Port', 'Destination IP', 'Destination Port', 'Protocol', 'Timestamp', 'Flow Duration', 'label']]
+
+#     df_f['MSE_Autoencoder'] = df_f['MSE_Autoencoder'].apply(lambda x: 0.001 if pd.isna(x) else x)
+#     # Tìm flow_id cuối cùng đã tồn tại trong collection
+#     last_document = flowpre_collection.find_one(sort=[("flow_id", -1)])  # Tìm document cuối cùng theo flow_id
+#     last_flow_id = last_document['flow_id'] if last_document else None  # Lấy flow_id cuối cùng, nếu không có thì là None
+#     # Chạy vòng lặp qua từng hàng trong dataframe df_f
+#     for index, row in df_f.iterrows():
+#         flow_id = row['_id'] if '_id' in row else index  # Giả sử '_id' là ID duy nhất trong MongoDB hoặc sử dụng 'index' nếu không có
+#     # Chỉ thêm dữ liệu nếu flow_id của dòng hiện tại lớn hơn last_flow_id
+#         if last_flow_id is None or flow_id > last_flow_id:
+     
+#             # Nếu last_flow_id là None (không có bản ghi nào trước đó) hoặc flow_id lớn hơn last_flow_id
+#             # flowpre_collection.insert_one({
+#             #     'flow_id': flow_id,
+#             #     "PortScan": row["RF"]["PortScan"],
+#             #     "DoS slowloris": row["RF"]["DoS slowloris"],  # Chứa xác suất dự đoán của Random Forest (dưới dạng phần trăm)
+#             #     "Bruce Force" : row["RF"]["Bruce Force"],
+#             #     'MSE_Autoencoder': row['MSE_Autoencoder']  # Chứa MSE của Autoencoder
+#             # })
+          
+#              flowpre_collection.insert_one({
+#                 'flow_id': flow_id,
+#                 "normal": row["RF"][0],
+#                 "portscan": row["RF"][1],
+#                 "dos_slowloris": row["RF"][2],  # Chứa xác suất dự đoán của Random Forest (dưới dạng phần trăm)
+#                 "bruce_force" : row["RF"][3],
+#                 'MSE_Autoencoder': row['MSE_Autoencoder'],
+#                 "time": row["Timestamp"]# Chứa MSE của Autoencoder
+#             })
+
+#     #print(df_f)
+#     df_f.drop(columns='MSE_Autoencoder', axis=1)
+    
+#     return df_f.to_dict(orient='records'), df_st.to_dict(orient='records')
 df_p, df_st = predict_label(collection)
 
 # ham thong ke
