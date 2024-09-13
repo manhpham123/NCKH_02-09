@@ -18,6 +18,8 @@ from tensorflow.keras.models import load_model
 from datetime import datetime
 from schema.file import FileNameInput, FileResponse
 from test_bert import bert_pred, bert_pred_pt
+from check_file import get_flow_file
+from virustotal import check_hash, check_hashes
 
 protocol_numbers = {
     1: "ICMP",          # Internet Control Message Protocol
@@ -76,6 +78,18 @@ threshold = 0.0036183422921063186
 
 def get_protocol_name(protocol_number):
     return protocol_numbers.get(protocol_number, "Unknown")
+
+def protocol_name_to_number(name):
+    # Chuẩn hóa tên giao thức về chữ in hoa
+    normalized_name = name.upper()
+    
+    # Duyệt qua dict để tìm số giao thức tương ứng
+    for number, protocol in protocol_numbers.items():
+        if protocol.upper() == normalized_name:
+            return number
+    
+    # Nếu không tìm thấy, trả về None
+    return None
 
 def get_port_app_pro(port_number):
     return port_to_protocol.get(port_number, "Unknown")
@@ -183,7 +197,44 @@ def get_flow_by_id(flow_id):
                         "bert": top_3}
     return combine_flow_pre
     
-    
+def get_files():
+    files = get_flow_file()
+    flow_files = []
+    print(files)
+    for file in files:
+        query = {
+        "Source IP": file['dest_ip'],
+        "Source Port": file['dest_port'],
+        "Destination IP": file['src_ip'],
+        "Destination Port": file['src_port'],
+        "Protocol": protocol_name_to_number(file['protocol']),
+        }
+        print(query)
+        # Tìm bản ghi khớp với điều kiện
+        result = collection.find_one(query)
+        if result is not None:
+            file["flow_id"] = result['_id']
+            flow_files.append(file)
+    return flow_files 
+
+def search_by_md5(md5_hash):
+    print("md5: ",md5_hash)
+    md5_hash = str(md5_hash)
+    # Kết nối tới MongoDB
+      # Thay thế với URL kết nối của bạn
+    db = client['hash_malware']  # Thay thế với tên cơ sở dữ liệu của bạn
+    collection = db['hash_md5']  # Thay thế với tên collection của bạn
+
+    # Tìm kiếm tài liệu có hash md5 khớp
+    result = collection.find_one({"hash.md5": md5_hash})
+
+    # Kiểm tra và trả về kết quả
+    if result:
+        result['_id'] = str(result['_id'])
+        return result
+    else:
+        result = check_hash(md5_hash)
+        return result
 
 def read_all_data(collection_name):
     cursor = collection_name.find().sort("flow_id", 1)
@@ -454,7 +505,7 @@ def predict_label(collection):
     df_f['label'] = pred_rf.astype(int)   #df_st['label'] = df_st['label'].map(reverse_label_mapping)
    
     df_f['RF'] = pred_proba_percent
-    print(pred_proba_percent)
+    #print(pred_proba_percent)
     
     
     uncertain_indices = np.where(pred_rf == 5)[0]
@@ -466,7 +517,7 @@ def predict_label(collection):
     df_st = df_f[['_id','Source IP', 'Source Port', 'Destination IP', 'Destination Port', 'Protocol', 'Timestamp', 'Flow Duration', 'label']]
     df_f['MSE_Autoencoder'] = df_f['MSE_Autoencoder'].apply(lambda x: 0.001 if pd.isna(x) else x)
     df_st['label'] = df_st['label'].map(reverse_label_mapping).astype('str')
-    print(df_f['label'])
+    #print(df_f['label'])
     update_database_with_predictions(df_f)
     df_f.drop(columns='MSE_Autoencoder', axis=1)
     
@@ -500,6 +551,9 @@ def update_database_with_predictions(df_f):
                 "time": row["Timestamp"]  # Chứa MSE của Autoencoder
             })    
     
+
+results = search_by_md5('b94af4a4d4af6eac81fc135abda1c40c')
+print(results)
 # def predict_label(collection):
 #     data = read_all_data(collection)
 #     df_f = pd.DataFrame(data)

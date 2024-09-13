@@ -98,16 +98,85 @@ import paramiko
 # def execute_ssh_sudo_command_api(ip: str = Query(1, alias="ip")):
 #     execute_ssh_sudo_command(host, port, username, password, command)
     
+
+
+from fastapi import FastAPI, Query, HTTPException
+from typing import List, Dict
+
+
+
+
 @app.get("/rule/alert/", response_model=List[dict])
 async def get_rule_alerts ():
     alearts = read_all_data(collection_name=collection_alert)
     return alearts
 
+@app.get("/rule/files", response_model=Dict)
+async def get_file(
+    page: int = Query(1, alias="page"), 
+    limit: int = Query(10, alias="limit"), 
+    filter_field: str = Query("", alias="filter_field"), 
+    filter_value: str = Query("", alias="filter_value")
+):
+    try:
+        # Lấy dữ liệu từ hàm get_files()
+        files = get_files()
+
+        # Nếu không có filter, phân trang dữ liệu
+        if filter_field == "" or filter_value == "":
+            skip = (page - 1) * limit
+            
+            # Tổng số bản ghi
+            total = len(files)
+            
+            # Áp dụng phân trang
+            paginated_files = files[skip: skip + limit]
+            
+        else:
+            # Áp dụng lọc dữ liệu dựa trên filter_field và filter_value
+            filtered_files = [file for file in files if file.get(filter_field) == filter_value]
+            
+            # Tổng số bản ghi sau khi lọc
+            total = len(filtered_files)
+            
+            # Áp dụng phân trang cho dữ liệu đã lọc
+            skip = (page - 1) * limit
+            paginated_files = filtered_files[skip: skip + limit]
+        
+        # Đối tượng kết quả trả về
+        re_ob = {
+            "data": paginated_files,
+            "limit": limit,
+            "page": page,
+            "total": total
+        }
+        
+        # Trả về kết quả dưới dạng JSON
+        return re_ob
+
+    except Exception as e:
+        # Nếu có lỗi, trả về thông báo lỗi với status code 500
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/search/{md5_hash}", response_model=Dict)
+async def search_md5(md5_hash: str):
+    try:
+        # Gọi hàm tìm kiếm
+        result = search_by_md5(md5_hash)
+        return result
+    except HTTPException as e:
+        # Trả về HTTPException nếu có lỗi
+        raise e
+    except Exception as e:
+        # Nếu có lỗi, trả về thông báo lỗi với status code 500
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/line-chart-data", response_model=Dict)
 async def get_chart_data():
     try: 
-        threshold = 0.0027183422921063186
-        pred_data = read_all_data(collection_name=flowpre_collection)
+        threshold = 0.0001285
+        pred_data = read_all_data_time(flowpre_collection, 'flow_id')
         max_mse_entry = max(pred_data, key=lambda x: x["MSE_Autoencoder"])
         data = {
             "data": pred_data,
