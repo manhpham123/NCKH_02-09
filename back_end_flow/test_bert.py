@@ -223,7 +223,7 @@ def recognize_from_packet(models, packet_hex, flow_id):
     
     top_k = 3
     for label, score in list(zip(labels, socres))[:top_k]:
-        #print(f"{label} : {score*100:.3f}")
+        print(f"{label} : {score*100:.3f}")
         if label in attack_label[flow_id]:
             if score*100 > 70:
                 attack_label[flow_id][label] += 1
@@ -342,14 +342,115 @@ def bert_pred_pt(flow_id, collection_name):
 
     return average_attack_label  # Trả về kết quả là dictionary chứa trung bình % dự đoán của mỗi nhãn
 
+def bert_pred_max(flow_id, collection_name):
+    attack_label = {}  # Dictionary để lưu tổng điểm của mỗi nhãn
+    model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
+    models = {
+        "tokenizer": tokenizer,
+        "model": model,
+    }
+    flow_payload = read_raw_payload(collection_name, flow_id=flow_id)
+    packets = flow_payload["raw_payload"]
+    top_k = 3
+
+    # Duyệt qua từng packet để dự đoán nhãn
+    for packet in packets:
+        try:
+            labels, scores = recognize_from_packet(models, packet, flow_payload["flow_id"])
+        except ValueError as e:
+            # Bỏ qua packet không phải là TCP/IP
+            print(f"Packet không phải là TCP/IP cho flow_id {flow_id}: {str(e)}")
+            continue
+        
+        # Cập nhật tổng điểm cho mỗi nhãn
+        for label, score in list(zip(labels, scores))[:top_k]:
+            # Nếu nhãn đã có trong attack_label, cộng dồn tổng điểm
+            if label in attack_label:
+                attack_label[label] += score * 100  # Cộng tổng điểm
+            else:
+                # Nếu nhãn chưa có trong attack_label, khởi tạo
+                attack_label[label] = score * 100
+
+    # Tìm nhãn có tổng xác suất cao nhất
+    if not attack_label:
+        return None  # Không có nhãn nào được dự đoán
+
+    # Lấy nhãn có tổng điểm cao nhất
+    highest_label = max(attack_label, key=attack_label.get)
+
+    return highest_label, attack_label[highest_label]  # Trả về nhãn có tổng điểm cao nhất
+
+def bert_pred_hybrid(flow_id, collection_name, attack_threshold=20):
+    """
+    Xác định nhãn của một flow dựa trên tỉ lệ dự đoán nhãn của các packets,
+    đồng thời giảm ảnh hưởng của nhãn "Normal" bằng cách tập trung vào các nhãn tấn công.
+
+    Args:
+    - flow_id (str): ID của flow cần dự đoán.
+    - collection_name (str): Tên của bộ sưu tập chứa dữ liệu flow.
+    - attack_threshold (int): Ngưỡng tỉ lệ để quyết định nhãn tấn công (mặc định là 20%).
+
+    Returns:
+    - str: Nhãn của flow hoặc "Normal" nếu không đạt ngưỡng tấn công.
+    """
+    attack_label = {}  # Dictionary để lưu tổng điểm của mỗi nhãn không phải "Normal"
+    normal_count = 0   # Biến đếm số lượng packets được dự đoán là "Normal"
+    model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
+    models = {
+        "tokenizer": tokenizer,
+        "model": model,
+    }
+    flow_payload = read_raw_payload(collection_name, flow_id=flow_id)
+    packets = flow_payload["raw_payload"]
+    top_k = 3
+
+    # Duyệt qua từng packet để dự đoán nhãn
+    for packet in packets:
+        try:
+            labels, scores = recognize_from_packet(models, packet, flow_payload["flow_id"])
+        except ValueError as e:
+            # Bỏ qua packet không phải là TCP/IP
+            print(f"Packet không phải là TCP/IP cho flow_id {flow_id}: {str(e)}")
+            continue
+        
+        # Cập nhật tổng điểm cho mỗi nhãn
+        for label, score in list(zip(labels, scores))[:top_k]:
+            print(f"{label} : {score*100:.3f}")
+            if label == "Normal":
+                normal_count += 1  # Tăng số lượng packets "Normal"
+            else:
+                # Nếu là nhãn tấn công, cộng dồn tổng điểm cho nhãn đó
+                if label in attack_label:
+                    attack_label[label] += score * 100  # Cộng tổng điểm
+                else:
+                    attack_label[label] = score * 100
+
+    # Tổng số packets đã xử lý
+    total_packets = len(packets)
+
+    # Nếu không có nhãn tấn công nào hoặc tất cả là "Normal"
+    if not attack_label or total_packets == normal_count:
+        return "Normal"  # Tất cả packets đều "Normal"
+
+    # Tính tỉ lệ các nhãn tấn công
+    attack_ratios = {label: (score / (total_packets * 100)) * 100 for label, score in attack_label.items()}
+
+    # Chọn nhãn tấn công có tỉ lệ cao nhất nếu vượt qua ngưỡng, nếu không thì trả về "Normal"
+    for label, ratio in attack_ratios.items():
+        if ratio >= attack_threshold:
+            return label  # Nhãn tấn công có tỉ lệ vượt ngưỡng
+
+    return "Normal"  # Trả về "Normal" nếu không có nhãn tấn công nào vượt ngưỡng
+
+
 
 def main():
-    # model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
+    model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
 
-    # models = {
-    #     "tokenizer": tokenizer,
-    #     "model": model,
-    # }
+    models = {
+        "tokenizer": tokenizer,
+        "model": model,
+    }
     print("hello")
     count = 0
     
@@ -364,14 +465,15 @@ def main():
     # for flow in flows:
     #     fl_id = flow["flow_id"]
     #     stt = int(fl_id[2:])
-    #     if stt > 1127:
+    #     if stt > 561:
     #         packets = flow["raw_payload"]
     #         for packet in packets:
+    #             print(fl_id)
     #             lables, scores = recognize_from_packet(models, packet, fl_id)
             
     #         print(f"flow_id : {fl_id}" ,attack_label[fl_id])
         
-    #print(bert_pred_pt("fl01247", collection_packets))
+    #print(bert_pred_hybrid("fl00561", collection_packets))
     
     # for packet_hex in packets:
     #     count += 1

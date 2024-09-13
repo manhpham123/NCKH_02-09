@@ -26,7 +26,7 @@ db_log = client["log_json"]
 db_rule = client["Rule"]
 
 ip = "192.168.189.133"
-intf_str = "ens36"
+intf_str = "ens33"
 num_rows = 0
 
 collection = db[f"flow_data_{ip}_{intf_str}"]
