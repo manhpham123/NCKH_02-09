@@ -1,0 +1,9 @@
+http://192.168.189.135/downloads/demo.exe
+http://192.168.189.135/downloads/yourfile.txt
+http://192.168.189.135/downloads/install.exe
+http://192.168.189.135/downloads/network.dll
+http://192.168.189.135/downloads/notepad.exe
+http://192.168.189.135/downloads/project.exe
+http://192.168.189.135/downloads/simulator.exe
+http://192.168.189.135/downloads/tool.exe
+http://192.168.189.135/downloads/toolkit.exe

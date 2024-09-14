@@ -1,0 +1,1 @@
+copy thư mục này vào thư mục : "/home/william/Documents"

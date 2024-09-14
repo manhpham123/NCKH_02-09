@@ -38,9 +38,9 @@ const FlowManagementFilter: React.FC<Props> = ({ filters, setFilters }) => {
         <Form.Item label="chọn thuộc tính" style={{ width: '150px' }}>
           <Select value={filterData.filter_field} onChange={handleSelectChange} allowClear>
             <Select.Option value="Source IP">Source IP</Select.Option>
-            {/* <Select.Option value="Source Port">Source Port</Select.Option> */}
+            <Select.Option value="Source Port">Source Port</Select.Option>
             <Select.Option value="Destination IP">Destination IP</Select.Option>
-            {/* <Select.Option value="Destination Port">Destination Port</Select.Option> */}
+            <Select.Option value="Destination Port">Destination Port</Select.Option>
             <Select.Option value="label">Dự Đoán</Select.Option>
             <Select.Option value="_id">Flow ID</Select.Option>
           </Select>

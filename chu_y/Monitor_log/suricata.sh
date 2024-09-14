@@ -1,4 +1,3 @@
-#!/bin/bash
 # 1. Khởi động Suricata
 echo "Starting Monitor"
 sudo systemctl start suricata.service
@@ -7,7 +6,8 @@ sudo systemctl start suricata.service
 echo "Monitoring traffic on ens33..."
 sudo suricata -c /etc/suricata/suricata.yaml -i ens33
 
-# 3. Sau khi nhấn Ctrl+C, tắt theo dõi và dừng Suricata
+
+# 3. Sau khi nhấn Ctrl+C để dừng thu thập trên suricata và cicflowmeter. Sau đó stop suricata
 echo "Stopping Monitor"
 sudo systemctl stop suricata.service
 
