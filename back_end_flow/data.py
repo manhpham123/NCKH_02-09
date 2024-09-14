@@ -690,6 +690,7 @@ def get_ls(df_st):
 
 def Filter(field, value, df_st):
     filter_data = []
+    
     print(field, ':', value)
     for d in df_st:
         if d[field] == value:

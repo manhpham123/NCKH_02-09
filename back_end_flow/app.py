@@ -236,6 +236,17 @@ async def read_items(page: int = Query(1, alias="page"), limit: int = Query(1, a
             skip = (page - 1) * limit
             # Tiền xử lý và dự đoán ở đây
             df_l, df_st = predict_label(collection)
+            try:
+                # Chuyển filter_value thành số nếu có thể
+                if filter_value.isdigit():
+                    filter_value = int(filter_value)
+                else:
+                    try:
+                        filter_value = float(filter_value)
+                    except ValueError:
+                        pass  # Nếu không phải số, giữ nguyên giá trị chuỗi
+            except ValueError:
+                pass
             
             df_st = Filter(filter_field, filter_value, df_st)
             
