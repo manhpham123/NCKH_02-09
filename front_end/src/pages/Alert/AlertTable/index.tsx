@@ -174,6 +174,17 @@ const AlertTable: FC = () => {
     },
     {
       key: 2,
+      title: "Flow ID",
+      dataIndex: "_id",
+      align: "center",
+      render: (group) => (
+        <Tooltip title={group}>
+          <div className="inline-text">{group}</div>
+        </Tooltip>
+      ),
+    },
+    {
+      key: 3,
       title: "Source IP",
       dataIndex: "Source IP",
       align: "center",
@@ -184,7 +195,7 @@ const AlertTable: FC = () => {
       ),
     },
     {
-      key: 3,
+      key: 4,
       title: "Source Port",
       dataIndex: "Source Port",
       align: "center",
@@ -195,7 +206,7 @@ const AlertTable: FC = () => {
       ),
     },
     {
-      key: 4,
+      key: 5,
       title: "Destination IP",
       dataIndex: "Destination IP",
       align: "center",
@@ -206,7 +217,7 @@ const AlertTable: FC = () => {
       ),
     },
     {
-      key: 5,
+      key: 6,
       title: "Destination Port",
       dataIndex: "Destination Port",
       align: "center",
@@ -217,7 +228,7 @@ const AlertTable: FC = () => {
       ),
     },
     {
-      key: 6,
+      key: 7,
       title: "Protocol",
       dataIndex: "Protocol",
       align: "center",
@@ -228,7 +239,7 @@ const AlertTable: FC = () => {
       ),
     },
     {
-      key: 7,
+      key: 8,
       title: "Timestamp",
       dataIndex: "Timestamp",
       align: "center",
@@ -238,17 +249,17 @@ const AlertTable: FC = () => {
         </Tooltip>
       ),
     },
-    {
-      key: 8,
-      title: "Flow Duration",
-      dataIndex: "Flow Duration",
-      align: "center",
-      render: (group) => (
-        <Tooltip title={group}>
-          <div className="inline-text">{group}</div>
-        </Tooltip>
-      ),
-    },
+    // {
+    //   key: 9,
+    //   title: "Flow Duration",
+    //   dataIndex: "Flow Duration",
+    //   align: "center",
+    //   render: (group) => (
+    //     <Tooltip title={group}>
+    //       <div className="inline-text">{group}</div>
+    //     </Tooltip>
+    //   ),
+    // },
     // {
     //   key: 9,
     //   title: "du doan",
@@ -262,7 +273,7 @@ const AlertTable: FC = () => {
     // }
     {
       key: 9,
-      title: "Dự Đoán",
+      title: "Cảnh Báo",
       dataIndex: "label",
       align: "center",
       render: (group: string) => {
@@ -272,8 +283,22 @@ const AlertTable: FC = () => {
             <div className={`inline-text ${color ? 'prediction-column' : ''}`} style={{ backgroundColor: color,color: 'white',fontWeight: 'bold' }}>{group}</div>
           </Tooltip>
         );
-      },
+      },   
     },
+    {
+      key: 10,
+      title: "Chi Tiết Flow",
+      align: "center",
+      width: "10%",
+      render: (_, record) => (
+        <>
+          <ListButtonActionUpdate
+            // editFunction={() => {}}
+            viewFunction={() =>  navigate(`/flow-details/${record._id}`)}
+          />
+        </>
+      ),
+    }
     // {
     //   key: 9,
     //   title: "Dự đoán",

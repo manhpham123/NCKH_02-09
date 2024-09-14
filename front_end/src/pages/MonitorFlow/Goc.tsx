@@ -25,8 +25,7 @@ const MonitorFlow: FC = () => {
       marker: {
         symbol: 'circle',
         fillColor: '#1f77b4',
-        radius: 4,
-        enabled: false 
+        radius: 4
       }
     },
     {
@@ -36,8 +35,7 @@ const MonitorFlow: FC = () => {
       marker: {
         symbol: 'circle',
         fillColor: '#ff7f0e',
-        radius: 4,
-        enabled: false 
+        radius: 4
       }
     },
     {
@@ -47,8 +45,7 @@ const MonitorFlow: FC = () => {
       marker: {
         symbol: 'circle',
         fillColor: '#2ca02c',
-        radius: 4,
-        enabled: false 
+        radius: 4
       }
     },
     {
@@ -58,8 +55,7 @@ const MonitorFlow: FC = () => {
       marker: {
         symbol: 'circle',
         fillColor: '#9467bd',
-        radius: 4,
-        enabled: false 
+        radius: 4
       }
     }
   ];
@@ -80,8 +76,6 @@ const MonitorFlow: FC = () => {
       title: {
         text: 'Flow'
       },
-      min: 0,  // Thiết lập giá trị nhỏ nhất của trục X là 0
-      max: flow_data && flow_data.data.length > 0 ? parseFlowId(flow_data.data[0].flow_id)+1: undefined, 
       crosshair: {
         color: '#ff0000',
         width: 2,
@@ -146,8 +140,7 @@ const MonitorFlow: FC = () => {
       marker: {
         symbol: 'circle',
         fillColor: '#1f77b4',
-        radius: 4,
-        enabled: false 
+        radius: 4
       }
     }
   ];
@@ -167,8 +160,6 @@ const MonitorFlow: FC = () => {
       title: {
         text: 'Flow'
       },
-      min: 0,  // Thiết lập giá trị nhỏ nhất của trục X là 0
-      max: flow_data && flow_data.data.length > 0 ? parseFlowId(flow_data.data[0].flow_id)+1: undefined, 
       crosshair: {
         color: '#ff0000',
         width: 2,
