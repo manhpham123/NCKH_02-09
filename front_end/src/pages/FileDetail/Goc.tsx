@@ -13,30 +13,184 @@ interface Detection {
 }
 
 const FileDetails: FC = () => {
-  const [dataFile, setDataFile] = useState<any | null>(null); // Đặt giá trị khởi tạo là null
+  const [dataFile, setDataFile] = useState<any[]>([]);
   const { id } = useParams();
 
   const fetchDataFile = async () => {
-    try {
-      const res = await FileApi.GetFileDetails({ md5: id });
-      setDataFile(res.data); // Lưu dữ liệu trả về vào state
-    } catch (error) {
-      console.error("Lỗi khi lấy chi tiết file:", error);
-    }
+    const res = await FileApi.GetFileDetails({ md5: id });
+    // Xử lý dữ liệu và cập nhật state
   };
 
   useEffect(() => {
     fetchDataFile();
   }, [id]);
-  
-  if (!dataFile) {
-    return <div>Đang tải dữ liệu...</div>; // Hiển thị thông báo khi dữ liệu chưa được tải
+
+  //===================== Dữ liệu mẫu===========================
+  /*=====================Với dữ liệu không có gì bất thường
+  const data: {
+    hash: {
+      md5: string;
+      sha1: string;
+      sha256: string;
+    };
+    score: string;
+    malicious_count: number;
+    total_engines: number;
+    detections: Detection[]; // Sử dụng kiểu `Detection` cho mảng này
+  } = {
+    hash: {
+      md5: "767c0d1fb7db23f58b6d5dbd96788779",
+      sha1: "d6e11ac5ea87bf787f18adfb59f307e85e5a67c3",
+      sha256: "6875a6975653703299dd4963c6ad9ad5b483b17755be756c2fc7ac7eeaed0fe3",
+    },
+    score: "0/65",
+    malicious_count: 0,
+    total_engines: 65,
+    detections: [],
+  };
+  */
+  const data = {
+    
+    "hash": {
+      "md5": "486868aae425e458c56a5a4c6a9fbcf2",
+      "sha1": "ee4b2a2a5992127b71678e82b72d574e54ded8b4",
+      "sha256": "c8440d0baf8343ef5e692d5b09ef495aa4532c9c88cdf1cffd37064e7e1704ed"
+    },
+    "score": "32/59",
+    "malicious_count": 32,
+    "total_engines": 59,
+    "detections": [
+      {
+        "engine_name": "Cynet",
+        "result": "Malicious (score: 85)"
+      },
+      {
+        "engine_name": "FireEye",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "CAT-QuickHeal",
+        "result": "Coinhive.Miner.30698"
+      },
+      {
+        "engine_name": "McAfee",
+        "result": "JS/Miner.ck"
+      },
+      {
+        "engine_name": "Zillya",
+        "result": "Trojan.CoinMiner.JS.3"
+      },
+      {
+        "engine_name": "Sangfor",
+        "result": "Malware"
+      },
+      {
+        "engine_name": "Invincea",
+        "result": "Coinhive JavaScript cryptocoin miner (PUA)"
+      },
+      {
+        "engine_name": "TrendMicro-HouseCall",
+        "result": "Coinminer_COINHIVE.SMF1-JS"
+      },
+      {
+        "engine_name": "Avast",
+        "result": "JS:Miner-AF [PUP]"
+      },
+      {
+        "engine_name": "ClamAV",
+        "result": "Js.Coinminer.Generic-6836639-1"
+      },
+      {
+        "engine_name": "BitDefender",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "NANO-Antivirus",
+        "result": "Riskware.Script.Miner.fmbqgs"
+      },
+      {
+        "engine_name": "MicroWorld-eScan",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "Rising",
+        "result": "Trojan.CoinHive!1.B2E9 (CLASSIC)"
+      },
+      {
+        "engine_name": "Ad-Aware",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "Emsisoft",
+        "result": "Application.BitCoinMiner.AJF (B)"
+      },
+      {
+        "engine_name": "Comodo",
+        "result": "Application.JS.CoinMiner.RA@7u1yex"
+      },
+      {
+        "engine_name": "F-Secure",
+        "result": "PotentialRisk.PUA/CryptoMiner.Gen"
+      },
+      {
+        "engine_name": "DrWeb",
+        "result": "JS.Miner.11"
+      },
+      {
+        "engine_name": "TrendMicro",
+        "result": "Coinminer_COINHIVE.SMF1-JS"
+      },
+      {
+        "engine_name": "Sophos",
+        "result": "Coinhive JavaScript cryptocoin miner (PUA)"
+      },
+      {
+        "engine_name": "Ikarus",
+        "result": "PUA.CoinMiner"
+      },
+      {
+        "engine_name": "Jiangmin",
+        "result": "Trojan.Script.Generic1"
+      },
+      {
+        "engine_name": "Avira",
+        "result": "PUA/CryptoMiner.Gen"
+      },
+      {
+        "engine_name": "Antiy-AVL",
+        "result": "Trojan[Infect]/JS.Miner"
+      },
+      {
+        "engine_name": "Microsoft",
+        "result": "Trojan:Script/Wacatac.C!ml"
+      },
+      {
+        "engine_name": "Arcabit",
+        "result": "Application.BitCoinMiner.AJF"
+      },
+      {
+        "engine_name": "GData",
+        "result": "Script.Application.CoinHive.A"
+      },
+      {
+        "engine_name": "Tencent",
+        "result": "Html.Win32.Script.504241"
+      },
+      {
+        "engine_name": "MAX",
+        "result": "malware (ai score=82)"
+      },
+      {
+        "engine_name": "Fortinet",
+        "result": "JS/Miner.CK!tr"
+      }
+    ]
   }
 
   // Tách dữ liệu phát hiện thành 2 khối
-  const halfLength = Math.ceil(dataFile.detections.length / 2);
-  const firstHalfDetections = dataFile.detections.slice(0, halfLength);
-  const secondHalfDetections = dataFile.detections.slice(halfLength);
+  const halfLength = Math.ceil(data.detections.length / 2);
+  const firstHalfDetections = data.detections.slice(0, halfLength);
+  const secondHalfDetections = data.detections.slice(halfLength);
 
   return (
     <div className="container-wrapper">
@@ -68,19 +222,19 @@ const FileDetails: FC = () => {
             <Text strong style={{ fontSize: "17px" }}>
               MD5:{" "}
             </Text>
-            <Text style={{ fontSize: "17px" }}>{dataFile.hash.md5}</Text>
+            <Text style={{ fontSize: "17px" }}>{data.hash.md5}</Text>
           </Col>
           <Col span={7}>
             <Text strong style={{ fontSize: "17px" }}>
               SHA1:{" "}
             </Text>
-            <Text style={{ fontSize: "17px" }}>{dataFile.hash.sha1}</Text>
+            <Text style={{ fontSize: "17px" }}>{data.hash.sha1}</Text>
           </Col>
           <Col span={11}>
             <Text strong style={{ fontSize: "17px" }}>
               SHA256:{" "}
             </Text>
-            <Text style={{ fontSize: "17px" }}>{dataFile.hash.sha256}</Text>
+            <Text style={{ fontSize: "17px" }}>{data.hash.sha256}</Text>
           </Col>
         </Row>
 
@@ -100,20 +254,20 @@ const FileDetails: FC = () => {
               type="danger"
               style={{ fontSize: "24px", fontWeight: "bold" }}
             >
-              {dataFile.score}
+              {data.score}
             </Text>
           </Col>
           <Col span={12}>
             <Title level={4}>Kết quả phát hiện</Title>
             <Text style={{ fontSize: "24px", fontWeight: "bold" }}>
-              {dataFile.malicious_count} / {dataFile.total_engines} Công cụ phát hiện
+              {data.malicious_count} / {data.total_engines} Công cụ phát hiện
               độc hại
             </Text>
           </Col>
         </Row>
 
         {/* Hiển thị tiêu đề cho các cột hoặc thông báo "Không phát hiện thấy bất thường" */}
-        {dataFile.malicious_count > 0 ? (
+        {data.malicious_count > 0 ? (
           <>
             {/* Tiêu đề cho các cột */}
             <Row gutter={16} style={{ marginBottom: 16 }}>
@@ -141,7 +295,7 @@ const FileDetails: FC = () => {
 
             {/* Dữ liệu phát hiện */}
             <Row gutter={16}>
-            {firstHalfDetections.map((detection: Detection, index: number) => (
+              {firstHalfDetections.map((detection, index) => (
                 <React.Fragment key={`row-${index}`}>
                   <Col span={6} key={`first-half-${index}`}>
                     <Text style={{ fontSize: "17px" }}>

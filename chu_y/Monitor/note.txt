@@ -1,1 +1,1 @@
-file này chạy ở client, dùng đê thu thập log, sau đó gửi về server
+2 file này dùng để thu thập log bằng 2 công cụ : suricata và cicfflow trên máy client

@@ -54,7 +54,7 @@ export const useCheckFile = (
     filter?: Alertfilter
 ) => {
     const { data, error, isLoading, mutate } = useSWR(
-        `checkfile/?page=${params?.page}&limit=${params?.limit}`,
+        `rule/files/?page=${params?.page}&limit=${params?.limit}`,
         { refreshInterval: 0}
     );
     return {
