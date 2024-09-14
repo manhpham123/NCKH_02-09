@@ -1,0 +1,8 @@
+  const flow_data = {
+    "data": [
+      { "flow_id": "fl00003", "dos_slowloris": 10, "portscan": 30, "bruce_force": 20, "normal": 40, "time": "2024-08-29 21:00:00" },
+      { "flow_id": "fl00002", "dos_slowloris": 10, "portscan": 30, "bruce_force": 20, "normal": 40, "time": "2024-08-29 22:00:00" },
+      { "flow_id": "fl00001", "dos_slowloris": 40, "portscan": 20, "bruce_force": 10, "normal": 30, "time": "2024-08-29 23:00:00" },
+      // Các đối tượng khác...
+    ]
+  };

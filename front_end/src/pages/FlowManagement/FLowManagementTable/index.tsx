@@ -68,6 +68,17 @@ const FLowManagementTable: FC<Props> = ({setFilters, filters}) => {
     },
     {
       key: 2,
+      title: "Flow ID",
+      dataIndex: "_id",
+      align: "center",
+      render: (group) => (
+        <Tooltip title={group}>
+          <div className="inline-text">{group}</div>
+        </Tooltip>
+      ),
+    },
+    {
+      key: 3,
       title: "Source IP",
       dataIndex: "Source IP",
       align: "center",
@@ -78,7 +89,7 @@ const FLowManagementTable: FC<Props> = ({setFilters, filters}) => {
       ),
     },
     {
-      key: 3,
+      key: 4,
       title: "Source Port",
       dataIndex: "Source Port",
       align: "center",
@@ -89,7 +100,7 @@ const FLowManagementTable: FC<Props> = ({setFilters, filters}) => {
       ),
     },
     {
-      key: 4,
+      key: 5,
       title: "Destination IP",
       dataIndex: "Destination IP",
       align: "center",
@@ -100,7 +111,7 @@ const FLowManagementTable: FC<Props> = ({setFilters, filters}) => {
       ),
     },
     {
-      key: 5,
+      key: 6,
       title: "Destination Port",
       dataIndex: "Destination Port",
       align: "center",
@@ -111,7 +122,7 @@ const FLowManagementTable: FC<Props> = ({setFilters, filters}) => {
       ),
     },
     {
-      key: 6,
+      key: 7,
       title: "Protocol",
       dataIndex: "Protocol",
       align: "center",
@@ -122,7 +133,7 @@ const FLowManagementTable: FC<Props> = ({setFilters, filters}) => {
       ),
     },
     {
-      key: 7,
+      key: 8,
       title: "Timestamp",
       dataIndex: "Timestamp",
       align: "center",
@@ -133,21 +144,41 @@ const FLowManagementTable: FC<Props> = ({setFilters, filters}) => {
       ),
     },
     {
-      key: 8,
+      key: 9,
       title: "Dự Đoán",
       dataIndex: "label",
       align: "center",
-      render: (group: string) => {
+      render: (group: string, record: any) => {
         const color = predictionColors[group] || ''; // Lấy màu sắc tương ứng từ bảng mã màu
+        const flow_detail = () => {
+          // Chuyển hướng sang trang mới sử dụng _id từ cột key 2
+          navigate(`/flow-details/${record._id}`);
+        };
         return (
           <Tooltip title={group}>
-            <div className={`inline-text ${color ? 'prediction-column' : ''}`} style={{ backgroundColor: color,color: 'white',fontWeight: 'bold' }}>{group}</div>
+            <div className={`inline-text ${color ? 'prediction-column' : ''}`} style={{ backgroundColor: color,color: 'white',fontWeight: 'bold' }}
+            onClick={flow_detail} 
+            >{group}</div>
           </Tooltip>
         );
       },
+    },
+    {
+      key: 10,
+      title: "Chi Tiết Flow",
+      align: "center",
+      width: "10%",
+      render: (_, record) => (
+        <>
+          <ListButtonActionUpdate
+            // editFunction={() => {}}
+            viewFunction={() =>  navigate(`/flow-details/${record._id}`)}
+          />
+        </>
+      ),
     }
     // {
-    //   key: 9,
+    //   key: 11,
     //   title: "Action",
     //   align: "center",
     //   width: "10%",
