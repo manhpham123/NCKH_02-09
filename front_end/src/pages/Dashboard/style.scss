@@ -1,14 +1,71 @@
-.customers-wrapper{
+body {
+    margin: 0; // Xóa bỏ margin mặc định của body để tránh tạo khoảng trống
+    background-color: #f0f2f5; // Đảm bảo màu nền xám trên toàn bộ trang
+    height: 100%; // Đảm bảo chiều cao của body và html chiếm hết màn hình
+    overflow-y: auto; // Đảm bảo cuộn dọc được bật khi nội dung vượt quá chiều cao màn hình
+  }
+  
+  html {
+    height: 100%; // Đảm bảo chiều cao của html chiếm hết màn hình
+  }
+  
+  .dashboard-wrapper {
+    background-color: #f0f2f5; // Màu nền xám cho giao diện ngoài
+    padding: 20px 20px; // Điều chỉnh khoảng cách hai bên
+    display: flex;
+    flex-direction: column;
+    align-items: center; // Căn giữa các phần tử
     width: 100%;
-    padding: 10px;
-    height: 400px;
-    .dasboard-gn-wrapper{
-        .ant-space-item{
-            // width: 200px;
-        }
+    min-height: 100vh; // Đảm bảo chiều cao tối thiểu là chiều cao của màn hình
+    box-sizing: border-box; // Bao gồm cả padding vào kích thước của phần tử
+    overflow: visible; // Cho phép nội dung của dashboard-wrapper không bị cắt
+  }
+  
+  .top-cards-row, .chart-row {
+    display: flex;
+    width: 100%;
+    justify-content: space-between; // Dãn đều các phần tử
+    margin-bottom: 20px; // Khoảng cách giữa các hàng
+    padding: 0 20px; // Tạo khoảng cách hai bên cho hàng
+    box-sizing: border-box; // Bao gồm cả padding vào kích thước của phần tử
+  }
+  
+  .dashboard-card {
+    background-color: #fff; // Màu nền trắng cho các khối component
+    border-radius: 20px; // Bo tròn các góc
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Đổ bóng nhẹ
+    padding: 16px;
+    text-align: center;
+    flex: 1; // Để các khối có chiều rộng bằng nhau
+    margin: 0 10px; // Khoảng cách giữa các khối
+    min-width: 200px; // Giới hạn chiều rộng tối thiểu cho mỗi khối để tránh quá nhỏ
+  }
+  
+  @media (max-width: 768px) {
+    .top-cards-row, .chart-row {
+      flex-direction: column;
+      align-items: center;
+      padding: 0; // Bỏ padding khi trên màn hình nhỏ
     }
-    .chart-wrapper{
-        height: 100%;
-        width: 100%;
+    .dashboard-card {
+      margin-bottom: 20px;
+      max-width: none;
+      width: 100%;
     }
-}
+  }
+  .card-1 {
+    background-color: #BAE7FF; // Màu nền xanh đậm hơn cho khối 1
+  }
+  
+  .card-2 {
+    background-color: #FFCCC7; // Màu nền đỏ đậm hơn cho khối 2
+  }
+  
+  .card-3 {
+    background-color: #D3ADF7; // Màu nền tím đậm hơn cho khối 3
+  }
+  
+  .card-4 {
+    background-color: #FFE58F; // Màu nền vàng đậm hơn cho khối 4
+  }
+  

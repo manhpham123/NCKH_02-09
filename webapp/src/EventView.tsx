@@ -253,12 +253,12 @@ export function EventView() {
     if (source.in_iface) {
       commonDetails.push(["In Interface", source.in_iface]);
     }
-    if (source.flow_id) {
-      commonDetails.push([
-        "Flow ID",
-        <SearchLink field={"flow_id"} value={source.flow_id} />,
-      ]);
-    }
+    // if (source.flow_id) {
+    //   commonDetails.push([
+    //     "Flow ID",
+    //     <SearchLink field={"flow_id"} value={source.flow_id} />,
+    //   ]);
+    // }
     if (source.community_id) {
       commonDetails.push([
         "Community ID",
@@ -433,14 +433,20 @@ export function EventView() {
   function goBack() {
     if (location.state) {
       window.history.back();
-    } else if (location.pathname.startsWith("/escalated")) {
-      navigate("/escalated");
-    } else if (location.pathname.startsWith("/inbox")) {
-      navigate("/inbox");
-    } else if (location.pathname.startsWith("/alerts")) {
-      navigate("/alerts");
+    }
+    //  else if (location.pathname.startsWith("/escalated")) {
+    //   navigate("/escalated");
+    // }
+    //  else if (location.pathname.startsWith("/inbox")) {
+    //   navigate("/inbox");
+    // } 
+    else if (location.pathname.startsWith("/alerts")) {
+      alert("quay trở lại bảng alert rule");
+     // navigate("/events");
     } else if (location.pathname.startsWith("/event")) {
-      navigate("/events");
+      alert("quay lại bảng check file");
+      window.location.href = "http://localhost:3000/check-hash";
+      //navigate("/events");
     }
   }
 

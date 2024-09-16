@@ -1,0 +1,23 @@
+- các sự kiện alert và fileinfo đều quy về url:
+http://localhost:3001/#/event/event_id
+
+-  vd event alert : 
++ http://localhost:3001/#/event/26985
++ http://localhost:3001/#/event/27067
++ http://localhost:3001/#/event/26991
+
+-  vd event fileinfo:
++ http://localhost:3001/#/event/32
++ http://localhost:3001/#/event/28
+
+
+====== nhưng ta có thể phân biệt 2 sự kiện fileinfo và alerts bằng 2 url khác nhau để cho nó rành mạch hơn
+** với fileinfo url vẫn như trên
+-  vd event fileinfo:
++ http://localhost:3001/#/event/32
++ http://localhost:3001/#/event/28
+*** còn với alert có thể sử dụng url alert nhu sau
+-  vd event alert : 
++ http://localhost:3001/#/alerts/26985
++ http://localhost:3001/#/alerts/27067
++ http://localhost:3001/#/alerts/26991

@@ -1,0 +1,47 @@
+
+{
+    "_id": 28,
+    "_source": {
+        "app_proto": "http",
+        "dest_ip": "192.168.189.133",
+        "dest_port": 50516,
+        "evebox": {
+            "filename": "/var/log/suricata/eve.json",
+            "hostname": "william"
+        },
+        "event_type": "fileinfo",
+        "fileinfo": {
+            "filename": "/downloads/demo.exe",
+            "gaps": false,
+            "magic": "PE32 executable (console) Intel 80386, for MS Windows",
+            "md5": "b94af4a4d4af6eac81fc135abda1c40c",
+            "sha1": "d6356b2c6f8d29f8626062b5aefb13b7fc744d54",
+            "sha256": "6ac06dfa543dca43327d55a61d0aaed25f3c90cce791e0555e3e306d47107859",
+            "size": 61440,
+            "state": "CLOSED",
+            "stored": false,
+            "tx_id": 0
+        },
+        "flow_id": 1496855551909030,
+        "http": {
+            "hostname": "192.168.189.135",
+            "http_content_type": "application/octet-stream",
+            "http_method": "GET",
+            "http_user_agent": "Wget/1.21.2",
+            "length": 61440,
+            "protocol": "HTTP/1.1",
+            "status": 200,
+            "url": "/downloads/demo.exe"
+        },
+        "in_iface": "ens33",
+        "pkt_src": "wire/pcap",
+        "proto": "TCP",
+        "src_ip": "192.168.189.135",
+        "src_port": 80,
+        "tags": [],
+        "timestamp": "2024-09-14T16:41:49.484373+0000"
+    }
+}
+
+
+=> lấy ra thông tin "_id": 28

@@ -95,4 +95,16 @@ Link yt: https://www.youtube.com/watch?v=3J6V_JYhRas
 - Xem các images tải về : docker images
 - xóa images: docker rmi images_ID
 
-
+================ ánh xạ thư mục từ thư mục docker vào 1 thư mục trên máy thật, mỗi khi thay đổi trên máy thật thì nó cũng thay đổi trên docker.W
+1. Xóa container cũ đi
+- docker stop
+- docker rm 
+2. Tạo cấu hình mới, ánh xạ code trên docker vào 1 thư mục trên máy tính
+mỗi khi có sự thay đổi trên máy thật thì trên docker cũng thay đổi theo
+- tạo thư mục để chứa source code bwapp: mkdir /home/william/Documents/source-bwapp
+- tạo docker mới ánh xạ thư mục từ docker vào: docker run -d -p 80:80 --name bwapp -v /home/william/Documents/source-bwapp:/var/www/html hackersploit/bwapp-docker
+3. Kiểm tra trên docker
+- nếu docker bị dừng thì start lên: docker start 
+- vào terminal docker : docker exec -it (container_id) bin/bash
+- thoát terminal docker :  exit
+4. thay đổi trên máy thật và kiểm tra sự thay đổi trên docker
