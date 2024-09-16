@@ -7,6 +7,7 @@ import { CommonGetAllParams } from "../../../constants/types/common.type";
 import CardTitleCustom from "../../../components/CardTitleCustom";
 import { useNavigate } from "react-router-dom";
 import { useCheckFile } from "../../../utils/request";
+import ListButtonActionUpdate from "../../../components/ListButtonActionUpdate";
 
 const CheckFileTable: FC = () => {
   const navigate = useNavigate();
@@ -43,6 +44,9 @@ const CheckFileTable: FC = () => {
 
   const getFileName = (filePath: string) => {
     return filePath.split('/').pop(); // Lấy tên file từ đường dẫn
+  };
+  const ChiTietFile = () => {
+    window.location.href = 'http://localhost:3001/#/event/28';
   };
  
   const columns: ColumnsType<any> = [
@@ -166,6 +170,34 @@ const CheckFileTable: FC = () => {
         <Tooltip title={group}>
           <div className="inline-text">{group}</div>
         </Tooltip>
+      ),
+    },
+    {
+      key: 10,
+      title: "Chi Tiết Flow",
+      align: "center",
+      width: "8%",
+      render: (_, record) => (
+        <>
+          <ListButtonActionUpdate
+            // editFunction={() => {}}
+            viewFunction={() =>  navigate(`/flow-details/${record.flow_id}`)}
+          />
+        </>
+      ),
+    },
+    {
+      key: 10,
+      title: "Chi Tiết File",
+      align: "center",
+      width: "8%",
+      render: (_, record) => (
+        <>
+          <ListButtonActionUpdate
+            // editFunction={() => {}}
+            viewFunction={ChiTietFile}
+          />
+        </>
       ),
     },
     // {
