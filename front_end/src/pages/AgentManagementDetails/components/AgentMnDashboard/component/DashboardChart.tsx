@@ -45,6 +45,7 @@ const AgentMnDashboardChart: FC<Props> = ({ id }) => {
             setDatatancong(datapactack)
         }
     },[])
+    /*
     const dataPieChart = {
         labels: ['Quang Huy', 'Dang Duong', 'Hoang Dat'],
         datasets: [
@@ -57,7 +58,8 @@ const AgentMnDashboardChart: FC<Props> = ({ id }) => {
         ],
 
     }
-    const dataLineChart: any = {
+*/
+   /* const dataLineChart: any = {
         labels: ['0.00-3.00', '3.00-6.00', '6.00-9.00', '9.00-12.00', '12.00-15.00', '15.00-18.00', '18.00-21.00', '21.00-24.00'],
         datasets: [
             {
@@ -80,6 +82,7 @@ const AgentMnDashboardChart: FC<Props> = ({ id }) => {
             }
         ]
     }
+        */
     const optionsLine: ChartOptions = {
         responsive: true,
         plugins: {
@@ -175,6 +178,7 @@ const AgentMnDashboardChart: FC<Props> = ({ id }) => {
             data: dataservice?.Unknown,
         }
     ]
+    
     const listServices = {
         labels: mockDataService.map(item => item.name),
         datasets: [
@@ -188,6 +192,7 @@ const AgentMnDashboardChart: FC<Props> = ({ id }) => {
             },
         ],
     };
+    
     const optionsBar: any = {
         scales: {
             x:{
@@ -242,12 +247,12 @@ const AgentMnDashboardChart: FC<Props> = ({ id }) => {
             <Typography className='chart-title'>Thống Kê Service</Typography>
              <Bar data={listServices} options={optionsBar} plugins={[chartAreaBackground]} />
             </div>
-            <div className='chart-item'>
+            {/* <div className='chart-item'>
             <HighchartsReact highcharts={Highcharts} options={customepie} />
             </div>
             <div className='chart-item'>
              <HighchartsReact highcharts={Highcharts} options={customepieactack} /> 
-            </div>
+            </div> */}
         </Space>
 
     );
