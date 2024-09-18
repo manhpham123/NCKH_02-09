@@ -34,13 +34,21 @@ body {
     background-color: #fff; // Màu nền trắng cho các khối component
     border-radius: 20px; // Bo tròn các góc
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Đổ bóng nhẹ
-    padding: 16px;
-    text-align: center;
+    padding: 0px;
+    text-align: center; 
     flex: 1; // Để các khối có chiều rộng bằng nhau
     margin: 0 10px; // Khoảng cách giữa các khối
     min-width: 200px; // Giới hạn chiều rộng tối thiểu cho mỗi khối để tránh quá nhỏ
+    height: 100%;  // Đảm bảo thẻ (Card) chiếm toàn bộ chiều cao của cột
+    width: 100%;   // Đảm bảo thẻ (Card) chiếm toàn bộ chiều rộng của cột
   }
-  
+  .highcharts-container {
+    width: 100% !important;  // Đảm bảo biểu đồ chiếm toàn bộ chiều rộng của thẻ
+    height: 100% !important; // Đảm bảo biểu đồ chiếm toàn bộ chiều cao của thẻ
+  }
+  .highcharts-root {
+    height: 100%; // Đảm bảo biểu đồ gốc chiếm toàn bộ chiều cao
+  }
   @media (max-width: 768px) {
     .top-cards-row, .chart-row {
       flex-direction: column;
@@ -62,10 +70,51 @@ body {
   }
   
   .card-3 {
-    background-color: #D3ADF7; // Màu nền tím đậm hơn cho khối 3
+    background-color: #d6cced; // Màu nền tím đậm hơn cho khối 3
   }
   
   .card-4 {
-    background-color: #FFE58F; // Màu nền vàng đậm hơn cho khối 4
+    background-color:#e3e1cc; // Màu nền vàng đậm hơn cho khối 4
   }
-  
+  .chart-row {
+    width: 100%; // Đảm bảo hàng chiếm toàn bộ chiều ngang
+    padding: 0 20px; // Tạo khoảng cách hai bên cho hàng
+    box-sizing: border-box; // Bao gồm cả padding vào kích thước của phần tử
+  }
+  .card-content {
+    display: flex; // Sử dụng Flexbox để bố trí
+    justify-content: space-between; // Icon và thông tin dãn đều hai bên
+    align-items: center; // Căn giữa theo chiều dọc
+    width: 90%;
+  }
+  .card-info {
+    display: flex;
+    flex-direction: column; // Sắp xếp tiêu đề và giá trị theo cột
+    margin-right: 10px; // Điều chỉnh khoảng cách với icon
+  }
+  .card-info h3 {
+    margin: 0;
+    margin-left: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .card-info p {
+    margin: 0;
+    font-size: 32px;
+    font-weight: bold;
+    color: #000;
+  }
+
+  .card-sub-info {
+    margin-top: 8px;
+    color: #52c41a; // Màu sắc cho thay đổi tăng
+  }
+
+  .card-icon {
+    font-size: 48px; // Kích thước của icon
+    color: #8c8c8c; // Màu của icon
+    margin-left: 10px; // Điều chỉnh khoảng cách với text để gần lại hơn
+  }
+ 

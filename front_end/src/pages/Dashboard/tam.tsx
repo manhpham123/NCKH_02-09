@@ -67,13 +67,10 @@ const Dashboard = () => {
     }
   }, [data, datapactack]);
 
-  // Chuyển đổi dữ liệu từ backend thành mảng các cặp [key, value]
-  const attackData: ChartDataType[] = Object.entries(datapactack || {}).map(([key, value]) => ({
-    name: key,
-    y: value as number,
-  }));
-
-  const topAttacks = attackData.slice(0, 3); // Lấy top 3 tấn công
+  // Kiểm tra và tạo topAttacks
+  const topAttacks = datapactack && typeof datapactack === 'object'
+    ? Object.entries(datapactack).slice(0, 3)
+    : [];
 
   // Kiểm tra dữ liệu trước khi cấu hình biểu đồ
   const hasAttackData = datatancong && Object.keys(datatancong).length > 0;
@@ -120,7 +117,13 @@ const Dashboard = () => {
     },
     series: [{
       name: 'số lượng flow',
-      data: attackData,  // Sử dụng dữ liệu đã chuyển đổi từ backend
+      data: [
+        { name: 'Port Scan', y: datatancong?.PortScan, color: '#02b2af' },
+        { name: 'Unknown attack', y: datatancong?.['Unknown attack'], color: '#2e96ff' },
+        { name: 'DoS', y: datatancong['DoS slowloris'], color: '#b800d8' },
+        { name: 'Bruce Force', y: datatancong['Bruce Force'], color: '#2731c8' },
+        { name: 'BENIGN', y: datatancong.BENIGN, color: '#60009b' }
+      ]
     }]
   } : null;
 
@@ -164,15 +167,15 @@ const Dashboard = () => {
     },
     series: [{
       name: 'số lượng flow',
-      data: Object.entries(datagiaothuc || {}).map(([key, value]) => ({
-        name: key,
-        y: value as number,
-      })),
+      data: [
+        { name: 'TCP', y: datagiaothuc?.TCP, color: '#02b2af' },
+        { name: 'UDP', y: datagiaothuc?.UDP, color: '#2e96ff' }
+      ]
     }]
   } : null;
 
   // Cấu hình biểu đồ dịch vụ nếu có dữ liệu
-  const BieuDoCot = hasServiceData ? {
+  const optionsCot = hasServiceData ? {
     chart: {
       type: 'column',
       height: 500,
@@ -248,25 +251,23 @@ const Dashboard = () => {
                 </div>
               </Card>
             </Col>
-            
-<Col xs={24} sm={12} md={6}>
-  <Card className="dashboard-card card-3" bodyStyle={{ padding: '0 0 20px 0' }}>
-    <div style={{ textAlign: 'left', marginLeft: '20px' }}>  {/* Ghi đè thuộc tính căn giữa và thêm margin-left */}
-      <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1b1529', marginBottom: '5px' ,marginLeft: '30px'}}>
-        <ShareAltOutlined /> Top 3 Cuộc Tấn Công
-      </h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingLeft: '20px', alignItems: 'flex-start', marginLeft: '20px' }}> {/* Sử dụng alignItems: 'flex-start' và thêm marginLeft */}
-        {topAttacks.map((attack, index) => (
-          <p key={attack.name} style={{ fontSize: '16px', fontWeight: '600', color: '#1b1529', fontFamily: 'Arial, sans-serif', margin: '0 0 0 20px' }}> {/* Thêm margin-left cho mỗi thẻ p */}
-            {index + 1}. {attack.name}: {attack.y}
-          </p>
-        ))}
-      </div>
-    </div>
-  </Card>
-</Col>
 
-
+            <Col xs={24} sm={12} md={6}>
+              <Card className="dashboard-card card-3" bodyStyle={{ padding: '0 0 20px 0' }}>
+                <div>
+                  <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1b1529', marginBottom: '5px' }}>
+                    <ShareAltOutlined /> Top 3 Cuộc Tấn Công
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {topAttacks.map(([attackType, count], index) => (
+                      <p key={attackType} style={{ fontSize: '16px', fontWeight: '600', color: '#1b1529', fontFamily: 'Arial, sans-serif', margin: 0 }}>
+                        {index + 1}. {attackType}: {count as number}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            </Col>
 
             <Col xs={24} sm={12} md={6}>
               <Card className="dashboard-card card-4" bodyStyle={{ padding: '0 0 20px 0' }}>
@@ -306,10 +307,10 @@ const Dashboard = () => {
 
           {/*=========== Hàng thứ ba: một biểu đồ cột thống kê các dịch vụ */}
           <Row gutter={[30, 16]} className="chart-row">
-            {BieuDoCot ? (
+            {optionsCot ? (
               <Col xs={24} md={24}>
                 <Card className="dashboard-card">
-                  <HighchartsReact highcharts={Highcharts} options={BieuDoCot} />
+                  <HighchartsReact highcharts={Highcharts} options={optionsCot} />
                 </Card>
               </Col>
             ) : <p>Không có dữ liệu dịch vụ để hiển thị.</p>}
