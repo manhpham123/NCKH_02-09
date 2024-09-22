@@ -20,7 +20,7 @@ from scapy.all import sniff, IP, TCP, raw
 client = MongoClient("mongodb://localhost:27017/")
 db = client["cici_flow"]
 ip = "192.168.189.133"
-intf_str = "ens36"
+intf_str = "ens33"
 collection_packets = db[f"packet_{ip}_{intf_str}"]
 
 def read_raw_payload(collection_name, flow_id):
@@ -98,6 +98,8 @@ def softmax(x, axis=None):
 def preprocess(packet_hex):
     packet_bytes = bytes.fromhex(packet_hex)
     packet = Ether(packet_bytes)
+    
+    # Kiểm tra và xử lý loại frame
     if packet.firstlayer().name != "Ethernet":
         packet = CookedLinux(packet_bytes)
         if packet.firstlayer().name != "cooked linux":
@@ -105,6 +107,7 @@ def preprocess(packet_hex):
                 f"{packet.firstlayer().name} frame not implemented. Ethernet and Cooked Linux are only supported."
             )
 
+    # Kiểm tra xem gói tin có lớp "IP" và "TCP" không
     if "IP" not in packet or "TCP" not in packet:
         raise ValueError("Only TCP/IP packets are supported.")
 
@@ -112,7 +115,7 @@ def preprocess(packet_hex):
     backward_packets = 0
     bytes_transfered = len(packet_bytes)
 
-    # Extract relevant information for feature creation.
+    # Trích xuất thông tin cần thiết để tạo feature.
     src_ip = packet["IP"].src
     dst_ip = packet["IP"].dst
     ip_length = len(packet["IP"])
@@ -123,9 +126,12 @@ def preprocess(packet_hex):
     tcp_data_offset = packet["TCP"].dataofs
     tcp_flags = packet["TCP"].flags
 
-    # Process payload content and create a feature string.
-    #payload_bytes = bytes(packet["IP"].payload if args.ip else packet["TCP"].payload)
-    payload_bytes = bytes(packet["TCP"].payload)
+    # Xử lý nội dung payload và tạo chuỗi feature.
+    if "IP" in packet and "TCP" in packet:
+        payload_bytes = bytes(packet["TCP"].payload)  # Sử dụng payload của TCP nếu có
+    else:
+        payload_bytes = bytes(packet["IP"].payload)  # Sử dụng payload của IP nếu không có TCP
+    
     payload_length = len(payload_bytes)
     payload_decimal = [str(byte) for byte in payload_bytes]
 
@@ -145,17 +151,88 @@ def preprocess(packet_hex):
         -1,
     ] + payload_decimal
 
-    final_data = " ".join(str(s) for s in final_data)
+    if len(payload_decimal) > 0:
+        final_data = " ".join(str(s) for s in final_data)
+        return final_data  
+    else:
+        return ""
+packets_brief = {}
+forward_packets = {}
+backward_packets = {}
+protocols = []
+protocol_counts = {}
+
+def processing_packet_conversion(packet_hex):
+    # Chuyển đổi chuỗi hex thành dạng byte
+    packet_bytes = bytes.fromhex(packet_hex)
+    
+    # Tạo đối tượng gói tin từ byte (Ethernet hoặc CookedLinux)
+    packet = Ether(packet_bytes)
+    if packet.firstlayer().name != "Ethernet":
+        packet = CookedLinux(packet_bytes)
+        if packet.firstlayer().name != "cooked linux":
+            raise ValueError(
+                f"{packet.firstlayer().name} frame not implemented. Ethernet and Cooked Linux are only supported."
+            )
+
+    # Tạo một bản sao của gói tin để xử lý mà không làm thay đổi gói tin gốc
+    packet_2 = packet.copy()
+
+    while packet_2:
+        # Trích xuất và đếm các lớp giao thức trong gói tin.
+        layer = packet_2[0]
+        if layer.name not in protocol_counts:
+            protocol_counts[layer.name] = 1  # Bắt đầu đếm từ 1
+        else:
+            protocol_counts[layer.name] += 1
+        protocols.append(layer.name)
+
+        # Thoát khỏi vòng lặp nếu không còn lớp payload nào
+        if not layer.payload:
+            break
+        packet_2 = layer.payload
+
+    # Kiểm tra xem gói tin có các lớp IP và TCP không
+    if IP not in packet or TCP not in packet:
+        raise ValueError("Only TCP/IP packets are supported.")
+
+    # Trích xuất thông tin cần thiết cho việc tạo feature.
+    src_ip = packet["IP"].src
+    dst_ip = packet["IP"].dst
+    src_port = packet["TCP"].sport
+    dst_port = packet["TCP"].dport
+    ip_length = len(packet["IP"])
+    ip_ttl = packet["IP"].ttl
+    ip_tos = packet["IP"].tos
+    tcp_data_offset = packet["TCP"].dataofs
+    tcp_flags = packet["TCP"].flags
+
+    # Xử lý nội dung payload và tạo chuỗi feature.
+    payload_bytes = bytes(packet["TCP"].payload)  # Lấy payload từ lớp TCP
+    payload_length = len(payload_bytes)
+    # Chuyển payload thành chuỗi ký tự
+    payload_content = payload_bytes.decode('utf-8', 'replace')
+    # Chuyển đổi payload thành chuỗi số thập phân
+    payload_decimal = ' '.join(str(byte) for byte in payload_bytes)
+    
+    # Tạo chuỗi dữ liệu đặc trưng
+    final_data = "0" + " " + "0" + " " + "195" + " " + "-1" + " " + \
+                 str(src_port) + " " + str(dst_port) + " " + str(ip_length) + " " + \
+                 str(payload_length) + " " + str(ip_ttl) + " " + str(ip_tos) + " " + \
+                 str(tcp_data_offset) + " " + str(int(tcp_flags)) + " " + "-1" + " " + payload_decimal
+    
     return final_data
 
-def predict(models, packet_hex):
+
+def predict(models, processed_packet):
     # Tiền xử lý packet_hex
-    final_format = preprocess(packet_hex)
+    
+    final_format = processed_packet
 
     # Khởi tạo tokenizer
     tokenizer = models["tokenizer"]
     # Mã hóa dữ liệu đầu vào
-    model_inputs = tokenizer(final_format[:1024], return_tensors="pt")  # Sử dụng "pt" cho PyTorch
+    model_inputs = tokenizer(final_format[:1024], return_tensors="pt", truncation=True, max_length=512)  # Sử dụng "pt" cho PyTorch
     input_ids = model_inputs["input_ids"]
     attention_mask = model_inputs["attention_mask"]
 
@@ -240,8 +317,8 @@ def recognize_from_packet(models, packet_hex, flow_id):
     
     #print("Script finished successfully.")
     
-MODEL_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/bert-packet-flow/model"
-TOKENIZER_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/bert-packet-flow/tokenizer"
+MODEL_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/5000_5lab"
+TOKENIZER_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/5000_5lab"
 
 def load_model_and_tokenizer(model_dir, tokenizer_dir):
     # Kiểm tra xem model và tokenizer đã tồn tại chưa
@@ -305,6 +382,104 @@ def bert_pred(flow_id, collection_name):
                         attack_label[label]= 0
     return attack_label
 
+def bert_pred_stats(flow_id, collection_name, attack_threshold=0, score_threshold=50):
+    """
+    Dự đoán nhãn của các packets trong một flow và tính số lượng packets, tổng điểm có trọng số, 
+    và trung bình % dự đoán cho mỗi nhãn tấn công. 
+    Nếu số lượng packets có nhãn "Normal" chiếm hơn 95% tổng số packets, thì kết quả của flow là "Normal". 
+    Chỉ tính điểm cho các nhãn tấn công nếu score của nhãn đó vượt qua ngưỡng `score_threshold`.
+
+    Args:
+    - flow_id (str): ID của flow cần dự đoán.
+    - collection_name (str): Tên của bộ sưu tập chứa dữ liệu flow.
+    - attack_threshold (int): Ngưỡng tỉ lệ để quyết định nhãn tấn công (mặc định là 20%).
+    - score_threshold (int): Ngưỡng để xác định score tối thiểu cho một nhãn để được tính điểm (mặc định là 50%).
+
+    Returns:
+    - dict: Từ điển chứa tỉ lệ % dự đoán trung bình, số packet/tổng số packet, và điểm trung bình theo trọng số cho mỗi nhãn tấn công.
+    - str: "Normal" nếu số lượng packets "Normal" > 95%, ngược lại là danh sách các nhãn tấn công có điểm trung bình vượt qua ngưỡng `attack_threshold`.
+    """
+    # Định nghĩa bảng trọng số cho các nhãn tấn công
+    weight_table = {
+        "Analysis": 1, "Backdoor": 5, "Bot": 4, "DDoS": 5, "DoS": 4,
+        "DoS GoldenEye": 4, "DoS Hulk": 4, "DoS SlowHTTPTest": 4, "DoS Slowloris": 4,
+        "Exploits": 5, "FTP Patator": 2, "Fuzzers": 2, "Generic": 1, "Heartbleed": 2,
+        "Infiltration": 5, "Port Scan": 3, "Reconnaissance": 3, "SSH Patator": 2,
+        "Shellcode": 5, "Web Attack - Brute Force": 3, "Web Attack - SQL Injection": 4,
+        "Web Attack - XSS": 3, "Worms": 5
+    }
+
+    # Khởi tạo từ điển để lưu số lượng packets và tổng điểm có trọng số cho mỗi nhãn
+    attack_stats = {}
+    normal_count = 0  # Biến đếm số lượng packets có nhãn "Normal"
+    total_packets = 0  # Tổng số lượng packets
+    labels_above_threshold = []  # Danh sách nhãn có điểm trung bình vượt ngưỡng
+
+    # Load mô hình và tokenizer
+    model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
+    models = {"tokenizer": tokenizer, "model": model}
+    flow_payload = read_raw_payload(collection_name, flow_id=flow_id)
+    packets = flow_payload["raw_payload"]
+    top_k = 3
+
+    # Duyệt qua từng packet để dự đoán nhãn
+    for packet in packets:
+        packet = preprocess(packet)
+        total_packets += 1  # Tăng tổng số lượng packets
+        try:
+            output = predict(models, packet)
+            labels, scores = output
+        except ValueError:
+            continue
+
+        # Cập nhật số lượng và tổng điểm cho mỗi nhãn tấn công
+        for label, score in list(zip(labels, scores))[:top_k]:
+            print(f"{label} : {score * 100:.3f}")
+            # Chỉ tính toán nếu score vượt qua ngưỡng score_threshold
+            if score * 100 >= score_threshold:
+                if label == "Normal":
+                    normal_count += 1  # Tăng số lượng packets có nhãn "Normal"
+                else:
+                    if label not in attack_stats:
+                        attack_stats[label] = {'count': 0, 'total_score': 0.0}
+                    
+                    # Áp dụng trọng số từ bảng trọng số cho nhãn
+                    weight = weight_table[label]
+                    attack_stats[label]['count'] += 1
+                    #attack_stats[label]['total_score'] += score * 100 * weight
+                    attack_stats[label]['total_score'] += score * 100
+
+    # Kiểm tra nếu số lượng packets "Normal" chiếm hơn 95%
+    if normal_count / total_packets > 0.95:
+        return {}, "Normal"
+
+    # Tính toán trung bình % dự đoán cho mỗi nhãn và kiểm tra ngưỡng tấn công
+    for label, stats in attack_stats.items():
+        if stats['count'] > 0:
+            stats['average_score'] = stats['total_score'] / stats['count']
+            stats['percentage_packets'] = (stats['count'] / total_packets) * 100
+            stats['weighted_average_score'] = stats['total_score'] / stats['count']
+        else:
+            stats['average_score'] = 0
+            stats['percentage_packets'] = 0
+            stats['weighted_average_score'] = 0
+        
+        # Kiểm tra nếu nhãn có điểm trung bình vượt qua ngưỡng
+        if stats['average_score'] >= attack_threshold:
+            labels_above_threshold.append({
+                'label': label,
+                'average_percentage_score': stats['average_score'],
+                'packet_ratio': f"{stats['count']}/{total_packets}",
+                'weighted_average_score': stats['weighted_average_score']
+            })
+
+    return attack_stats, labels_above_threshold
+
+
+
+
+
+
 def bert_pred_pt(flow_id, collection_name):
     attack_label = {}  # Tạo dictionary để lưu tổng số điểm và số lần xuất hiện của mỗi nhãn
     model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
@@ -315,18 +490,23 @@ def bert_pred_pt(flow_id, collection_name):
     flow_payload = read_raw_payload(collection_name, flow_id=flow_id)
     packets = flow_payload["raw_payload"]
     top_k = 3
+    total_packet = 0
 
     # Duyệt qua từng packet để dự đoán nhãn
     for packet in packets:
+        packet = preprocess(packet)
         try:
-            labels, scores = recognize_from_packet(models, packet, flow_payload["flow_id"])
+            output = predict(models, packet)
+            labels, scores = output
         except ValueError as e:
             # Bỏ qua packet không phải là TCP/IP
             print(f"Packet không phải là TCP/IP cho flow_id {flow_id}: {str(e)}")
             continue
         for label, score in list(zip(labels, scores))[:top_k]:
+            total_packet += 1
             # Nếu nhãn đã có trong attack_label, cập nhật tổng điểm và số lần xuất hiện
             #if label != "Normal":
+            
             if label in attack_label:
                 attack_label[label]["total_score"] += score * 100  # Cộng tổng điểm
                 attack_label[label]["count"] += 1
@@ -338,7 +518,7 @@ def bert_pred_pt(flow_id, collection_name):
     # Tính toán trung bình % dự đoán của mỗi nhãn
     average_attack_label = {}
     for label, data in attack_label.items():
-        average_attack_label[label] = data["total_score"] / data["count"]  # Tính trung bình
+        average_attack_label[label] = data["total_score"] / total_packet  # Tính trung bình
 
     return average_attack_label  # Trả về kết quả là dictionary chứa trung bình % dự đoán của mỗi nhãn
 
@@ -442,6 +622,64 @@ def bert_pred_hybrid(flow_id, collection_name, attack_threshold=20):
 
     return "Normal"  # Trả về "Normal" nếu không có nhãn tấn công nào vượt ngưỡng
 
+def bert_pred_hybrid_improved(flow_id, collection_name, attack_threshold=20, window_size=5):
+    """
+    Xác định nhãn của một flow dựa trên tỉ lệ dự đoán nhãn của các packets
+    và sử dụng cửa sổ trượt để tăng cường độ chính xác phát hiện tấn công.
+
+    Args:
+    - flow_id (str): ID của flow cần dự đoán.
+    - collection_name (str): Tên của bộ sưu tập chứa dữ liệu flow.
+    - attack_threshold (int): Ngưỡng tỉ lệ để quyết định nhãn tấn công (mặc định là 20%).
+    - window_size (int): Kích thước của cửa sổ trượt để phân tích các packet.
+
+    Returns:
+    - str: Nhãn của flow hoặc "Normal" nếu không đạt ngưỡng tấn công.
+    """
+    attack_label = {}  # Dictionary để lưu tổng điểm của mỗi nhãn không phải "Normal"
+    normal_count = 0   # Biến đếm số lượng packets được dự đoán là "Normal"
+    model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
+    models = {
+        "tokenizer": tokenizer,
+        "model": model,
+    }
+    flow_payload = read_raw_payload(collection_name, flow_id=flow_id)
+    packets = flow_payload["raw_payload"]
+    top_k = 3
+
+    # Duyệt qua từng packet để dự đoán nhãn theo cửa sổ trượt
+    for i in range(0, len(packets), window_size):
+        window_packets = packets[i:i+window_size]  # Lấy các packet trong cửa sổ
+        for packet in window_packets:
+            try:
+                labels, scores = recognize_from_packet(models, packet, flow_payload["flow_id"])
+            except ValueError:
+                # Bỏ qua packet không phải là TCP/IP
+                continue
+            
+            # Cập nhật tổng điểm cho mỗi nhãn
+            for label, score in list(zip(labels, scores))[:top_k]:
+                if label == "Normal":
+                    normal_count += 1  # Tăng số lượng packets "Normal"
+                else:
+                    # Nếu là nhãn tấn công, cộng dồn tổng điểm cho nhãn đó
+                    attack_label[label] = attack_label.get(label, 0) + score * 100
+
+    # Tổng số packets đã xử lý
+    total_packets = len(packets)
+
+    # Nếu không có nhãn tấn công nào hoặc tất cả là "Normal"
+    if not attack_label or total_packets == normal_count:
+        return "Normal"  # Tất cả packets đều "Normal"
+
+    # Tính tỉ lệ các nhãn tấn công và quyết định nhãn cuối cùng
+    for label, score in attack_label.items():
+        ratio = (score / (total_packets * 100)) * 100  # Tỉ lệ nhãn tấn công
+        if ratio >= attack_threshold:
+            return label  # Nhãn tấn công có tỉ lệ vượt ngưỡng
+
+    return "Normal"  # Trả về "Normal" nếu không có nhãn tấn công nào vượt ngưỡng
+
 
 
 def main():
@@ -454,11 +692,11 @@ def main():
     print("hello")
     count = 0
     
-    #packets = read_packets_from_file('packets_hex.txt')
+    packets = read_packets_from_file('packets.txt')
     # flow = read_raw_payload(collection_packets, "fl00003")
     # packets = flow["raw_payload"]
     
-    flows = read_all_payload(collection_packets)
+    #flows = read_all_payload(collection_packets)
     
     
     
@@ -473,14 +711,14 @@ def main():
             
     #         print(f"flow_id : {fl_id}" ,attack_label[fl_id])
         
-    #print(bert_pred_hybrid("fl00561", collection_packets))
+    #print(bert_pred_stats("fl00003", collection_packets))
     
     # for packet_hex in packets:
     #     count += 1
     #     if count == 800:
     #         break
-    # #recognize_from_packet(models, packet_hex)
-    #     print(recognize_from_packet(models, packet_hex))
+    #recognize_from_packet(models, packet_hex)
+    print(bert_pred_stats("fl05945", collection_packets))
         
  
     

@@ -259,8 +259,6 @@ def read_all_data_time(collection_name, time_col):
     return all_data
 
 
-
-
 def FilterRead_data(filter_field, filter_value):
     """
     Đọc dữ liệu từ MongoDB và lọc theo trường cụ thể.
@@ -690,6 +688,7 @@ def get_ls(df_st):
 
 def Filter(field, value, df_st):
     filter_data = []
+    
     print(field, ':', value)
     for d in df_st:
         if d[field] == value:
