@@ -700,5 +700,5 @@ def main():
     #     if count == 800:
     #         break
     #recognize_from_packet(models, packet_hex)
-    print(bert_pred_stats("fl05945", collection_packets))   
+    #print(bert_pred_stats("fl05945", collection_packets))   
 main()
