@@ -204,6 +204,16 @@ async def get_flow(flow_id: str = Query(...)):
     # Nếu có lỗi, trả về thông báo lỗi với status code 500
         raise HTTPException(status_code=500, detail=str(e))
     
+@app.get("/get_bert_pre/", response_model=Dict)
+async def get_bert(flow_id: str = Query(...)):
+    try:
+        flow_id = str(flow_id)
+        result = get_bert_predict(flow_id)
+        return result
+    except Exception as e:
+    # Nếu có lỗi, trả về thông báo lỗi với status code 500
+        raise HTTPException(status_code=500, detail=str(e))
+    
    
     
 #API: http://127.0.0.1:8000/items/?page=1&limit=10&filter_field=Source%20IP&filter_value=117.18.232.200   

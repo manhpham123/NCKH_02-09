@@ -190,13 +190,21 @@ def get_flow_by_id(flow_id):
     flow = collection.find_one({"_id": str(flow_id)})
     predict = flowpre_collection.find_one({"flow_id": str(flow_id)})
     predict.pop("_id", None)
+    combine_flow_pre = {"info": flow,
+                        "pre_rf_ae":predict
+                        }
+    return combine_flow_pre
+
+def get_bert_predict(flow_id):
+    print(flow_id)
+    flow = collection.find_one({"_id": str(flow_id)})
     bert_pred_fl = bert_pred_pt(flow_id, collection_packets)
     top_3 = dict(sorted(bert_pred_fl.items(), key=lambda x: x[1], reverse=True)[:3])
     combine_flow_pre = {"info": flow,
-                        "pre_rf_ae":predict,
-                        "bert": top_3}
+                        "pre_rf_ae":top_3
+                        }
     return combine_flow_pre
-    
+   
 def get_files():
     files = get_flow_file()
     flow_files = []

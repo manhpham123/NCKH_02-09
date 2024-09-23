@@ -61,30 +61,12 @@ def use_packets(packets):
 
 
 LABELS = [
-    "Analysis",
-    "Backdoor",
-    "Bot",
-    "DDoS",
-    "DoS",
-    "DoS GoldenEye",
-    "DoS Hulk",
-    "DoS SlowHTTPTest",
     "DoS Slowloris",
-    "Exploits",
-    "FTP Patator",
-    "Fuzzers",
-    "Generic",
-    "Heartbleed",
-    "Infiltration",
     "Normal",
     "Port Scan",
-    "Reconnaissance",
     "SSH Patator",
-    "Shellcode",
-    "Web Attack - Brute Force",
     "Web Attack - SQL Injection",
-    "Web Attack - XSS",
-    "Worms",
+    "Web Attack - XSS"
 ]
 
 def softmax(x, axis=None):
@@ -317,8 +299,8 @@ def recognize_from_packet(models, packet_hex, flow_id):
     
     #print("Script finished successfully.")
     
-MODEL_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/5000_5lab"
-TOKENIZER_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/5000_5lab"
+MODEL_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/6_label_v1"
+TOKENIZER_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/6_label_v1"
 
 def load_model_and_tokenizer(model_dir, tokenizer_dir):
     # Kiểm tra xem model và tokenizer đã tồn tại chưa
@@ -718,8 +700,5 @@ def main():
     #     if count == 800:
     #         break
     #recognize_from_packet(models, packet_hex)
-    print(bert_pred_stats("fl05945", collection_packets))
-        
- 
-    
+    print(bert_pred_stats("fl05945", collection_packets))   
 main()
