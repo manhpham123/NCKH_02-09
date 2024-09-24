@@ -22,4 +22,5 @@ export const MONITOR_FLOW = "/monitor-flow";
 export const FLOW_DETAILS = "/flow-details/:id";
 export const CHECK_FILE = "/check-hash";
 export const FILE_DETAILS = "/file-details/:id";
+export const ALERT_RULE = "/rule-alert";
 

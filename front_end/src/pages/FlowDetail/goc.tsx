@@ -120,14 +120,21 @@ const FlowDetails: FC = () => {
           {/* Phần chứa biểu đồ tròn ở bên phải */}
           <Col span={13}>
             <div className="right-side-container">
-              <div className="threshold-container">
-                <Text strong>Threshold: 0.03</Text>
-                <br />
-                <Text strong>MSE_Autoencoder: {preRfAeData.MSE_Autoencoder || 'N/A'}</Text>
+              <div className="threshold-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <Text strong>Threshold: 0.03</Text>
+                  <br />
+                  <Text strong>MSE_Autoencoder: {preRfAeData.MSE_Autoencoder || 'N/A'}</Text>
+                </div>
+                <Button
+                  type="primary"
+                  onClick={handlePrint}
+                  className="print-button"
+                  style={{ marginLeft: '100px' }} // Thêm marginLeft: 'auto' để đẩy button sang phải
+                >
+                  PRINT
+                </Button>
               </div>
-              <Button type="primary" onClick={handlePrint} className="print-button">
-                Print
-              </Button>
               <div className="pie-charts-container">
                 {/* Biểu đồ tròn đầu tiên */}
                 <div className="pie-chart">

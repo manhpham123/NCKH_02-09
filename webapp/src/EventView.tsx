@@ -442,7 +442,7 @@ export function EventView() {
     // } 
     else if (location.pathname.startsWith("/alerts")) {
       alert("quay trở lại bảng alert rule");
-     // navigate("/events");
+      window.location.href = ("http://localhost:3000/rule-alert");
     } else if (location.pathname.startsWith("/event")) {
       alert("quay lại bảng check file");
       window.location.href = "http://localhost:3000/check-hash";

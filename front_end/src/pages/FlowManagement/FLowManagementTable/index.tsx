@@ -157,7 +157,7 @@ const FLowManagementTable: FC<Props> = ({setFilters, filters}) => {
         return (
           <Tooltip title={group}>
             <div className={`inline-text ${color ? 'prediction-column' : ''}`} style={{ backgroundColor: color,color: 'white',fontWeight: 'bold' }}
-            onClick={flow_detail} 
+            // onClick={flow_detail} 
             >{group}</div>
           </Tooltip>
         );

@@ -73,7 +73,7 @@ const Dashboard = () => {
     y: value as number,
   }));
 
-  const topAttacks = attackData.slice(0, 3); // Lấy top 3 tấn công
+  const topAttacks = attackData.slice(1, 4); // Lấy top 3 tấn công
 
   // Kiểm tra dữ liệu trước khi cấu hình biểu đồ
   const hasAttackData = datatancong && Object.keys(datatancong).length > 0;
@@ -89,7 +89,7 @@ const Dashboard = () => {
       width: 690,
     },
     title: {
-      text: 'Thống kê tấn công'
+      text: 'THỐNG KÊ TẤN CÔNG'
     },
     plotOptions: {
       pie: {
@@ -133,7 +133,7 @@ const Dashboard = () => {
       width: 690,
     },
     title: {
-      text: 'Thống kê Protocol'
+      text: 'THỐNG KÊ GIAO THỨC'
     },
     plotOptions: {
       pie: {
@@ -179,7 +179,7 @@ const Dashboard = () => {
       backgroundColor: 'white',
     },
     title: {
-      text: 'Thống Kê Service'
+      text: 'THỐNG KÊ DỊCH VỤ'
     },
     xAxis: {
       categories: chartData.map(item => item.name),
@@ -275,9 +275,9 @@ const Dashboard = () => {
                     <ShareAltOutlined /> Top 3 Rule
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <p style={{ fontSize: '16px', fontWeight: '600', color: '#ed0c31', fontFamily: 'Arial, sans-serif', margin: 0 }}>1. 12345</p>
-                    <p style={{ fontSize: '16px', fontWeight: '600', color: '#ed0c31', fontFamily: 'Arial, sans-serif', margin: 0 }}>2. 56789</p>
-                    <p style={{ fontSize: '16px', fontWeight: '600', color: '#ed0c31', fontFamily: 'Arial, sans-serif', margin: 0 }}>3. 13271</p>
+                    <p style={{ fontSize: '16px', fontWeight: '600', color: '#ed0c31', fontFamily: 'Arial, sans-serif', margin: 0 }}>1. 2016672</p>
+                    <p style={{ fontSize: '16px', fontWeight: '600', color: '#ed0c31', fontFamily: 'Arial, sans-serif', margin: 0 }}>2. 2017808</p>
+                    <p style={{ fontSize: '16px', fontWeight: '600', color: '#ed0c31', fontFamily: 'Arial, sans-serif', margin: 0 }}>3. 2010963</p>
                   </div>
                 </div>
               </Card>
