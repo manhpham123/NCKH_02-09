@@ -19,13 +19,16 @@ const FlowDetails: FC = () => {
 
   const fetchDataFlow = async () => {
     const res = await FlowApi.GetFlowDetails({ flow_id: id });
-    const info = res.data.info;
-    const data = Object.entries(info).map(([key, value]) => ({ key, value }));
-    setDataFlow(data);
 
-    // Fetch additional data for pre_rf_ae and bert
-    setPreRfAeData(res.data.pre_rf_ae);
-    setBertData(res.data.bert);
+    if (res && res.data) {
+      const info = res.data.info || {};  // Thêm điều kiện kiểm tra
+      const data = Object.entries(info).map(([key, value]) => ({ key, value }));
+      setDataFlow(data);
+  
+      // Fetch additional data for pre_rf_ae and bert with null checks
+      setPreRfAeData(res.data.pre_rf_ae || {});
+      setBertData(res.data.bert || {});
+    }
   };
 
   useEffect(() => {
@@ -91,9 +94,8 @@ const FlowDetails: FC = () => {
     preRfAeData.bruce_force || 0,
   ];
   const preRfAeLabels = ['Normal', 'Portscan', 'DoS Slowloris', 'Bruce Force'];
-
-  const bertLabels = Object.keys(bertData);
-  const bertDataArray = Object.values(bertData) as number[];
+const bertLabels = bertData ? Object.keys(bertData) : [];
+const bertDataArray = bertData ? Object.values(bertData) as number[] : [];
 
   const handlePrint = () => {
     window.print();
@@ -122,7 +124,7 @@ const FlowDetails: FC = () => {
             <div className="right-side-container">
               <div className="threshold-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <Text strong>Threshold: 0.03</Text>
+                  <Text strong>Threshold: 0.0001235</Text>
                   <br />
                   <Text strong>MSE_Autoencoder: {preRfAeData.MSE_Autoencoder || 'N/A'}</Text>
                 </div>
@@ -137,19 +139,24 @@ const FlowDetails: FC = () => {
               </div>
               <div className="pie-charts-container">
                 {/* Biểu đồ tròn đầu tiên */}
-                <div className="pie-chart">
-                  <HighchartsReact
-                    highcharts={Highcharts}
-                    options={getChartOptions(preRfAeDataArray, preRfAeLabels, 'RandomForest')}
-                  />
-                </div>
+                {preRfAeDataArray.length > 0 && (
+                  <div className="pie-chart">
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={getChartOptions(preRfAeDataArray, preRfAeLabels, 'RandomForest')}
+                    />
+                  </div>
+                )}
+
                 {/* Biểu đồ tròn thứ hai */}
-                <div className="pie-chart">
-                  <HighchartsReact
-                    highcharts={Highcharts}
-                    options={getChartOptions(bertDataArray, bertLabels, 'BERT')}
-                  />
-                </div>
+                {bertDataArray.length > 0 && (
+                  <div className="pie-chart">
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={getChartOptions(bertDataArray, bertLabels, 'BERT')}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </Col>
