@@ -18,7 +18,7 @@ from tensorflow.keras.models import load_model
 from datetime import datetime
 from schema.file import FileNameInput, FileResponse
 from test_bert import bert_pred, bert_pred_pt, bert_pred_stats
-from check_file import get_flow_file
+from check_file import get_flow_file, get_rule_alert
 from virustotal import check_hash, check_hashes
 
 protocol_numbers = {
@@ -229,6 +229,26 @@ def get_files():
             file["flow_id"] = result['_id']
             flow_files.append(file)
     return flow_files 
+
+def get_alert_rules():
+    alerts = get_rule_alert()
+    flow_alerts = []
+    print(alerts)
+    for alert in alerts:
+        query = {
+        "Source IP": alert['dest_ip'],
+        "Source Port": alert['dest_port'],
+        "Destination IP": alert['src_ip'],
+        "Destination Port": alert['src_port'],
+        "Protocol": protocol_name_to_number(alert['protocol']),
+        }
+        print(query)
+        # Tìm bản ghi khớp với điều kiện
+        result = collection.find_one(query)
+        if result is not None:
+            alert["flow_id"] = result['_id']
+            flow_alerts.append(alert)
+    return flow_alerts
 
 def search_by_md5(md5_hash):
     print("md5: ",md5_hash)

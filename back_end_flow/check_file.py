@@ -19,6 +19,7 @@ def get_flow_file():
     query = """
     SELECT ROWID ,source FROM events
     WHERE json_extract(source, '$.event_type') = 'fileinfo'
+    ORDER BY json_extract(source, '$.timestamp') DESC
     """
 
 
@@ -77,8 +78,10 @@ def transform_data(events):
     transformed_data = []
 
     for event in events:
-        source_data = json.loads(event[0])  # Cột 'source' chứa JSON trong cơ sở dữ liệu
+        source_data = json.loads(event[1])  # Cột 'source' chứa JSON trong cơ sở dữ liệu
+        row_id = event[0]
         transformed_event = {
+            "_id": row_id,
             "timestamp": source_data.get("timestamp"),
             "src_ip": source_data.get("src_ip"),
             "src_port": source_data.get("src_port"),
@@ -101,7 +104,9 @@ def read_events_from_db(db_path):
     cursor = conn.cursor()
 
     # Truy vấn dữ liệu
-    query = "SELECT source FROM events WHERE json_extract(source, '$.event_type') = 'alert'"
+    query = """ SELECT ROWID ,source FROM events 
+    WHERE json_extract(source, '$.event_type') = 'alert'
+    ORDER BY json_extract(source, '$.timestamp') DESC """
     cursor.execute(query)
 
     # Lấy tất cả các bản ghi trả về từ truy vấn
@@ -116,7 +121,7 @@ def read_events_from_db(db_path):
 # Đường dẫn tới cơ sở dữ liệu SQLite
 
 
-def get_alert():
+def get_rule_alert():
     db_path = '/var/lib/evebox/events.sqlite'
     result = read_events_from_db(db_path)
 
@@ -127,7 +132,7 @@ def get_alert():
 
 
 
-print(get_alert())
+print(get_rule_alert())
 # files = get_flow_file()
 # # Hiển thị kết quả
 # for source in files:
