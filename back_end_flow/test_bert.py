@@ -374,7 +374,7 @@ def bert_pred(flow_id, collection_name):
                         attack_label[label]= 0
     return attack_label
 
-def bert_pred_stats(flow_id, collection_name, attack_threshold=70, score_threshold=50):
+def bert_pred_stats(flow_id, collection_name, attack_threshold=50, score_threshold=50):
     """
     Dự đoán nhãn của các packets trong một flow và tính số lượng packets, tổng điểm có trọng số, 
     và trung bình % dự đoán cho mỗi nhãn tấn công. 
@@ -424,13 +424,13 @@ def bert_pred_stats(flow_id, collection_name, attack_threshold=70, score_thresho
                 normal['total_score'] += score * 100
             else:
                 if label not in attack_stats:
-                    attack_stats[label] = {'count': 0, 'total_score': 0.0, 'average_score': 0.0, 'packet_ratio': '0/0'}
+                    attack_stats[label] = {'count': 0, 'total_score': 0.0, 'average_percentage_score': 0.0, 'packet_ratio': '0/0'}
                 attack_stats[label]['count'] += 1
                 attack_stats[label]['total_score'] += score * 100
 
     # Tính toán điểm trung bình và tỉ lệ phần trăm packet cho Normal
     if normal['count'] > 0:
-        normal['average_score'] = normal['total_score'] / normal['count']
+        normal['average_percentage_score'] = normal['total_score'] / normal['count']
         normal['packet_ratio'] = f"{normal['count']}/{total_packets}"
         normal['percentage_packets'] = (normal['count'] / total_packets) * 100
 
@@ -704,5 +704,5 @@ def main():
     #     if count == 800:
     #         break
     #recognize_from_packet(models, packet_hex)
-    print(bert_pred_stats("fl05945", collection_packets))   
+    print(bert_pred_stats("fl05976", collection_packets))   
 main()
