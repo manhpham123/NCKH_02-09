@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Card, Col, Row, Button, Typography } from "antd";
+import { Card, Col, Row, Button, Typography, Spin } from "antd";
 import { ColumnsType } from "antd/es/table";
 import "./style.scss";
 import SimpleTable from "../../components/SimpleTable";
@@ -8,27 +8,38 @@ import { useParams } from 'react-router-dom';
 import { FlowApi } from "../../apis/flow";
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import TableBert from "../../components/TableBert";
 
 const { Text } = Typography;
 
 const FlowDetails: FC = () => {
   const [dataFlow, setDataFlow] = useState<any[]>([]);
   const [preRfAeData, setPreRfAeData] = useState<any>({});
-  const [bertData, setBertData] = useState<any>({});
+  const [bertData, setBertData] = useState<any>(null); // State for BERT API data
+  const [isLoadingBert, setIsLoadingBert] = useState(false); // Loading state for BERT API
+  const [isBertFetched, setIsBertFetched] = useState(false); // Whether BERT API is fetched
   const { id } = useParams();
 
+  // Fetch Flow Details API (always shown)
   const fetchDataFlow = async () => {
     const res = await FlowApi.GetFlowDetails({ flow_id: id });
-
     if (res && res.data) {
-      const info = res.data.info || {};  // Thêm điều kiện kiểm tra
+      const info = res.data.info || {};
       const data = Object.entries(info).map(([key, value]) => ({ key, value }));
       setDataFlow(data);
-  
-      // Fetch additional data for pre_rf_ae and bert with null checks
       setPreRfAeData(res.data.pre_rf_ae || {});
-      setBertData(res.data.bert || {});
     }
+  };
+
+  // Fetch BERT Data API (called on demand)
+  const fetchBertData = async () => {
+    setIsLoadingBert(true);
+    const bert_pre = await FlowApi.GetBertPre({ flow_id: id });
+    if (bert_pre && bert_pre.data) {
+      setBertData(bert_pre.data.pre_rf_ae);
+      setIsBertFetched(true);
+    }
+    setIsLoadingBert(false);
   };
 
   useEffect(() => {
@@ -94,11 +105,13 @@ const FlowDetails: FC = () => {
     preRfAeData.bruce_force || 0,
   ];
   const preRfAeLabels = ['Normal', 'Portscan', 'DoS Slowloris', 'Bruce Force'];
-const bertLabels = bertData ? Object.keys(bertData) : [];
-const bertDataArray = bertData ? Object.values(bertData) as number[] : [];
 
-  const handlePrint = () => {
-    window.print();
+  const customFields = {
+    "label": "Nhãn dự đoán",
+    "average_percentage_score": "Tỷ lệ phần trăm dự đoán trung bình (%)",
+    "packet_ratio": "Số gói tin"
+    // "total_time": "Tổng thời gian",
+    // "time_per_pac": "Thời gian/gói tin"
   };
 
   return (
@@ -130,13 +143,14 @@ const bertDataArray = bertData ? Object.values(bertData) as number[] : [];
                 </div>
                 <Button
                   type="primary"
-                  onClick={handlePrint}
+                  onClick={() => window.print()}
                   className="print-button"
-                  style={{ marginLeft: '100px' }} // Thêm marginLeft: 'auto' để đẩy button sang phải
+                  style={{ marginLeft: '100px' }}
                 >
                   PRINT
                 </Button>
               </div>
+
               <div className="pie-charts-container">
                 {/* Biểu đồ tròn đầu tiên */}
                 {preRfAeDataArray.length > 0 && (
@@ -148,13 +162,27 @@ const bertDataArray = bertData ? Object.values(bertData) as number[] : [];
                   </div>
                 )}
 
-                {/* Biểu đồ tròn thứ hai */}
-                {bertDataArray.length > 0 && (
+                {/* Button for fetching BERT data */}
+                {!isBertFetched && !isLoadingBert && (
+                  <Button
+                    type="primary"
+                    onClick={fetchBertData}
+                    className="bert-button"
+                    style={{ marginTop: '20px' }}
+                  >
+                    Dự đoán bert
+                  </Button>
+                )}
+
+                {/* Show loading spinner when fetching BERT data */}
+                {isLoadingBert && <Spin tip="Đang load dữ liệu..." />}
+
+                {/* Display BERT data when available */}
+                {bertData && (
                   <div className="pie-chart">
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={getChartOptions(bertDataArray, bertLabels, 'BERT')}
-                    />
+                    <div className="table-container">
+                      <TableBert data={bertData} customFields={customFields} />
+                    </div>
                   </div>
                 )}
               </div>
