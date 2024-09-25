@@ -17,7 +17,7 @@ from sklearn.preprocessing import normalize
 from tensorflow.keras.models import load_model
 from datetime import datetime
 from schema.file import FileNameInput, FileResponse
-from test_bert import bert_pred, bert_pred_pt
+from test_bert import bert_pred, bert_pred_pt, bert_pred_stats
 from check_file import get_flow_file
 from virustotal import check_hash, check_hashes
 
@@ -132,6 +132,8 @@ randomforest = joblib.load("random_forest_model_12_9_cic_4label.joblib")
 #model = keras.models.load_model('rfc1.md5')
 autoencoder = load_model('autoencoder62_09_09_53_32_12_8_new.keras')
 print("okk")
+T1 = 0.95
+T2 = 0.0001285
 
 #CSDL 
 
@@ -191,17 +193,20 @@ def get_flow_by_id(flow_id):
     predict = flowpre_collection.find_one({"flow_id": str(flow_id)})
     predict.pop("_id", None)
     combine_flow_pre = {"info": flow,
-                        "pre_rf_ae":predict
+                        "pre_rf_ae":predict,
+                        "threshold": T2
                         }
     return combine_flow_pre
 
 def get_bert_predict(flow_id):
     print(flow_id)
     flow = collection.find_one({"_id": str(flow_id)})
-    bert_pred_fl = bert_pred_pt(flow_id, collection_packets)
-    top_3 = dict(sorted(bert_pred_fl.items(), key=lambda x: x[1], reverse=True)[:3])
+    labels_above_threshold, total_time, total_packets = bert_pred_stats(flow_id, collection_packets)
+    top = max(labels_above_threshold, key=lambda x: x["average_percentage_score"])
     combine_flow_pre = {"info": flow,
-                        "pre_rf_ae":top_3
+                        "pre_rf_ae":top,
+                        "total_time": total_time,
+                        "time_per_pac": total_time/total_packets
                         }
     return combine_flow_pre
    
@@ -485,8 +490,7 @@ def preprocess_flow(df_f):
 # Gọi hàm preprocess để tiền xử lý dữ liệu
 
 # In DataFrame sau khi thêm cột 'label'
-T1 = 0.95
-T2 = 0.0001285
+
 
 def predict_label(collection):
     data = read_all_data_time(collection, "Timestamp")

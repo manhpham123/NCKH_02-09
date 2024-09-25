@@ -206,13 +206,18 @@ def processing_packet_conversion(packet_hex):
     return final_data
 
 
+import time
+
 def predict(models, processed_packet):
+    # Bắt đầu đếm thời gian
+    start_time = time.time()
+
     # Tiền xử lý packet_hex
-    
     final_format = processed_packet
 
     # Khởi tạo tokenizer
     tokenizer = models["tokenizer"]
+    
     # Mã hóa dữ liệu đầu vào
     model_inputs = tokenizer(final_format[:1024], return_tensors="pt", truncation=True, max_length=512)  # Sử dụng "pt" cho PyTorch
     input_ids = model_inputs["input_ids"]
@@ -235,7 +240,12 @@ def predict(models, processed_packet):
     labels = np.array(LABELS)[idx]
     scores = scores[idx]
 
-    return (labels, scores)
+    # Kết thúc đếm thời gian
+    prediction_time = time.time() - start_time
+    print(f"Thời gian dự đoán: {prediction_time:.4f} giây")
+
+    return (labels, scores, prediction_time)
+
 
 
 
@@ -299,8 +309,8 @@ def recognize_from_packet(models, packet_hex, flow_id):
     
     #print("Script finished successfully.")
     
-MODEL_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/6_label_v1"
-TOKENIZER_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/6_label_v1"
+MODEL_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/New_bert"
+TOKENIZER_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/New_bert"
 
 def load_model_and_tokenizer(model_dir, tokenizer_dir):
     # Kiểm tra xem model và tokenizer đã tồn tại chưa
@@ -364,24 +374,13 @@ def bert_pred(flow_id, collection_name):
                         attack_label[label]= 0
     return attack_label
 
-def bert_pred_stats(flow_id, collection_name, attack_threshold=0, score_threshold=50):
+def bert_pred_stats(flow_id, collection_name, attack_threshold=70, score_threshold=50):
     """
     Dự đoán nhãn của các packets trong một flow và tính số lượng packets, tổng điểm có trọng số, 
     và trung bình % dự đoán cho mỗi nhãn tấn công. 
     Nếu số lượng packets có nhãn "Normal" chiếm hơn 95% tổng số packets, thì kết quả của flow là "Normal". 
     Chỉ tính điểm cho các nhãn tấn công nếu score của nhãn đó vượt qua ngưỡng `score_threshold`.
-
-    Args:
-    - flow_id (str): ID của flow cần dự đoán.
-    - collection_name (str): Tên của bộ sưu tập chứa dữ liệu flow.
-    - attack_threshold (int): Ngưỡng tỉ lệ để quyết định nhãn tấn công (mặc định là 20%).
-    - score_threshold (int): Ngưỡng để xác định score tối thiểu cho một nhãn để được tính điểm (mặc định là 50%).
-
-    Returns:
-    - dict: Từ điển chứa tỉ lệ % dự đoán trung bình, số packet/tổng số packet, và điểm trung bình theo trọng số cho mỗi nhãn tấn công.
-    - str: "Normal" nếu số lượng packets "Normal" > 95%, ngược lại là danh sách các nhãn tấn công có điểm trung bình vượt qua ngưỡng `attack_threshold`.
     """
-    # Định nghĩa bảng trọng số cho các nhãn tấn công
     weight_table = {
         "Analysis": 1, "Backdoor": 5, "Bot": 4, "DDoS": 5, "DoS": 4,
         "DoS GoldenEye": 4, "DoS Hulk": 4, "DoS SlowHTTPTest": 4, "DoS Slowloris": 4,
@@ -391,71 +390,76 @@ def bert_pred_stats(flow_id, collection_name, attack_threshold=0, score_threshol
         "Web Attack - XSS": 3, "Worms": 5
     }
 
-    # Khởi tạo từ điển để lưu số lượng packets và tổng điểm có trọng số cho mỗi nhãn
     attack_stats = {}
-    normal_count = 0  # Biến đếm số lượng packets có nhãn "Normal"
-    total_packets = 0  # Tổng số lượng packets
-    labels_above_threshold = []  # Danh sách nhãn có điểm trung bình vượt ngưỡng
-
-    # Load mô hình và tokenizer
+    normal_count = 0
+    total_packets = 0
+    labels_above_threshold = []
+    normal = {'label': "Normal", 'count': 0, 'total_score': 0.0, 'average_score': 0.0, 'packet_ratio': '0/0'}
+    
     model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
     models = {"tokenizer": tokenizer, "model": model}
     flow_payload = read_raw_payload(collection_name, flow_id=flow_id)
     packets = flow_payload["raw_payload"]
     top_k = 3
+    total_time = 0
 
     # Duyệt qua từng packet để dự đoán nhãn
     for packet in packets:
         packet = preprocess(packet)
-        total_packets += 1  # Tăng tổng số lượng packets
+        total_packets += 1
         try:
             output = predict(models, packet)
-            labels, scores = output
+            labels, scores, pk_time = output
+            total_time += pk_time
         except ValueError:
             continue
 
-        # Cập nhật số lượng và tổng điểm cho mỗi nhãn tấn công
-        for label, score in list(zip(labels, scores))[:top_k]:
-            print(f"{label} : {score * 100:.3f}")
-            # Chỉ tính toán nếu score vượt qua ngưỡng score_threshold
-            if score * 100 >= score_threshold:
-                if label == "Normal":
-                    normal_count += 1  # Tăng số lượng packets có nhãn "Normal"
-                else:
-                    if label not in attack_stats:
-                        attack_stats[label] = {'count': 0, 'total_score': 0.0}
-                    
-                    # Áp dụng trọng số từ bảng trọng số cho nhãn
-                    weight = weight_table[label]
-                    attack_stats[label]['count'] += 1
-                    #attack_stats[label]['total_score'] += score * 100 * weight
-                    attack_stats[label]['total_score'] += score * 100
+        for label, score in zip(labels[:top_k], scores[:top_k]):
+            if score * 100 < score_threshold:
+                continue
 
-    # Kiểm tra nếu số lượng packets "Normal" chiếm hơn 95%
-    if normal_count / total_packets > 0.95:
-        return {}, "Normal"
+            if label == "Normal":
+                normal_count += 1
+                normal['count'] += 1
+                normal['total_score'] += score * 100
+            else:
+                if label not in attack_stats:
+                    attack_stats[label] = {'count': 0, 'total_score': 0.0, 'average_score': 0.0, 'packet_ratio': '0/0'}
+                attack_stats[label]['count'] += 1
+                attack_stats[label]['total_score'] += score * 100
 
-    # Tính toán trung bình % dự đoán cho mỗi nhãn và kiểm tra ngưỡng tấn công
+    # Tính toán điểm trung bình và tỉ lệ phần trăm packet cho Normal
+    if normal['count'] > 0:
+        normal['average_score'] = normal['total_score'] / normal['count']
+        normal['packet_ratio'] = f"{normal['count']}/{total_packets}"
+        normal['percentage_packets'] = (normal['count'] / total_packets) * 100
+
+    # Nếu số lượng packets Normal > 99%, trả về Normal với cùng định dạng với các nhãn tấn công
+    if normal_count / total_packets > 0.99:
+        return [normal], total_time, total_packets
+
+    # Tính toán trung bình % dự đoán cho mỗi nhãn tấn công và kiểm tra ngưỡng tấn công
     for label, stats in attack_stats.items():
-        if stats['count'] > 0:
-            stats['average_score'] = stats['total_score'] / stats['count']
-            stats['percentage_packets'] = (stats['count'] / total_packets) * 100
-            stats['weighted_average_score'] = stats['total_score'] / stats['count']
-        else:
-            stats['average_score'] = 0
-            stats['percentage_packets'] = 0
-            stats['weighted_average_score'] = 0
+        stats['average_score'] = stats['total_score'] / stats['count']
+        stats['packet_ratio'] = f"{stats['count']}/{total_packets}"
+        stats['percentage_packets'] = (stats['count'] / total_packets) * 100
         
         # Kiểm tra nếu nhãn có điểm trung bình vượt qua ngưỡng
         if stats['average_score'] >= attack_threshold:
             labels_above_threshold.append({
                 'label': label,
                 'average_percentage_score': stats['average_score'],
-                'packet_ratio': f"{stats['count']}/{total_packets}",
-                'weighted_average_score': stats['weighted_average_score']
+                'packet_ratio': stats['packet_ratio'],
             })
 
-    return attack_stats, labels_above_threshold
+    # Nếu không có nhãn tấn công nào vượt ngưỡng, trả về Normal với định dạng đồng nhất
+    if not labels_above_threshold:
+        return [normal], total_time, total_packets
+
+    # Trả về danh sách các nhãn tấn công có định dạng đồng nhất với nhãn Normal
+    return labels_above_threshold, total_time, total_packets
+
+
 
 
 
@@ -665,12 +669,12 @@ def bert_pred_hybrid_improved(flow_id, collection_name, attack_threshold=20, win
 
 
 def main():
-    model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
+    #model, tokenizer = load_model_and_tokenizer(MODEL_DIR, TOKENIZER_DIR)
 
-    models = {
-        "tokenizer": tokenizer,
-        "model": model,
-    }
+    # models = {
+    #     "tokenizer": tokenizer,
+    #     "model": model,
+    # }
     print("hello")
     count = 0
     
@@ -700,5 +704,5 @@ def main():
     #     if count == 800:
     #         break
     #recognize_from_packet(models, packet_hex)
-    #print(bert_pred_stats("fl05945", collection_packets))   
+    print(bert_pred_stats("fl05945", collection_packets))   
 main()
