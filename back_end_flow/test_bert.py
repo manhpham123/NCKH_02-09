@@ -415,6 +415,8 @@ def bert_pred_stats(flow_id, collection_name, attack_threshold=50, score_thresho
             continue
 
         for label, score in zip(labels[:top_k], scores[:top_k]):
+            
+            print(label, score)
             if score * 100 < score_threshold:
                 continue
 
@@ -704,5 +706,5 @@ def main():
     #     if count == 800:
     #         break
     #recognize_from_packet(models, packet_hex)
-    print(bert_pred_stats("fl05976", collection_packets))   
+    print(bert_pred_stats("fl05988", collection_packets))   
 main()
