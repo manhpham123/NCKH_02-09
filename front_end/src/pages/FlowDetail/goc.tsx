@@ -8,24 +8,25 @@ import { useParams } from 'react-router-dom';
 import { FlowApi } from "../../apis/flow";
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import TableBert from "../../components/TableBert";
 
 const { Text } = Typography;
 
 const FlowDetails: FC = () => {
   const [dataFlow, setDataFlow] = useState<any[]>([]);
   const [preRfAeData, setPreRfAeData] = useState<any>({});
-  const [bertData, setBertData] = useState<any>({});
   const { id } = useParams();
 
   const fetchDataFlow = async () => {
     const res = await FlowApi.GetFlowDetails({ flow_id: id });
-    const info = res.data.info;
-    const data = Object.entries(info).map(([key, value]) => ({ key, value }));
-    setDataFlow(data);
+    const bert_pre = await FlowApi.GetBertPre({ flow_id: id });
 
-    // Fetch additional data for pre_rf_ae and bert
-    setPreRfAeData(res.data.pre_rf_ae);
-    setBertData(res.data.bert);
+    if (res && res.data) {
+      const info = res.data.info || {};  // Thêm điều kiện kiểm tra
+      const data = Object.entries(info).map(([key, value]) => ({ key, value }));
+      setDataFlow(data);
+      setPreRfAeData(res.data.pre_rf_ae || {});
+    }
   };
 
   useEffect(() => {
@@ -91,12 +92,22 @@ const FlowDetails: FC = () => {
     preRfAeData.bruce_force || 0,
   ];
   const preRfAeLabels = ['Normal', 'Portscan', 'DoS Slowloris', 'Bruce Force'];
-
-  const bertLabels = Object.keys(bertData);
-  const bertDataArray = Object.values(bertData) as number[];
-
   const handlePrint = () => {
     window.print();
+  };
+  const data_bert = {
+    "label": "Web Attack - SQL INJECTION",
+    "average_percentage_score": "95.1577438967",
+    "packet_ratio": "8/25",
+    "total_time": "4.130246162",
+    "time_per_pac": "0.4531930073"
+  };
+  const customFields = {
+    "label": "Nhãn dự đoán",
+    "average_percentage_score": "Tỷ lệ phần trăm dự đoán trung bình (%)",
+    "packet_ratio": "Số gói tin",
+    "total_time": "Tổng thời gian",
+    "time_per_pac": "Thời gian/gói tin"
   };
 
   return (
@@ -122,7 +133,7 @@ const FlowDetails: FC = () => {
             <div className="right-side-container">
               <div className="threshold-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <Text strong>Threshold: 0.03</Text>
+                  <Text strong>Threshold: 0.0001235</Text>
                   <br />
                   <Text strong>MSE_Autoencoder: {preRfAeData.MSE_Autoencoder || 'N/A'}</Text>
                 </div>
@@ -137,19 +148,21 @@ const FlowDetails: FC = () => {
               </div>
               <div className="pie-charts-container">
                 {/* Biểu đồ tròn đầu tiên */}
-                <div className="pie-chart">
-                  <HighchartsReact
-                    highcharts={Highcharts}
-                    options={getChartOptions(preRfAeDataArray, preRfAeLabels, 'RandomForest')}
-                  />
-                </div>
-                {/* Biểu đồ tròn thứ hai */}
-                <div className="pie-chart">
-                  <HighchartsReact
-                    highcharts={Highcharts}
-                    options={getChartOptions(bertDataArray, bertLabels, 'BERT')}
-                  />
-                </div>
+                {preRfAeDataArray.length > 0 && (
+                  <div className="pie-chart">
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={getChartOptions(preRfAeDataArray, preRfAeLabels, 'RandomForest')}
+                    />
+                  </div>
+                )}
+                {
+          <div className="pie-chart">
+            <div className="table-container">
+              <TableBert data={data_bert} customFields={customFields} />
+            </div>
+          </div>
+                } 
               </div>
             </div>
           </Col>

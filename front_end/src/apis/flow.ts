@@ -6,5 +6,11 @@ export const FlowApi = {
           method: "GET",
           params,
         })
+      },
+      GetBertPre: (params: FlowIdParams )=>{
+        return NCKHAxiosClient("/get_bert_pre/",{
+          method: "GET",
+          params,
+        })
       }
 };
