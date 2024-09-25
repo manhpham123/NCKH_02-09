@@ -441,10 +441,10 @@ export function EventView() {
     //   navigate("/inbox");
     // } 
     else if (location.pathname.startsWith("/alerts")) {
-      alert("quay trở lại bảng alert rule");
+     // alert("quay trở lại bảng alert rule");
       window.location.href = ("http://localhost:3000/rule-alert");
     } else if (location.pathname.startsWith("/event")) {
-      alert("quay lại bảng check file");
+     // alert("quay lại bảng check file");
       window.location.href = "http://localhost:3000/check-hash";
       //navigate("/events");
     }

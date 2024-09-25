@@ -109,9 +109,9 @@ const FlowDetails: FC = () => {
   const customFields = {
     "label": "Nhãn dự đoán",
     "average_percentage_score": "Tỷ lệ phần trăm dự đoán trung bình (%)",
-    "packet_ratio": "Số gói tin"
-    // "total_time": "Tổng thời gian",
-    // "time_per_pac": "Thời gian/gói tin"
+    "packet_ratio": "Số gói tin",
+    "total_time": "Tổng thời gian",
+    "time_per_pac": "Thời gian/gói tin"
   };
 
   return (
@@ -151,41 +151,45 @@ const FlowDetails: FC = () => {
                 </Button>
               </div>
 
-              <div className="pie-charts-container">
-                {/* Biểu đồ tròn đầu tiên */}
-                {preRfAeDataArray.length > 0 && (
-                  <div className="pie-chart">
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={getChartOptions(preRfAeDataArray, preRfAeLabels, 'RandomForest')}
-                    />
-                  </div>
-                )}
+<div className="pie-charts-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  {/* Biểu đồ tròn đầu tiên */}
+  {preRfAeDataArray.length > 0 && (
+    <div className="pie-chart">
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={getChartOptions(preRfAeDataArray, preRfAeLabels, 'RandomForest')}
+      />
+    </div>
+  )}
 
-                {/* Button for fetching BERT data */}
-                {!isBertFetched && !isLoadingBert && (
-                  <Button
-                    type="primary"
-                    onClick={fetchBertData}
-                    className="bert-button"
-                    style={{ marginTop: '20px' }}
-                  >
-                    Dự đoán bert
-                  </Button>
-                )}
+  {/* Button for fetching BERT data, now placed below the first pie chart */}
+  {!isBertFetched && !isLoadingBert && (
+    <Button
+      type="primary"
+      onClick={fetchBertData}
+      className="bert-button"
+      style={{ marginBottom: '400px', width: '200px',marginRight:'50px' }} // Adjust margin to create space between pie chart and button
+    >
+      DỰ ĐOÁN BERT
+    </Button>
+  )}
+  
 
-                {/* Show loading spinner when fetching BERT data */}
-                {isLoadingBert && <Spin tip="Đang load dữ liệu..." />}
+  {/* Show loading spinner when fetching BERT data */}
+  {isLoadingBert && <Spin tip="Đang load dữ liệu..." style={{ marginBottom: '400px' }} />}
 
-                {/* Display BERT data when available */}
-                {bertData && (
-                  <div className="pie-chart">
-                    <div className="table-container">
-                      <TableBert data={bertData} customFields={customFields} />
-                    </div>
-                  </div>
-                )}
-              </div>
+  {/* Display BERT data when available */}
+  {bertData && (
+    <div className="pie-chart">
+      <div className="table-container">
+        <TableBert data={bertData} customFields={customFields} />
+      </div>
+    </div>
+  )}
+</div>
+
+
+
             </div>
           </Col>
         </Row>

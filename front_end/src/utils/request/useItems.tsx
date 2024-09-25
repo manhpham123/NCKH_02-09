@@ -61,6 +61,19 @@ export const useCheckFile = (
         data, error, isLoading, mutate
     };
 }
+export const useRuleAlert = (
+    params?: CommonGetAllParams,
+    filter?: Alertfilter
+) => {
+    const { data, error, isLoading, mutate } = useSWR(
+        `rule/alerts/?page=${params?.page}&limit=${params?.limit}`,
+        { refreshInterval: 0}
+    );
+    return {
+        data, error, isLoading, mutate
+    };
+}
+
 
 export const useListFileRule  = (
     params?: CommonGetAllParams,

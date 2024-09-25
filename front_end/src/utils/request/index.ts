@@ -1,1 +1,2 @@
-export {useAllitem, usePhantrang, useStaticService,useStaticProtocol,useAlert, useStaticattack,useListFileRule,useMonitorFlow,useCheckFile }from './useItems'
+export {useAllitem, usePhantrang, useStaticService,useStaticProtocol,useAlert, useStaticattack,useListFileRule,
+useMonitorFlow,useCheckFile, useRuleAlert }from './useItems'
