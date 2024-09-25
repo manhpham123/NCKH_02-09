@@ -158,6 +158,54 @@ async def get_file(
     except Exception as e:
         # Nếu có lỗi, trả về thông báo lỗi với status code 500
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.get("/rule/alerts", response_model=Dict)
+async def get_alerts_rules(
+    page: int = Query(1, alias="page"), 
+    limit: int = Query(10, alias="limit"), 
+    filter_field: str = Query("", alias="filter_field"), 
+    filter_value: str = Query("", alias="filter_value")
+):
+    try:
+        # Lấy dữ liệu từ hàm get_files()
+        files = get_alert_rules()
+
+        # Nếu không có filter, phân trang dữ liệu
+        if filter_field == "" or filter_value == "":
+            skip = (page - 1) * limit
+            
+            # Tổng số bản ghi
+            total = len(files)
+            
+            # Áp dụng phân trang
+            paginated_files = files[skip: skip + limit]
+            
+        else:
+            # Áp dụng lọc dữ liệu dựa trên filter_field và filter_value
+            filtered_files = [file for file in files if file.get(filter_field) == filter_value]
+            
+            # Tổng số bản ghi sau khi lọc
+            total = len(filtered_files)
+            
+            # Áp dụng phân trang cho dữ liệu đã lọc
+            skip = (page - 1) * limit
+            paginated_files = filtered_files[skip: skip + limit]
+        
+        # Đối tượng kết quả trả về
+        re_ob = {
+            "data": paginated_files,
+            "limit": limit,
+            "page": page,
+            "total": total
+        }
+        
+        # Trả về kết quả dưới dạng JSON
+        return re_ob
+
+    except Exception as e:
+        # Nếu có lỗi, trả về thông báo lỗi với status code 500
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/search/{md5_hash}", response_model=Dict)
 async def search_md5(md5_hash: str):
