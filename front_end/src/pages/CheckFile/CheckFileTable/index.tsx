@@ -45,9 +45,10 @@ const CheckFileTable: FC = () => {
   const getFileName = (filePath: string) => {
     return filePath.split('/').pop(); // Lấy tên file từ đường dẫn
   };
-  const ChiTietFile = () => {
-    window.location.href = 'http://localhost:3001/#/event/28';
-  };
+  const ChiTietFile = (_id: number) => {
+    window.location.href = `http://localhost:3001/#/event/${_id}`;
+};
+
  
   const columns: ColumnsType<any> = [
     {
@@ -193,11 +194,10 @@ const CheckFileTable: FC = () => {
       width: "8%",
       render: (_, record) => (
         <>
-          <ListButtonActionUpdate
-            // editFunction={() => {}}
-            viewFunction={ChiTietFile}
-          />
-        </>
+        <ListButtonActionUpdate
+          viewFunction={() => ChiTietFile(record._id)}
+        />
+      </>
       ),
     },
     // {

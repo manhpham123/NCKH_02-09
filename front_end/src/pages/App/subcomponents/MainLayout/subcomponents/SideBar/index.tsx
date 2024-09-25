@@ -44,7 +44,7 @@ function getItem(
 const items: MenuItem[] = [
   getItem(<Link to={DASHBOARD}>THỐNG KÊ</Link>, '1', <PieChartOutlined />,),
   getItem(<Link to={FLOW_MANAGEMENT}>QUẢN LÝ FLOW</Link>, '2', <BranchesOutlined  />),
- // getItem(<Link to={AGENT_MANAGEMENT}>Quản Lý Máy</Link>, '3', <AppstoreFilled />),
+  getItem(<Link to={AGENT_MANAGEMENT}>QUẢN LÝ MÁY</Link>, '3', <AppstoreFilled />),
   getItem(<Link to={ALERT}>QUẢN LÝ THÔNG BÁO</Link>, '4', <BellOutlined  />),
   // getItem( <Link to={RULE}>Rule</Link>,'5', <AppstoreFilled />,
   //   getItem( <Link to={RULE}>Rule</Link>, '3', <AppstoreFilled />),
