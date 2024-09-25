@@ -203,10 +203,10 @@ def get_bert_predict(flow_id):
     flow = collection.find_one({"_id": str(flow_id)})
     labels_above_threshold, total_time, total_packets = bert_pred_stats(flow_id, collection_packets)
     top = max(labels_above_threshold, key=lambda x: x["average_percentage_score"])
+    top["total_time"] = total_time
+    top["time_per_pac"] = total_time/total_packets
     combine_flow_pre = {"info": flow,
-                        "pre_rf_ae":top,
-                        "total_time": total_time,
-                        "time_per_pac": total_time/total_packets
+                        "pre_rf_ae":top
                         }
     return combine_flow_pre
    
