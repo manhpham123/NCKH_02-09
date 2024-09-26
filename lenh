@@ -30,7 +30,7 @@ git branch -r
 - chạy front_end chinh: cd vào thư mục front-end 
 + tải thư viện: npm i
 + chạy: npm start
-+ vao duong dan: http://localhost:3000/dashboard  
++ vao duong dan: http://localhost:3000/dashboard
 
 - chay front_end evebox: cd vào thư mục webapp
 + chuyển sang nodejs phiên bản v20: nvm use

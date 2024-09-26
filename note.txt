@@ -155,5 +155,10 @@ chú ý 2 sự kiện là "fileinfo" và "http". còn để phát hiện các cu
 + Bruce Force
 + DoS slowloris
 + bình thường : BENIGN
+==========================
+- Trên máy Ubuntu, có thể sử dụng các lệnh sau để xem Process ID (PID) và trạng thái của các tiến trình.
++ ps -p $(pgrep -f "/usr/bin/suricata -c /etc/suricata/suricata.yaml") -o pid,stat,cmd
++ ps -p $(pgrep -f "/usr/bin/python3 /usr/local/bin/cicflowmeter -i ens33 -c --dir /home/william/Desktop/cici_client/data/new" | tr '\n' ',' | sed 's/,$//') -o pid,stat,cmd
+
 
 
