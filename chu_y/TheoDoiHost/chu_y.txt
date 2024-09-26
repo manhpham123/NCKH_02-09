@@ -6,3 +6,9 @@
 + eve.sh , với lệnh như sau : evebox agent -c /etc/evebox/agent.yaml
 + Cấp quyền cho nó: sudo chmod 777 eve.sh
 + chạy: ./eve.sh
+================================
+- Trên máy Ubuntu, có thể sử dụng các lệnh sau để xem Process ID (PID) và trạng thái của các tiến trình.
++ ps -p 12345 -o pid,stat,cmd
++ ps -p $(pgrep -f "/usr/bin/suricata -c /etc/suricata/suricata.yaml") -o pid,stat,cmd
++ ps -p $(pgrep -f "/usr/bin/python3 /usr/local/bin/cicflowmeter -i ens33 -c --dir /home/william/Desktop/cici_client/data/new" | tr '\n' ',' | sed 's/,$//') -o pid,stat,cmd
+
