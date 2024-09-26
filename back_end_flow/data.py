@@ -236,10 +236,10 @@ def get_alert_rules():
     print(alerts)
     for alert in alerts:
         query = {
-        "Source IP": alert['dest_ip'],
-        "Source Port": alert['dest_port'],
-        "Destination IP": alert['src_ip'],
-        "Destination Port": alert['src_port'],
+        "Source IP": alert['src_ip'],
+        "Source Port": alert['src_port'],
+        "Destination IP": alert['dest_ip'],
+        "Destination Port": alert['dest_port'],
         "Protocol": protocol_name_to_number(alert['protocol']),
         }
         print(query)
@@ -767,6 +767,5 @@ def get_alert (df_st):
 # all_data = read_all_data(collection)
 
 # print(all_data)
-
 
 
