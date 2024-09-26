@@ -309,8 +309,8 @@ def recognize_from_packet(models, packet_hex, flow_id):
     
     #print("Script finished successfully.")
     
-MODEL_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/New_bert"
-TOKENIZER_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/New_bert"
+MODEL_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/Bert_f1"
+TOKENIZER_DIR = "/home/frblam/NCKH_2024/NCKH_02-09/Bert_f1"
 
 def load_model_and_tokenizer(model_dir, tokenizer_dir):
     # Kiểm tra xem model và tokenizer đã tồn tại chưa
@@ -374,7 +374,7 @@ def bert_pred(flow_id, collection_name):
                         attack_label[label]= 0
     return attack_label
 
-def bert_pred_stats(flow_id, collection_name, attack_threshold=50, score_threshold=50):
+def bert_pred_stats(flow_id, collection_name, attack_threshold=50, score_threshold=70):
     """
     Dự đoán nhãn của các packets trong một flow và tính số lượng packets, tổng điểm có trọng số, 
     và trung bình % dự đoán cho mỗi nhãn tấn công. 

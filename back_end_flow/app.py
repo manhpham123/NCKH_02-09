@@ -15,6 +15,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import paramiko
 from schema.file import FileNameInput, FileResponse
 from test_rules_all import *
+from CodeDoiStatus import toggle_status
+
 
 
 
@@ -105,7 +107,11 @@ from fastapi import FastAPI, Query, HTTPException
 from typing import List, Dict
 
 
-
+# API để bật/tắt trạng thái theo dõi host
+@app.post("/toggle_status/{host_id}")
+def api_toggle_status(host_id: int):
+    result = toggle_status(host_id)
+    return result
 
 @app.get("/rule/alert/", response_model=List[dict])
 async def get_rule_alerts ():
