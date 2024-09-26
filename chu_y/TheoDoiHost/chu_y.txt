@@ -1,0 +1,8 @@
+- Cách thiết lập quyền sudo không cần mật khẩu ở máy client
++ sudo visudo
++ Thêm dòng dưới đây để cho phép tài khoản của bạn (ví dụ username) chạy sudo mà không cần nhập mật khẩu:william ALL=(ALL) NOPASSWD: ALL
+
+- ở máy client ta tạo 1 file: 
++ eve.sh , với lệnh như sau : evebox agent -c /etc/evebox/agent.yaml
++ Cấp quyền cho nó: sudo chmod 777 eve.sh
++ chạy: ./eve.sh
