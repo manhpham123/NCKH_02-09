@@ -1,66 +1,65 @@
 import { Card, Switch, Tooltip, Typography } from "antd";
 import { FC, useState } from "react";
 import { ColumnsType } from "antd/es/table";
-
 import "./style.scss";
-import { IpType } from "../../../constants/types/rules.type";
-import ListButtonActionUpdate from "../../../components/ListButtonActionUpdate";
 import TableCustom from "../../../components/TableCustom";
 import { CommonGetAllParams } from "../../../constants/types/common.type";
-import { dataMock } from "./mockData.config";
 import CardTitleCustom from "../../../components/CardTitleCustom";
 import { useNavigate } from "react-router-dom";
-//import { USER_MANAGEMENT_DETAILS } from "../../../routes/route.constant";
-import { usePhantrang } from "../../../utils/request";
-import { Ipfilter } from "../../../constants/types/common.type";
-
 const AgentManagementTable: FC = () => {
   const navigate = useNavigate();
-  /* =========== SAU NAY LIST DANH SACH IP PHAN TRANG O DAY==============
-  const [params, setParams] = useState<CommonGetAllParams>({
-    limit: 10,
-    page: 1,
-  });
-  const {data, mutate,isLoading} = usePhantrang(params);
-*/
+
 /*================ DU LIEU MAU, backend tra ve dang nay=============*/
 const [params, setParams] = useState<CommonGetAllParams>({
   limit: 10,
   page: 1,
 });
 const isLoading = false
-const Danhsachip = {
+const DanhSachHost = {
   "data": 
   [
-  {'ip':'192.168.190.10','id':1},
-  {'ip':'192.168.190.11','id':2},
-  {'ip':'192.168.190.12','id':3}
-                          ],
+    {
+      "id": 1,
+      "hostname": "CLI_01",
+      "ip": "192.168.189.133",
+      "status": "on"
+  },
+  {
+      "id": 2,
+      "hostname": "CLI_02",
+      "ip": "192.168.10.10",
+      "status": "off"
+  },
+  {
+      "id": 3,
+      "hostname": "CLI_03",
+      "ip": "192.168.189.135",
+      "status": "off"
+  },
+  {
+      "id": 4,
+      "hostname": "CLI_04",
+      "ip": "192.168.10.5",
+      "status": "off"
+  },
+  {
+      "id": 5,
+      "hostname": "CLI_05",
+      "ip": "192.168.189.128",
+      "status": "off"
+  },
+  {
+      "id": 6,
+      "hostname": "CLI_06",
+      "ip": "192.168.10.3",
+      "status": "off"
+  }
+  ],
       "limit": 5,
       "page": 1,
       "total": 5
-    }
-  
-  //=================== KET THUC DU LIEU MAU===================
-  const [isEditSystemParamsModalShow, SetIsEditSystemParamsModalShow] =
-    useState(false);
-  const [selectedRule, setSelectedRule] = useState<any>({});
-  const closeEditSystemParamsModal = () => {
-    SetIsEditSystemParamsModalShow(false);
-  };
-  const openEditSystemParamsModal = (record: any) => {
-    SetIsEditSystemParamsModalShow(true);
-    setSelectedRule(record);
-  };
-  // const { data, isLoading, error, mutate } = useSystemParams(params, filter);
-  // const dataTable = dataMock.data
-  //   ? dataMock.data.map((item: any) => {
-  //     return {
-  //       ...item,
-  //       key: item.id,
-  //     };
-  //   })
-  //   : [];
+  }
+
   const columns: ColumnsType<any> = [
     {
       key: 1,
@@ -73,6 +72,17 @@ const Danhsachip = {
     },
     {
       key: 2,
+      title: "Tên Máy",
+      dataIndex: "hostname",
+      align: "center",
+      render: (group) => (
+        <Tooltip title={group}>
+          <div className="inline-text">{group}</div>
+        </Tooltip>
+      ),
+    },
+    {
+      key: 3,
       title: "Địa Chỉ IP  ",
       dataIndex: "ip",
       align: "center",
@@ -83,32 +93,16 @@ const Danhsachip = {
       ),
     },
     {
-      key: 3,
-      title: "Trạng Thái Theo Dõi",
-      align: "center",
-      width: "10%",
-      render: (_, record) => (
-        <>
-      <Switch defaultValue={true}/>
-        </>
-      ),
-    },
-    {
       key: 4,
-      title: "Thông Tin Chi Tiết",
+      title: "Thu Thập Dữ Liệu",
       align: "center",
       width: "10%",
       render: (_, record) => (
         <>
-          <ListButtonActionUpdate
-            // editFunction={() => {}}
-            viewFunction={() => navigate(`/agent-management-details/${record.id}`)}
-          />
-          
-        </>
+        <Switch defaultChecked={record.status === "on"} />
+      </>
       ),
     }
-
   ];
  
 
@@ -117,13 +111,13 @@ const Danhsachip = {
       <Card className="card-container" size="small">
         <CardTitleCustom title="Danh Sách Các Máy Theo Dõi"/>
         <TableCustom
-          dataSource={Danhsachip?.data}
+          dataSource={DanhSachHost?.data}
           columns={columns}
           bordered={true}
           //isLoading={!data && isLoading}
           isLoading={isLoading}
-          limit={Danhsachip.limit || 10}
-          total={Danhsachip?.total}
+          limit={DanhSachHost.limit || 10}
+          total={DanhSachHost?.total}
           onLimitChange={(limit) => {
             setParams({ ...params, limit });
           }}
