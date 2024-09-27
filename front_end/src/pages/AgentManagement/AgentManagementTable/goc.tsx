@@ -6,57 +6,33 @@ import TableCustom from "../../../components/TableCustom";
 import { CommonGetAllParams } from "../../../constants/types/common.type";
 import CardTitleCustom from "../../../components/CardTitleCustom";
 import { useNavigate } from "react-router-dom";
+import { useListHost} from "../../../utils/request";
+
+
 const AgentManagementTable: FC = () => {
-const navigate = useNavigate();
-const [params, setParams] = useState<CommonGetAllParams>({
-  limit: 10,
-  page: 1,
-});
-const isLoading = false
-const DanhSachHost = {
-  "data": 
-  [
-    {
-      "id": 1,
-      "hostname": "CLI_01",
-      "ip": "192.168.189.133",
-      "status": "on"
-  },
-  {
-      "id": 2,
-      "hostname": "CLI_02",
-      "ip": "192.168.10.10",
-      "status": "off"
-  },
-  {
-      "id": 3,
-      "hostname": "CLI_03",
-      "ip": "192.168.189.135",
-      "status": "off"
-  },
-  {
-      "id": 4,
-      "hostname": "CLI_04",
-      "ip": "192.168.10.5",
-      "status": "off"
-  },
-  {
-      "id": 5,
-      "hostname": "CLI_05",
-      "ip": "192.168.189.128",
-      "status": "off"
-  },
-  {
-      "id": 6,
-      "hostname": "CLI_06",
-      "ip": "192.168.10.3",
-      "status": "off"
-  }
-  ],
-      "limit": 5,
-      "page": 1,
-      "total": 5
-  }
+  const navigate = useNavigate();
+  const [params, setParams] = useState<CommonGetAllParams>({
+    limit: 10,
+    page: 1,
+  });
+  const {data, mutate,isLoading} = useListHost(params);
+
+  const [loadingSwitch, setLoadingSwitch] = useState<{ [key: number]: boolean }>({}); // Theo dõi trạng thái loading của từng switch
+
+
+  // Hàm để xử lý sự kiện khi nhấn vào switch
+  const handleSwitchChange = (checked: boolean, id: number) => {
+    // Đặt trạng thái loading cho switch tương ứng với ID
+    setLoadingSwitch((prev) => ({ ...prev, [id]: true }));
+    
+    // Sau 2s thì cập nhật trạng thái
+    setTimeout(() => {
+      // Xử lý logic thay đổi trạng thái của switch tại đây (nếu cần)
+
+      // Tắt loading sau 2 giây
+      setLoadingSwitch((prev) => ({ ...prev, [id]: false }));
+    }, 5000);
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -97,25 +73,28 @@ const DanhSachHost = {
       width: "10%",
       render: (_, record) => (
         <>
-        <Switch defaultChecked={record.status === "on"} />
-      </>
+          <Switch
+            checked={record.status === "on"}
+            loading={loadingSwitch[record.id]} // Bật icon loading khi switch đang trong trạng thái loading
+            onChange={(checked) => handleSwitchChange(checked, record.id)} // Gọi hàm xử lý khi switch được nhấn
+          />
+        </>
       ),
-    }
+    },
   ];
- 
 
   return (
     <div>
       <Card className="card-container" size="small">
-        <CardTitleCustom title="Danh Sách Các Máy Theo Dõi"/>
+        <CardTitleCustom title="Theo Dõi Máy"/>
         <TableCustom
-          dataSource={DanhSachHost?.data}
+          dataSource={data?.data}
           columns={columns}
           bordered={true}
           //isLoading={!data && isLoading}
           isLoading={isLoading}
-          limit={DanhSachHost.limit || 10}
-          total={DanhSachHost?.total}
+          limit={params.limit || 10}
+          total={data?.total}
           onLimitChange={(limit) => {
             setParams({ ...params, limit });
           }}

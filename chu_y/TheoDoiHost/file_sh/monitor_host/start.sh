@@ -8,13 +8,14 @@ sudo systemctl start suricata.service
 echo "Starting Suricata and Cicflowmeter..."
 
 # Tiến trình 1: Suricata
-sudo suricata -c /etc/suricata/suricata.yaml -i ens33 &
+nohup sudo suricata -c /etc/suricata/suricata.yaml -i ens33 > /dev/null 2>&1 &
 
 # Tiến trình 2: Cicflowmeter (tuần tự)
 cd /home/william/Desktop/cici_client/cicflowmeter-py
-sudo cicflowmeter -i ens33 -c --dir /home/william/Desktop/cici_client/data/new &
+nohup sudo cicflowmeter -i ens33 -c --dir /home/william/Desktop/cici_client/data/new > /dev/null 2>&1 &
 
-# Chờ cả hai tiến trình hoàn thành
-wait
+# In ra thông báo hoàn thành
+echo "Suricata and Cicflowmeter started and running in background."
 
-echo "Suricata and Cicflowmeter started."
+# Thoát khỏi script
+exit 0

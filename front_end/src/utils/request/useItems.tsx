@@ -36,6 +36,21 @@ export const usePhantrang = (
         data, error, isLoading, mutate
     };
 }
+export const useListHost = (
+    params?: CommonGetAllParams,
+    filter?: Flowfilter
+) => {
+    const { data, error, isLoading, mutate } = useSWR(
+        `host/?${serialize({
+            ...params,
+            ...filter
+        })}`,
+        { refreshInterval: 0}
+    );
+    return {
+        data, error, isLoading, mutate
+    };
+}
 
 export const useAlert = (
     params?: CommonGetAllParams,
