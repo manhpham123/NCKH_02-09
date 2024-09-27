@@ -49,8 +49,7 @@ def toggle_status(host_id):
     host = collection.find_one({"id": host_id})
 
     if not host:
-        print(f"Không tìm thấy host với id: {host_id}")
-        return
+        return {"error": f"Không tìm thấy host với id: {host_id}"}, 404
     
     # Lấy thông tin máy từ xa từ cơ sở dữ liệu
     remote_ip = host.get("ip")
@@ -70,38 +69,33 @@ def toggle_status(host_id):
     )
 
     if result.modified_count > 0:
-        print(f"Đã cập nhật thành công status của host có id: {host_id} từ {current_status} sang {new_status}")
+        message = f"Đã cập nhật thành công status của host có id: {host_id} từ {current_status} sang {new_status}"
 
         # Nếu chuyển trạng thái từ off sang on, bắt đầu theo dõi Suricata và Cicflowmeter song song
         if new_status == "on":
-            print(f"Bắt đầu theo dõi với Suricata và Cicflowmeter trên máy {remote_ip}...")
-            # Thực hiện lệnh khởi động dịch vụ suricata
+            message += f", bắt đầu theo dõi với Suricata và Cicflowmeter trên máy {remote_ip}..."
             execute_remote_command(remote_ip, username, password, "sudo systemctl start suricata.service")
             
-            # Chạy đồng thời Suricata và Cicflowmeter
             suricata_thread = threading.Thread(target=run_suricata, args=(remote_ip, username, password))
             cicflowmeter_thread = threading.Thread(target=run_cicflowmeter, args=(remote_ip, username, password))
 
-            # Bắt đầu cả hai tiến trình đồng thời
             suricata_thread.start()
             cicflowmeter_thread.start()
 
-            # Đợi cả hai tiến trình hoàn thành
             suricata_thread.join()
             cicflowmeter_thread.join()
-        
-        # Nếu chuyển trạng thái từ on sang off, dừng theo dõi Suricata và Cicflowmeter
-        elif new_status == "off":
-            print(f"Dừng theo dõi với Suricata và Cicflowmeter trên máy {remote_ip}...")
 
-            # Dừng đồng thời cả Suricata và Cicflowmeter bằng tín hiệu Ctrl+C (SIGINT)
+        elif new_status == "off":
+            message += f", dừng theo dõi với Suricata và Cicflowmeter trên máy {remote_ip}..."
             execute_remote_command(remote_ip, username, password, "sudo pkill -SIGINT suricata")
             execute_remote_command(remote_ip, username, password, "sudo pkill -SIGINT cicflowmeter")
-            
-            # Sau khi cả hai tiến trình đã dừng, dừng dịch vụ Suricata
             execute_remote_command(remote_ip, username, password, "sudo systemctl stop suricata.service")
+        
+        return {"message": message}
     else:
-        print(f"Có lỗi xảy ra khi cập nhật status của host có id: {host_id}")
+        return {"error": f"Có lỗi xảy ra khi cập nhật status của host có id: {host_id}"}, 500
+
+
 
 # Ví dụ: Nhập id của host và chuyển đổi trạng thái
 host_id = int(input("Nhập id của host: "))  # Chuyển đổi input thành số nguyên
