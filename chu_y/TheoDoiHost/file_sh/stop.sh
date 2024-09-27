@@ -2,7 +2,7 @@
 
 # Dừng tất cả các tiến trình liên quan đến Suricata
 echo "Stopping all Suricata processes..."
-suricata_pids=$(pgrep -f "/usr/bin/suricata -c /etc/suricata/suricata.yaml")
+suricata_pids=$(pgrep -f "suricata -c /etc/suricata/suricata.yaml -i ens33")
 
 if [ -n "$suricata_pids" ]; then
     sudo kill $suricata_pids
