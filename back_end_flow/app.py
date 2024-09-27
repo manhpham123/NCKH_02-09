@@ -38,6 +38,8 @@ flowpre_collection = db[f"flow_prediction_{ip}_{intf_str}"]
 collection_packets = db[f"packet_{ip}_{intf_str}"]
 
 
+collection_host = db['monitor_host']
+
 #file para
 client_ip = "192.168.189.133"
 username = "william"
@@ -82,6 +84,54 @@ async def toggle_status_api(host_id: int):
 async def get_rule_alerts ():
     alearts = read_all_data(collection_name=collection_alert)
     return alearts
+
+@app.get("/host/", response_model=Dict)
+async def get_list_host(
+    page: int = Query(1, alias="page"),
+    limit: int = Query(10, alias="limit"),
+    filter_field: str = Query("", alias="filter_field"),
+    filter_value: str = Query("", alias="filter_value")
+):
+    try:
+        # Lấy dữ liệu từ hàm read_all_data()
+        hosts = read_all_data(collection_name=collection_host)
+
+        # Nếu không có filter, phân trang dữ liệu
+        if filter_field == "" or filter_value == "":
+            skip = (page - 1) * limit
+            
+            # Tổng số bản ghi
+            total = len(hosts)
+            
+            # Áp dụng phân trang
+            paginated_hosts = hosts[skip: skip + limit]
+            
+        else:
+            # Áp dụng lọc dữ liệu dựa trên filter_field và filter_value
+            filtered_hosts = [host for host in hosts if host.get(filter_field) == filter_value]
+            
+            # Tổng số bản ghi sau khi lọc
+            total = len(filtered_hosts)
+            
+            # Áp dụng phân trang cho dữ liệu đã lọc
+            skip = (page - 1) * limit
+            paginated_hosts = filtered_hosts[skip: skip + limit]
+        
+        # Đối tượng kết quả trả về
+        re_ob = {
+            "data": paginated_hosts,
+            "limit": limit,
+            "page": page,
+            "total": total
+        }
+        
+        # Trả về kết quả dưới dạng JSON
+        return re_ob
+
+    except Exception as e:
+        # Nếu có lỗi, trả về thông báo lỗi với status code 500
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/rule/files", response_model=Dict)
 async def get_file(
