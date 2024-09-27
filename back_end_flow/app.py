@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from data import *
 import pandas as pd
 import json
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, BackgroundTasks
 from pydantic import BaseModel
 import pandas as pd
 import uvicorn
@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import paramiko
 from schema.file import FileNameInput, FileResponse
 from test_rules_all import *
-from CodeDoiStatus import toggle_status
+from CodeTheoDoiHost import toggle_status
 
 
 
@@ -59,47 +59,12 @@ app.add_middleware(
     allow_headers=["*"], # Tiêu đề HTTP cho phép
 )
 
-# @app.get("/items/", response_model=List[dict])
-# async def read_items():
-#     try:
-    
-        
-#         # # Tiền xử lý dữ liệu
-#         # df_processed = preprocess_flow(df_f)
-        
-#         # # Dự đoán
-#         # pred = model.predict(df_processed)
-        
-#         # # Thêm kết quả dự đoán vào DataFrame
-#         # df_f['label'] = pred
-        
-#         df_l = predict_label(collection)
 
-        
-#         return df_l[0:15]
-        
-#         # Trả về kết quả dưới dạng JSON
-#         #return df_f.to_dict(orient='records')
-#     except Exception as e:
-#     # Nếu có lỗi, trả về thông báo lỗi với status code 500
-#         raise HTTPException(status_code=500, detail=str(e))
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import paramiko
-# Thay thế các thông tin dưới đây với thông tin thực tế của bạn
-# host = '192.168.189.133'
-# port = 22  # Port SSH mặc định
-# username = 'william'
-# password = 'k'
-# command = '/home/william/Desktop/run_command.sh'  # Lệnh bạn muốn thực thi
 
-
-
-
-# @app.post("/control/on")
-# def execute_ssh_sudo_command_api(ip: str = Query(1, alias="ip")):
-#     execute_ssh_sudo_command(host, port, username, password, command)
     
 
 
@@ -108,10 +73,10 @@ from typing import List, Dict
 
 
 # API để bật/tắt trạng thái theo dõi host
-@app.post("/toggle_status/{host_id}")
-def api_toggle_status(host_id: int):
-    result = toggle_status(host_id)
-    return result
+# API FastAPI cho toggle status
+@app.post("/toggle-status/{host_id}")
+async def toggle_status_api(host_id: int):
+    return toggle_status(host_id)
 
 @app.get("/rule/alert/", response_model=List[dict])
 async def get_rule_alerts ():
@@ -377,21 +342,6 @@ async def read_alert(page: int = Query(1, alias="page"), limit: int = Query(1, a
         # Nếu có lỗi, trả về thông báo lỗi với status code 500
         raise HTTPException(status_code=500, detail=str(e))
 
-# @app.get("/alert/", response_model=List[dict])
-# async def read_alert():
-#     try:
-        
-#         df_l, df_st = predict_label(collection)
-#         df_a = get_alert(df_st)
-
-        
-#         return df_a[-100:]
-        
-#         # Trả về kết quả dưới dạng JSON
-#         #return df_f.to_dict(orient='records')
-#     except Exception as e:
-#     # Nếu có lỗi, trả về thông báo lỗi với status code 500
-#         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/rule_files/", response_model=Dict)
