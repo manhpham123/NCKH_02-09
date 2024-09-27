@@ -16,7 +16,7 @@ const AgentManagementTable: FC = () => {
     limit: 10,
     page: 1,
   });
-  const { data, mutate, isLoading } = useListHost(params); // Sử dụng mutate để cập nhật lại dữ liệu
+  const { data, mutate, isLoading } = useListHost(params);
 
   const [loadingSwitch, setLoadingSwitch] = useState<{ [key: number]: boolean }>({}); // Theo dõi trạng thái loading của từng switch
 
@@ -25,31 +25,27 @@ const AgentManagementTable: FC = () => {
     <LoadingOutlined style={{ fontSize: 20, color: "#e61c0e" }} spin />
   ); // Màu đỏ
 
-  // Hàm để xử lý sự kiện khi nhấn vào switch
-  const handleSwitchChange = async (checked: boolean, id: number) => {
-    // Đặt trạng thái loading cho switch tương ứng với ID
-    setLoadingSwitch((prev) => ({ ...prev, [id]: true }));
+// Hàm để xử lý sự kiện khi nhấn vào switch
+const handleSwitchChange = async (checked: boolean, id: number) => {
+  // Đặt trạng thái loading cho switch tương ứng với ID
+  setLoadingSwitch((prev) => ({ ...prev, [id]: true }));
 
-    try {
-      // Gọi API để thay đổi trạng thái trên backend
-      const res = await HostApi.ToggleStatus(id);
+  try {
+    // Gọi API để thay đổi trạng thái trên backend
+    const res = await HostApi.ToggleStatus(id);
 
-      // Xử lý kết quả trả về từ API nếu cần
-      console.log("Response from API:", res);
-
-      // Sau khi trạng thái thay đổi thành công, cập nhật lại danh sách host từ backend
-      mutate(); // Gọi lại API để cập nhật dữ liệu từ backend
-    } catch (error) {
-      // Xử lý lỗi nếu có
-      console.error("Failed to toggle status:", error);
-    } finally {
-      // Sau 1s thì tắt icon loading
-      setTimeout(() => {
-        setLoadingSwitch((prev) => ({ ...prev, [id]: false }));
-      }, 2000);
-    }
-  };
-
+    // Xử lý kết quả trả về từ API nếu cần
+    console.log("Response from API:", res);
+  } catch (error) {
+    // Xử lý lỗi nếu có
+    console.error("Failed to toggle status:", error);
+  } finally {
+    // Sau 5s thì tắt icon loading và cập nhật trạng thái của switch (giả lập hành động bất đồng bộ)
+    setTimeout(() => {
+      setLoadingSwitch((prev) => ({ ...prev, [id]: false }));
+    }, 1000);
+  }
+};
   const columns: ColumnsType<any> = [
     {
       key: 1,
@@ -94,7 +90,7 @@ const AgentManagementTable: FC = () => {
             <Spin indicator={customLoadingIcon} />
           ) : (
             <Switch
-              checked={record.status === "on"} // Trạng thái của switch được lấy từ dữ liệu API
+              checked={record.status === "on"}
               onChange={(checked) => handleSwitchChange(checked, record.id)} // Gọi hàm xử lý khi switch được nhấn
             />
           )}
@@ -108,7 +104,7 @@ const AgentManagementTable: FC = () => {
       <Card className="card-container" size="small">
         <CardTitleCustom title="Theo Dõi Máy" />
         <TableCustom
-          dataSource={data?.data} // Dữ liệu sẽ tự động cập nhật sau khi mutate()
+          dataSource={data?.data}
           columns={columns}
           bordered={true}
           isLoading={isLoading}
