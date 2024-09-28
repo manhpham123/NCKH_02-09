@@ -11,16 +11,22 @@ import FlowManagement from "../FlowManagement"; // Nhập thành phần FlowMana
 const MonitorFlow: FC = () => {
   const navigate = useNavigate();
   const [selectedPoint, setSelectedPoint] = useState(null);
-   const {data:flow_data} =  useMonitorFlow();
+  const { data: flow_data } = useMonitorFlow();
 
   const parseFlowId = (flow_id: string): number => {
     return parseInt(flow_id.replace('fl', ''), 10);  // Loại bỏ 'fl' và chuyển sang số
   };
 
+  // Kiểm tra nếu flow_data hoặc flow_data.data không tồn tại
+  if (!flow_data || !flow_data.data) {
+    return <div>Loading...</div>; // Hoặc bạn có thể hiển thị loader
+  }
+
+  // Tạo các series cho các biểu đồ khác nhau
   const seriesDataMot: any[] = [
     {
       name: 'Dos_Slowloris',
-      data: flow_data?.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.dos_slowloris, flow_id: item.flow_id })),
+      data: flow_data.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.dos_slowloris, flow_id: item.flow_id })),
       color: '#1f77b4',
       marker: {
         symbol: 'circle',
@@ -31,7 +37,7 @@ const MonitorFlow: FC = () => {
     },
     {
       name: 'Port_Scan',
-      data: flow_data?.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.portscan, flow_id: item.flow_id })),
+      data: flow_data.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.portscan, flow_id: item.flow_id })),
       color: '#ff7f0e',
       marker: {
         symbol: 'circle',
@@ -42,7 +48,7 @@ const MonitorFlow: FC = () => {
     },
     {
       name: 'Bruce_Force',
-      data: flow_data?.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.bruce_force, flow_id: item.flow_id })),
+      data: flow_data.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.bruce_force, flow_id: item.flow_id })),
       color: '#2ca02c',
       marker: {
         symbol: 'circle',
@@ -53,7 +59,7 @@ const MonitorFlow: FC = () => {
     },
     {
       name: 'Normal',
-      data: flow_data?.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.normal, flow_id: item.flow_id })),
+      data: flow_data.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.normal, flow_id: item.flow_id })),
       color: '#9467bd',
       marker: {
         symbol: 'circle',
@@ -81,7 +87,7 @@ const MonitorFlow: FC = () => {
         text: 'Flow'
       },
       min: 0,  // Thiết lập giá trị nhỏ nhất của trục X là 0
-      max: flow_data && flow_data.data.length > 0 ? parseFlowId(flow_data.data[0].flow_id)+1: undefined, 
+      max: flow_data && flow_data.data.length > 0 ? parseFlowId(flow_data.data[0].flow_id)+1 : undefined, 
       crosshair: {
         color: '#ff0000',
         width: 2,
@@ -129,7 +135,6 @@ const MonitorFlow: FC = () => {
           events: {
             click: function () {
               const point = this as any;
-              //alert(`Flow ID: ${point.flow_id}`);
               setSelectedPoint(point);
               navigate(`/flow-details/${point.flow_id}`);
             }
@@ -138,19 +143,25 @@ const MonitorFlow: FC = () => {
       }
     }
   };
+
   const seriesDataHai: any[] = [
     {
       name: 'MSE Autoencoder',
-      data: flow_data?.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.MSE_Autoencoder, flow_id: item.flow_id })),
+      data: flow_data.data.map((item: any) => ({
+        x: parseFlowId(item.flow_id),
+        y: item.MSE_Autoencoder,
+        flow_id: item.flow_id
+      })),
       color: '#1f77b4',
       marker: {
         symbol: 'circle',
         fillColor: '#1f77b4',
         radius: 4,
-        enabled: false 
+        enabled: false
       }
     }
   ];
+
   const options_hai: Highcharts.Options = {
     chart: {
       type: 'line',
@@ -167,8 +178,8 @@ const MonitorFlow: FC = () => {
       title: {
         text: 'Flow'
       },
-      min: 0,  // Thiết lập giá trị nhỏ nhất của trục X là 0
-      max: flow_data && flow_data.data.length > 0 ? parseFlowId(flow_data.data[0].flow_id)+1: undefined, 
+      min: 0, // Thiết lập giá trị nhỏ nhất của trục X là 0
+      max: flow_data && flow_data.data.length > 0 ? parseFlowId(flow_data.data[0].flow_id) + 1 : undefined,
       crosshair: {
         color: '#ff0000',
         width: 2,
@@ -191,14 +202,15 @@ const MonitorFlow: FC = () => {
       title: {
         text: 'Ngưỡng'
       },
-      tickInterval: 0.005,
+      type: 'logarithmic', // Sử dụng thang đo logarit để hiển thị các giá trị chênh lệch lớn
+      minorTickInterval: 0.1, // Hiển thị các tick nhỏ hơn
       labels: {
         formatter: function (this: Highcharts.AxisLabelsFormatterContextObject) {
           return `${this.value}`;
         }
       },
-      min: 0,
-      max: 0.03,
+      min: Math.max(Math.min(...flow_data.data.map((item: any) => item.MSE_Autoencoder)), 1e-5), // Đảm bảo giá trị min > 0 cho trục logarit
+      max: Math.max(...flow_data.data.map((item: any) => item.MSE_Autoencoder)) * 1.1, // Điều chỉnh giá trị max một chút để có khoảng không gian
       plotLines: [{
         color: 'red', // Màu của đường ngang
         value: 0.0035, // Giá trị trên trục y mà đường sẽ vẽ
@@ -229,7 +241,6 @@ const MonitorFlow: FC = () => {
           events: {
             click: function () {
               const point = this as any;
-              //alert(`Flow ID: ${point.flow_id}`);
               setSelectedPoint(point);
               navigate(`/flow-details/${point.flow_id}`);
             }
@@ -239,34 +250,29 @@ const MonitorFlow: FC = () => {
     }
   };
 
-
-
   return (
-    <div className ="container" style={{ width: '100%' }} >
-            {/* Hiển thị thành phần FlowManagement ở đây
-            <FlowManagement /> */}
-  
-    <Card className="card-container" size="small">
+    <div className="container" style={{ width: '100%' }} >
+      <Card className="card-container" size="small">
+        <div className="highcharts-container">
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={options_mot}
+          />
+        </div>
+      </Card>
 
-    <div className="highcharts-container">
-    <HighchartsReact
-      highcharts={Highcharts}
-      options={options_mot}
-    />
-  </div>
-    </Card>
+      <Card className="card-container" size="small">
+        <div className="highcharts-container">
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={options_hai}
+          />
+        </div>
+      </Card>
 
-  <Card className="card-container" size="small">
-<div className="highcharts-container">
-<HighchartsReact
-  highcharts={Highcharts}
-  options={options_hai}
-/>
-</div>
-</Card>
-         {/* Hiển thị thành phần FlowManagement ở đây */}
-         <FlowManagement />
-  </div>
+      {/* Hiển thị thành phần FlowManagement ở đây */}
+      <FlowManagement />
+    </div>
   );
 };
 
