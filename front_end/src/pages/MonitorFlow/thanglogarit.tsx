@@ -15,7 +15,7 @@ const MonitorFlow: FC = () => {
 
   const parseFlowId = (flow_id: string): number => {
     return parseInt(flow_id.replace('fl', ''), 10);  // Loại bỏ 'fl' và chuyển sang số
-  };
+  };  
 
   const seriesDataMot: any[] = [
     {
@@ -141,16 +141,21 @@ const MonitorFlow: FC = () => {
   const seriesDataHai: any[] = [
     {
       name: 'MSE Autoencoder',
-      data: flow_data?.data.map((item: any) => ({ x: parseFlowId(item.flow_id), y: item.MSE_Autoencoder, flow_id: item.flow_id })),
+      data: flow_data?.data.map((item: any) => ({
+        x: parseFlowId(item.flow_id),
+        y: item.MSE_Autoencoder,
+        flow_id: item.flow_id
+      })),
       color: '#1f77b4',
       marker: {
         symbol: 'circle',
         fillColor: '#1f77b4',
         radius: 4,
-        enabled: false 
+        enabled: false
       }
     }
   ];
+
   const options_hai: Highcharts.Options = {
     chart: {
       type: 'line',
@@ -167,8 +172,8 @@ const MonitorFlow: FC = () => {
       title: {
         text: 'Flow'
       },
-      min: 0,  // Thiết lập giá trị nhỏ nhất của trục X là 0
-      max: flow_data && flow_data.data.length > 0 ? parseFlowId(flow_data.data[0].flow_id)+1: undefined, 
+      min: 0, // Thiết lập giá trị nhỏ nhất của trục X là 0
+      max: flow_data && flow_data.data.length > 0 ? parseFlowId(flow_data.data[0].flow_id) + 1 : undefined,
       crosshair: {
         color: '#ff0000',
         width: 2,
@@ -191,14 +196,15 @@ const MonitorFlow: FC = () => {
       title: {
         text: 'Ngưỡng'
       },
-      tickInterval: 0.005,
+      type: 'logarithmic', // Sử dụng thang đo logarit để hiển thị các giá trị chênh lệch lớn
+      minorTickInterval: 0.1, // Hiển thị các tick nhỏ hơn
       labels: {
         formatter: function (this: Highcharts.AxisLabelsFormatterContextObject) {
           return `${this.value}`;
         }
       },
-      min: 0,
-      max: 0.03,
+      min: Math.max(Math.min(...flow_data?.data.map((item: any) => item.MSE_Autoencoder)), 1e-5), // Đảm bảo giá trị min > 0 cho trục logarit
+      max: Math.max(...flow_data?.data.map((item: any) => item.MSE_Autoencoder)) * 1.1, // Điều chỉnh giá trị max một chút để có khoảng không gian
       plotLines: [{
         color: 'red', // Màu của đường ngang
         value: 0.0035, // Giá trị trên trục y mà đường sẽ vẽ
@@ -229,7 +235,6 @@ const MonitorFlow: FC = () => {
           events: {
             click: function () {
               const point = this as any;
-              //alert(`Flow ID: ${point.flow_id}`);
               setSelectedPoint(point);
               navigate(`/flow-details/${point.flow_id}`);
             }
@@ -238,8 +243,7 @@ const MonitorFlow: FC = () => {
       }
     }
   };
-
-
+ 
 
   return (
     <div className ="container" style={{ width: '100%' }} >

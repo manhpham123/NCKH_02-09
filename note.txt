@@ -128,6 +128,7 @@ chú ý 2 sự kiện là "fileinfo" và "http". còn để phát hiện các cu
 ===================== Tổng hợp lệnh hay dùng
 1. Server :
 - xóa dữ liệu trong db events.sqlite: sudo systemctl stop evebox && sudo rm /var/lib/evebox/events.sqlite && sudo systemctl start evebox
+- xóa dữ liệu trong mongodb
 2. máy client:
 - xóa tất cả log suricata: 
 + cd /var/log/suricata && sudo truncate -s 0 fast.log eve.json stats.log suricata.log suricata-start.log
@@ -164,3 +165,20 @@ chú ý 2 sự kiện là "fileinfo" và "http". còn để phát hiện các cu
 - dừng tất cả tiến trình của cả 2
 + sudo pkill -f "suricata -c /etc/suricata/suricata.yaml -i ens33"
 + sudo pkill -f "/usr/bin/python3 /usr/local/bin/cicflowmeter -i ens33 -c --dir /home/william/Desktop/cici_client/data/new"
+====================================================================================
+- khi tải file về nó sẽ dự đoán ra: unknown attack,vào checkfile, có alert
+-tấn công dos đang ra : unknown attack
+- bruce force: dự đoán đúng, ko có alert
+- port scan: dự đoán ra Unknown attack nhiều, vẫn dự đoán ra port scan. Nếu dùng lệnh nmap thì có nhiều alert
+- FTP: ra unknown attack hết, có alert
+- truy cập internet: có nhiều BENIGN, vân có ít unknown attack
+- sql injection
++ get search: lam' union select 1,user(), database(),4,5,6,7 #  : ra unknown attack, bert ra đúng, có alert
++ get select: http://192.168.189.133:8080/sqli_2.php?movie=1 and 1=0 union all select 1,database(),3,4,5,6,7--&action=go  : 
+ra unknown attack, bert ra đúng  (1 bert ra ssh, 1 bert ra đúng)
++ sql injection(AJAX\JSON\jQuery): uyen ' union select 1, user(),3,4,5,6,7 # : ra unknown attack, bert ra đúng (1 bert ra ssh, 
+1 bert ra đúng), có alert
+- xss: 
++ get: <script>alert(document.cookie)</script>     ra unknown attack, bert ra đúng, có alert
++ post: <script>alert(document.cookie)</script>    ra unknown attack, bert ra sai (ra normal hết), ko có alert
++ json: "\"}]}';alert(document.cookie)</script>"   ra unknown attack, bert (sql, xss), có alert

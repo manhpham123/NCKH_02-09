@@ -6,3 +6,31 @@
       // Các đối tượng khác...
     ]
   };
+
+
+  {
+    "data": [
+      {
+        "_id": "66f6741276b178a47d3429e7",
+        "flow_id": "fl00458",
+        "normal": 84,
+        "portscan": 2,
+        "dos_slowloris": 0,
+        "bruce_force": 14.000000000000002,
+        "MSE_Autoencoder": 0.0012099561949246323,
+        "time": "2024-09-27 15:59:39"
+      },
+      {
+        "_id": "66f6741276b178a47d3429e6",
+        "flow_id": "fl00457",
+        "normal": 99,
+        "portscan": 0,
+        "dos_slowloris": 1,
+        "bruce_force": 0,
+        "MSE_Autoencoder": 0.00006521925547143096,
+        "time": "2024-09-27 15:59:45"
+      }
+    ],
+    "max_mse": 8.83966506936783,
+    "threshold": 0.0001285
+  }
