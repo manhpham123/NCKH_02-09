@@ -769,4 +769,3 @@ def get_alert (df_st):
 # all_data = read_all_data(collection)
 
 # print(all_data)
-

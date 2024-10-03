@@ -260,3 +260,16 @@ thay đổi giá trị từ true sang false. Điều này sẽ tắt tính năng
 + browser.safebrowsing.malware.enabled
 + browser.safebrowsing.phishing.enabled . Đối với mỗi cài đặt, nhấp đúp để chuyển từ true sang false.
  Điều này sẽ tắt tính năng duyệt web an toàn, bao gồm cả việc chặn các trang web có nguy cơ gây hại và cảnh báo về tải xuống độc hại.
+================
+- hiển thị các dịch vụ đang sử dụng cổng 80:  sudo lsof -i :80
+** apache
+- xem version: apache2 -v
+- Trạng thái:  sudo systemctl status apache2
+- bật: sudo systemctl start apache2
+- tắt:  sudo systemctl stop apache2
+
+ **nginx:
+- xem version: nginx -v
+- Trạng thái:  sudo systemctl status nginx
+- bật: sudo systemctl start nginx
+- tắt:  sudo systemctl stop nginx
