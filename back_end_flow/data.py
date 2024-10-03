@@ -768,4 +768,3 @@ def get_alert (df_st):
 
 # print(all_data)
 
-
