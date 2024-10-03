@@ -169,7 +169,14 @@ demo tải 3 file (2 file mã độc và 1 file an toàn)
 + sudo pkill -f "/usr/bin/python3 /usr/local/bin/cicflowmeter -i ens33 -c --dir /home/william/Desktop/cici_client/data/new"
 ====================================================================================
 
-***tấn công dos đang ra : sudo python3 /home/kali/Desktop/Slowloris/slowloris/slowloris.py 192.168.189.133 -s 500 -p 80
+***tấn công dos
+    - sudo python3 /home/kali/Desktop/Slowloris/slowloris/slowloris.py 192.168.189.133 -s 500 -p 80
+       - khi bật apache2
+              + dự đoán ra 99% là unknown attack vì tỷ lệ dự đoán dos của RF-AE thấp tầm 50%
+              + dự đoán của bert là đúng, ra dos 
+       - khi bật nginxS
+              + tỉ lệ nhãn unknnow và dos là 40-60%, tỉ lệ dư đoán các nhãn là unknow tầm trên 80%
+              + dự đoán của bert là đúng, ra dos 
 
 *****port scan (25s):
 + sudo python /home/kali/Desktop/script_data/portscan_new.py
