@@ -515,6 +515,7 @@ def preprocess_flow(df_f):
 def predict_label(collection):
     data = read_all_data_time(collection, "Timestamp")
     df_f = pd.DataFrame(data)
+    
     df_processed, df_f = preprocess_flow(df_f)
     #columns_to_drop = ['_id', 'RF']
 
@@ -543,7 +544,8 @@ def predict_label(collection):
         # Gán nhãn dựa trên ngưỡng T2 cho các mẫu không chắc chắn
         pred_ae = np.where(df_f.loc[uncertain_indices, 'MSE_Autoencoder'] > T2, 4, 0)
         df_f.loc[uncertain_indices, 'label'] = pred_ae
-            
+    
+    df_f = df_f[(df_f['Source IP'] != "192.168.189.128")&(df_f['Destination IP'] != "192.168.189.128")]       
     df_st = df_f[['_id','Source IP', 'Source Port', 'Destination IP', 'Destination Port', 'Protocol', 'Timestamp', 'Flow Duration', 'label']]
     df_f['MSE_Autoencoder'] = df_f['MSE_Autoencoder'].apply(lambda x: 0.001 if pd.isna(x) else x)
     df_st['label'] = df_st['label'].map(reverse_label_mapping).astype('str')
