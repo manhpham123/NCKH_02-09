@@ -169,12 +169,22 @@ const FLowManagementTable: FC<Props> = ({setFilters, filters}) => {
       align: "center",
       width: "10%",
       render: (_, record) => (
+        // <>
+        //   <ListButtonActionUpdate
+        //     // editFunction={() => {}}
+        //     viewFunction={() =>  navigate(`/flow-details/${record._id}`)}
+        //   />
+        // </>
         <>
-          <ListButtonActionUpdate
-            // editFunction={() => {}}
-            viewFunction={() =>  navigate(`/flow-details/${record._id}`)}
-          />
-        </>
+        <ListButtonActionUpdate
+          viewFunction={() => {
+            const newWindow = window.open(`/flow-details/${record._id}`, '_blank');
+            if (newWindow) {
+              newWindow.focus();
+            }
+          }}
+        />
+      </>
       ),
     }
     // {

@@ -237,7 +237,8 @@ const CheckFileTable: FC = () => {
   ];
  
 const handleCheckFile = (md5: string) => {
-  navigate(`/file-details/${md5}`);
+  // navigate(`/file-details/${md5}`);
+  window.open(`/file-details/${md5}`, '_blank');
   };
 
 const handleCheckDb = (md5: string) => {

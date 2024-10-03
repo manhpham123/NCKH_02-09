@@ -168,26 +168,26 @@ demo tải 3 file (2 file mã độc và 1 file an toàn)
 + sudo pkill -f "suricata -c /etc/suricata/suricata.yaml -i ens33"
 + sudo pkill -f "/usr/bin/python3 /usr/local/bin/cicflowmeter -i ens33 -c --dir /home/william/Desktop/cici_client/data/new"
 ====================================================================================
-- khi tải file về nó sẽ dự đoán ra:
-+ tất cả flow liên quan đến tải file là : unknown attack,vào checkfile, có alert
-(tất cả đều có alert, trừ flow liên quan đến file an toàn là yourfile.txt là ko có alert )
-+ Gồm có 2 alert
-      + Signature:ET INFO Executable Download from dotted-quad Host,  Category: Potentially Bad Traffic, Severity:	2, Signature ID:2016141
-      + Signature:ET INFO Wget Request for Executable,  Category: Potentially Bad Traffic, Severity:	2, Signature ID:2027076
--tấn công dos đang ra : unknown attack
-- bruce force (20s):
-+  dự đoán ra cả unknown attack và bruce force
-+ có alert
-      + Signature:ET SCAN Potential SSH Scan,  Category: Attempted Information Leak, Severity:	2, Signature ID:2001219
 
-- port scan (25s):
+***tấn công dos đang ra : sudo python3 /home/kali/Desktop/Slowloris/slowloris/slowloris.py 192.168.189.133 -s 500 -p 80
+
+*****port scan (25s):
++ sudo python /home/kali/Desktop/script_data/portscan_new.py
 + hầu hết dự đoán ra port scan.1 phần rất ít ra unknown attack
 + có alert
     + Signature: ET SCAN Suspicious inbound to mySQL port 3306  Category: Potentially Bad Traffic, Severity:2, Signature ID: 2010937
 
-- FTP: ra unknown attack hết
+**** bruce force (20s):
++ sudo patator ssh_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.189.133 -x ignore:fgrep='Access denied for user'
++  dự đoán ra cả unknown attack(ra nhiều chiếm 50%, tỉ lệ bruce force 90-94%) và bruce force
 + có alert
-    + Signature: GPL FTP PASS overflow attempt ,Category: Attempted Administrator Privilege Gain
+      + Signature:ET SCAN Potential SSH Scan,  Category: Attempted Information Leak, Severity:	2, Signature ID:2001219
+
+****FTP: hầu hết ra unknown attack hết
++ sudo patator ftp_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.189.133 -x ignore:fgrep='Access denied for user'
++ có alert
+    + Signature: GPL FTP PASS overflow attempt 
+    + Signature: ET SCAN Potential FTP Brute-Force attempt response
 
 - truy cập internet: phần lớn là BENIGN, có 1 số rất ít ra unknown attack
 
@@ -213,8 +213,8 @@ demo tải 3 file (2 file mã độc và 1 file an toàn)
                 + Signature: ET WEB_SERVER Possible MySQL SQLi Attempt Information Schema Access, Category:Web Application Attack
          - nhơm 2:+ "http://192.168.189.133:8080/sqli_2.php?movie=100 union select 1, 2,3,4,5,6,7 #&action=go"
             -> dự đoán ra begign và bert ra sql injection
-2. xss: 
-2.1.  get:
+2. xss: (điền 1 hàng thôi)
+2.1.  get: hàng 2 : hello
       - dùng các lệnh sau
           +  "<script>alert(document.cookie)</script>"
           +  "<img src=\"#\" onmouseover=\"alert('XSS via onmouseover')\">"
@@ -225,10 +225,22 @@ demo tải 3 file (2 file mã độc và 1 file an toàn)
                 + Signature: ET WEB_SERVER Onmouseover= in URI - Likely Cross Site Scripting Attempt
 
 2.2. (bỏ) post: <script>alert(document.cookie)</script>    ra unknown attack, bert ra sai (ra normal hết)
-2.3.  json:
+
+2.3.  json: (lệnh thêm cả dấu "" vào)
         +  "\"}]}';alert(document.cookie)</script>"
          ->  dự đoán ra unknown attack, bert ra xss 
             -   có alert: ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt
+            
+***khi tải file về nó sẽ dự đoán ra:
+                    + http://192.168.189.135/downloads/demo.exe
+                    + http://192.168.189.135/downloads/yourfile.txt
+                    + http://192.168.189.135/downloads/install.exe
++ tất cả flow liên quan đến tải file là : unknown attack,vào checkfile, có alert
+(tất cả đều có alert, trừ flow liên quan đến file an toàn là yourfile.txt là ko có alert )
++ Gồm có 2 alert
+      + Signature:ET INFO Executable Download from dotted-quad Host
+      + Signature:ET INFO Wget Request for Executable
+      
 ================= tắt kiểm tra tính năng kiểm tra file trên firefox
 - Cách tắt kiểm tra tệp trong Firefox:
 
