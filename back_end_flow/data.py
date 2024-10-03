@@ -127,12 +127,12 @@ flowpre_collection = db[f"flow_prediction_{ip}_{intf_str}"]
 collection_alert = db_log["alert"]
 collection_packets = db[f"packet_{ip}_{intf_str}"]
 #load model
-randomforest = joblib.load("random_forest_model_12_9_cic_4label.joblib")
+randomforest = joblib.load("/home/frblam/NCKH_2024/NCKH_02-09/back_end_flow/F_RandomForest/random_forest_model_27_9_cic_4label.joblib")
 
 #model = keras.models.load_model('rfc1.md5')
-autoencoder = load_model('autoencoder62_09_09_53_32_12_8_new.keras')
+autoencoder = load_model('/home/frblam/NCKH_2024/NCKH_02-09/back_end_flow/autoencoder62_09_09_53_32_12_8_new.keras')
 print("okk")
-T1 = 0.95
+T1 = 0.90
 T2 = 0.0001285
 
 #CSDL 
@@ -354,7 +354,7 @@ def FilterRead_data(filter_field, filter_value):
 #     return X, index
 zero_variance_cols = ['Fwd PSH Flags', 'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'SYN Flag Count', 'RST Flag Count', 'PSH Flag Count', 'ACK Flag Count', 'URG Flag Count', 'CWE Flag Count', 'ECE Flag Count', 'Fwd Avg Bytes/Bulk', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bulk Rate', 'Bwd Avg Bytes/Bulk', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bulk Rate']
 identical_cols = ['Subflow Fwd Packets', 'Subflow Bwd Packets', 'Subflow Fwd Bytes', 'Subflow Bwd Bytes', 'Avg Fwd Segment Size', 'Avg Bwd Segment Size', 'Fwd Header Length.1', 'Average Packet Size']
-scaler_path = 'minmax_scaler_53_32.save'
+scaler_path = '/home/frblam/NCKH_2024/NCKH_02-09/back_end_flow/minmax_scaler_53_32.save'
 def preprocess_autoencoder(df, scaler_path = scaler_path, zero_variance_cols = zero_variance_cols, identical_cols = identical_cols):
     """
     Xử lý dữ liệu đầu vào cho dự đoán sau khi đã huấn luyện mô hình.
@@ -499,7 +499,7 @@ def preprocess_flow(df_f):
     
     df_sl = df[selected_columns1]
 
-    ss = joblib.load('scaler_real_cic_129.save')
+    ss = joblib.load('/home/frblam/NCKH_2024/NCKH_02-09/back_end_flow/F_RandomForest/scaler_real_cic_129 .save')
     df = ss.transform(df_sl)  
         
     return df, df_f
