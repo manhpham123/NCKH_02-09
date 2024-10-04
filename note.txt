@@ -127,7 +127,7 @@ chú ý 2 sự kiện là "fileinfo" và "http". còn để phát hiện các cu
 
 ===================== Tổng hợp lệnh hay dùng
 1. Server :
-- xóa dữ liệu trong db events.sqlite: sudo systemctl stop evebox && sudo rm /var/lib/evebox/events.sqlite && sudo systemctl start evebox
+- xóa dữ liệu trong db events.sqlite: 
 - xóa dữ liệu trong mongodb
 2. máy client:
 - xóa tất cả log suricata: 
@@ -169,34 +169,35 @@ demo tải 3 file (2 file mã độc và 1 file an toàn)
 + sudo pkill -f "/usr/bin/python3 /usr/local/bin/cicflowmeter -i ens33 -c --dir /home/william/Desktop/cici_client/data/new"
 ====================================================================================
 
-***tấn công dos
+***tấn công dos (nên dùng apache2)
+    - bật apache2: sudo systemctl start apache2
+    - luồng dự đoán dos: 135:(port bất kỳ) -> 133:80  (lọc theo port đích 80 là ra) 
+    - luồng phản hồi sẽ ra bình thường từ: 133:80 -> 135: (port bất kỳ)
     - sudo python3 /home/kali/Desktop/Slowloris/slowloris/slowloris.py 192.168.189.133 -s 500 -p 80
-       - khi bật apache2
-              + dự đoán ra 99% là unknown attack vì tỷ lệ dự đoán dos của RF-AE thấp tầm 50%
-              + dự đoán của bert là đúng, ra dos 
-       - khi bật nginxS
-              + tỉ lệ nhãn unknnow và dos là 40-60%, tỉ lệ dư đoán các nhãn là unknow tầm trên 80%
-              + dự đoán của bert là đúng, ra dos 
+       - bật apache2: hầu hết dự đoán ra dos, phần rất ít ra unknown attack
 
 *****port scan (25s):
+- luồng dự đoán port scan: 189.135 -> 189.133 (cổng 2 bên bất kỳ)
 + sudo python /home/kali/Desktop/script_data/portscan_new.py
 + hầu hết dự đoán ra port scan.1 phần rất ít ra unknown attack
 + có alert
     + Signature: ET SCAN Suspicious inbound to mySQL port 3306  Category: Potentially Bad Traffic, Severity:2, Signature ID: 2010937
 
 **** bruce force (20s):
+- luồng dự đoán bruce force: 135:(port bất kỳ) -> 133:22  (lọc theo port đích 22 là ra) 
 + sudo patator ssh_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.189.133 -x ignore:fgrep='Access denied for user'
-+  dự đoán ra cả unknown attack(ra nhiều chiếm 50%, tỉ lệ bruce force 90-94%) và bruce force
++  dự đoán ra cả unknown attack(ra ít) và ra nhiều bruce force
 + có alert
-      + Signature:ET SCAN Potential SSH Scan,  Category: Attempted Information Leak, Severity:	2, Signature ID:2001219
+      + Signature:ET SCAN Potential SSH Scan,  Category: Attempted Information Leak, Severity:	2, 
 
 ****FTP: hầu hết ra unknown attack hết
+- luồng dự đoán unknown attack : 135:(port bất kỳ) -> 133:21  (lọc theo port đích 21 là ra) 
 + sudo patator ftp_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.189.133 -x ignore:fgrep='Access denied for user'
 + có alert
     + Signature: GPL FTP PASS overflow attempt 
     + Signature: ET SCAN Potential FTP Brute-Force attempt response
 
-- truy cập internet: phần lớn là BENIGN, có 1 số rất ít ra unknown attack
+- truy cập internet: phần lớn là BENIGN, có 1 số rất ít ra unknown attack  (lọc port đích 443 là ra)
 
 1.sql injection
 1.1. get search:
@@ -225,7 +226,6 @@ demo tải 3 file (2 file mã độc và 1 file an toàn)
       - dùng các lệnh sau
           +  "<script>alert(document.cookie)</script>"
           +  "<img src=\"#\" onmouseover=\"alert('XSS via onmouseover')\">"
-          +  "<h1 style=\"color: red;\">Hacked by XSS</h1>",
             -> tất cả dự đoán đều ra unknown attack, bert ra xss hết
                 - các alert
                 + Signature: ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt
@@ -244,9 +244,8 @@ demo tải 3 file (2 file mã độc và 1 file an toàn)
                     + http://192.168.189.135/downloads/install.exe
 + tất cả flow liên quan đến tải file là : unknown attack,vào checkfile, có alert
 (tất cả đều có alert, trừ flow liên quan đến file an toàn là yourfile.txt là ko có alert )
-+ Gồm có 2 alert
++ có alert
       + Signature:ET INFO Executable Download from dotted-quad Host
-      + Signature:ET INFO Wget Request for Executable
       
 ================= tắt kiểm tra tính năng kiểm tra file trên firefox
 - Cách tắt kiểm tra tệp trong Firefox:

