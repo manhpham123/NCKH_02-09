@@ -474,8 +474,8 @@ async def static_protocol():
         static_data = get_ls(df_st)
         
         sorted_ser_ls = dict(sorted(static_data.service_ls.items(), key=lambda x:x[1], reverse=True))
-        
-        return sorted_ser_ls
+        top_6_elements = dict(list(sorted_ser_ls.items())[:6])
+        return top_6_elements
         
         # Trả về kết quả dưới dạng JSON
         #return df_f.to_dict(orient='records')
