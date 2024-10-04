@@ -710,12 +710,14 @@ def get_ls(df_st):
             
         if d['Source IP']+'-'+d['Destination IP'] in st1.ip_ls.keys():
             st1.ip_ls[d['Source IP']+'-'+d['Destination IP']] += 1
-            
-        if d['label'] not in st1.alert_ls.keys():
-            st1.alert_ls[d['label']] = 0
         
-        if d['label'] in st1.alert_ls.keys():
-            st1.alert_ls[d['label']] += 1
+        if d['label'] != "BENIGN":
+            
+            if d['label'] not in st1.alert_ls.keys():
+                st1.alert_ls[d['label']] = 0
+            
+            if d['label'] in st1.alert_ls.keys():
+                st1.alert_ls[d['label']] += 1
     
     return st1
 
