@@ -28,7 +28,9 @@ const RuleAlertTable: FC = () => {
   };
 
   const ChiTietRule = (_id: number) => {
-    window.location.href = `http://localhost:3001/#/alerts/${_id}`;
+    // window.location.href = `http://localhost:3001/#/alerts/${_id}`;
+    window.open(`http://localhost:3001/#/alerts/${_id}`, '_blank');
+
   };
  
   const columns: ColumnsType<any> = [
@@ -174,10 +176,14 @@ const RuleAlertTable: FC = () => {
       width: "8%",
       render: (_, record) => (
         <>
-          <ListButtonActionUpdate
-            // editFunction={() => {}}
-            viewFunction={() =>  navigate(`/flow-details/${record.flow_id}`)}
-          />
+         <ListButtonActionUpdate
+          viewFunction={() => {
+            const newWindow = window.open(`/flow-details/${record._id}`, '_blank');
+            if (newWindow) {
+              newWindow.focus();
+            }
+          }}
+        />
         </>
       ),
     },

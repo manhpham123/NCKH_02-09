@@ -136,7 +136,8 @@ const MonitorFlow: FC = () => {
             click: function () {
               const point = this as any;
               setSelectedPoint(point);
-              navigate(`/flow-details/${point.flow_id}`);
+              // navigate(`/flow-details/${point.flow_id}`);
+              window.open(`/flow-details/${point.flow_id}`, '_blank');
             }
           }
         }
@@ -242,7 +243,8 @@ const MonitorFlow: FC = () => {
             click: function () {
               const point = this as any;
               setSelectedPoint(point);
-              navigate(`/flow-details/${point.flow_id}`);
+              // navigate(`/flow-details/${point.flow_id}`);
+              window.open(`/flow-details/${point.flow_id}`, '_blank');
             }
           }
         }

