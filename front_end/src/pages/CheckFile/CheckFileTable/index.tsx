@@ -46,7 +46,8 @@ const CheckFileTable: FC = () => {
     return filePath.split('/').pop(); // Lấy tên file từ đường dẫn
   };
   const ChiTietFile = (_id: number) => {
-    window.location.href = `http://localhost:3001/#/event/${_id}`;
+    // window.location.href = `http://localhost:3001/#/event/${_id}`;
+    window.open(`http://localhost:3001/#/event/${_id}`, '_blank');
 };
 
  

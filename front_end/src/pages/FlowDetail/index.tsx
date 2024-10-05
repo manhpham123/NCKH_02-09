@@ -109,7 +109,7 @@ const FlowDetails: FC = () => {
   const customFields = {
     "label": "Nhãn dự đoán",
     "average_percentage_score": "Tỷ lệ phần trăm dự đoán trung bình (%)",
-    "packet_ratio": "Số gói tin",
+    // "packet_ratio": "Số gói tin",
     "total_time": "Tổng thời gian",
     "time_per_pac": "Thời gian/gói tin"
   };
